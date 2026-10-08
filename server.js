@@ -10,9 +10,10 @@ const PORT = +process.env.PORT || 8047;
 const ROOT = __dirname;
 const GAME = path.join(ROOT, "kitnet.html");
 const DATA_DIR = path.join(ROOT, "data");
+const FONTS = path.join(ROOT, "fonts");
 const DATA = path.join(DATA_DIR, "rooms.json");
 const CODE_RE = /^[A-Z0-9]{3,6}$/;
-const KINDS = new Set(["join", "start", "tap", "act", "chat"]);
+const KINDS = new Set(["join", "start", "ready", "tap", "act", "chat"]);
 const MAX_EVENTS = 6000;
 
 // rooms[code] = { created, events: [] }
@@ -82,6 +83,9 @@ function gamePage() {
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://x");
+  // works both behind the /escape proxy (prefix stripped) and opened directly with /escape
+  if (url.pathname === "/escape") { res.writeHead(308, { Location: "/escape/" + url.search }); return res.end(); }
+  if (url.pathname.startsWith("/escape/")) url.pathname = url.pathname.slice(7);
   const parts = url.pathname.split("/").filter(Boolean);
 
   if (req.method === "GET" && (url.pathname === "/" || url.pathname === "/index.html")) {
@@ -90,7 +94,15 @@ const server = http.createServer(async (req, res) => {
       return res.end(gamePage());
     } catch (e) { res.writeHead(500); return res.end("kitnet.html não encontrado"); }
   }
-  if (url.pathname === "/api/ping") return json(res, 200, { kitnet: 1 });
+  if (url.pathname === "/api/ping") return json(res, 200, { kitnet: 1, now: Date.now() });
+
+  if (parts[0] === "fonts" && parts.length === 2 && /^[a-z0-9-]+\.woff2$/.test(parts[1])) {
+    return fs.readFile(path.join(FONTS, parts[1]), (err, buf) => {
+      if (err) { res.writeHead(404); return res.end(); }
+      res.writeHead(200, { "Content-Type": "font/woff2", "Cache-Control": "public, max-age=604800" });
+      res.end(buf);
+    });
+  }
 
   if (parts[0] === "api" && parts[1] === "rooms" && !parts[2] && req.method === "GET") {
     return json(res, 200, Object.entries(rooms).map(([code, r]) => ({ code, created: r.created, events: r.events.length })));

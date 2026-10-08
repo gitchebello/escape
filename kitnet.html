@@ -3,14 +3,19 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Rubik+Wet+Paint&family=VT323&display=swap">
 <style>
+@font-face{font-family:"K47 Chakra";src:url(fonts/chakra-400.woff2) format("woff2");font-weight:400}
+@font-face{font-family:"K47 Chakra";src:url(fonts/chakra-600.woff2) format("woff2");font-weight:600}
+@font-face{font-family:"K47 Chakra";src:url(fonts/chakra-700.woff2) format("woff2");font-weight:700}
+@font-face{font-family:"K47 Wet";src:url(fonts/wetpaint.woff2) format("woff2")}
+@font-face{font-family:"K47 VT";src:url(fonts/vt323.woff2) format("woff2")}
 /* Layout: one-screen mobile app — HUD + room roster on top, first-person wall view in the middle with turn arrows, pocket below. Single neon-night look by choice. */
 :root{
   --ink:#0c0414; --night:#1b0a2e; --panel:#22103a; --panel-2:#2e1650;
   --pink:#ff2e88; --cyan:#2de2e6; --sun:#ffd23f; --blood:#e0102f; --ok:#3dff8b;
   --paper:#f7ecff; --muted:#ab93cc; --line:rgba(255,46,136,.38);
-  --f-display:"Rubik Wet Paint","Impact","Arial Black",sans-serif;
-  --f-ui:"Chakra Petch","Trebuchet MS",system-ui,sans-serif;
-  --f-hud:"VT323",ui-monospace,"Courier New",monospace;
+  --f-display:"Rubik Wet Paint","K47 Wet","Impact","Arial Black",sans-serif;
+  --f-ui:"Chakra Petch","K47 Chakra","Trebuchet MS",system-ui,sans-serif;
+  --f-hud:"VT323","K47 VT",ui-monospace,"Courier New",monospace;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -103,16 +108,17 @@ input[type=text]:focus{border-color:var(--cyan)}
 @keyframes siren{50%{opacity:.15}}
 .sway{animation:sway 4s ease-in-out infinite}
 @keyframes sway{0%,100%{transform:rotate(calc(var(--h)*-.25deg)) translateX(calc(var(--h)*-1px))}50%{transform:rotate(calc(var(--h)*.25deg)) translateX(calc(var(--h)*1px))}}
-.arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:46px;min-height:96px;border:2px solid var(--pink);background:rgba(12,4,20,.72);color:var(--pink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 2px}
-.arrow.l{left:0}.arrow.r{right:0}
-.arrow:active{background:var(--pink);color:var(--ink)}
-.arrow .ch{font-size:26px;line-height:1;font-weight:700}
-.arrow .nx{font-size:9px;letter-spacing:.06em;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);color:var(--paper)}
-.arrow .pd{display:flex;flex-direction:column;gap:3px}
+.navbar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:stretch}
+.arrow,.back{min-height:48px;border:2px solid var(--pink);background:rgba(12,4,20,.72);color:var(--pink);display:flex;align-items:center;gap:6px;padding:4px 8px;font-weight:700;min-width:0}
+.arrow.l{justify-content:flex-start}.arrow.r{justify-content:flex-end}
+.arrow:active,.back:active{background:var(--pink);color:var(--ink)}
+.arrow .ch{font-size:26px;line-height:1}
+.arrow .nx{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--paper);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arrow .pd{display:flex;gap:3px;flex:none}
 .arrow .pd i{width:8px;height:8px;border-radius:50%;display:block}
-.back{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);z-index:5;min-height:44px;padding:0 18px;border:2px solid var(--pink);background:rgba(12,4,20,.8);color:var(--pink);font-weight:700;letter-spacing:.14em;text-transform:uppercase}
-.viewname{position:absolute;top:6px;left:50%;transform:translateX(-50%);z-index:4;font-family:var(--f-hud);font-size:20px;letter-spacing:.12em;color:var(--sun);background:rgba(12,4,20,.75);padding:0 10px;white-space:nowrap;pointer-events:none}
-.here{position:absolute;left:50%;bottom:58px;transform:translateX(-50%);z-index:4;display:flex;gap:6px;pointer-events:none;flex-wrap:wrap;justify-content:center;width:80%}
+.back{grid-column:1 / -1;justify-content:center;letter-spacing:.14em;text-transform:uppercase}
+.viewname{font-family:var(--f-hud);font-size:20px;letter-spacing:.12em;color:var(--sun);display:grid;place-items:center;padding:0 6px;white-space:nowrap}
+.here{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;display:flex;gap:6px;pointer-events:none;flex-wrap:wrap;justify-content:center;width:80%}
 .here span{font-family:var(--f-hud);font-size:16px;padding:0 6px;background:rgba(12,4,20,.8);border:1px solid currentColor}
 .inv{display:flex;gap:6px;align-items:center;min-height:44px;overflow-x:auto;padding-bottom:8px}
 .inv .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);flex:none}
@@ -215,7 +221,7 @@ input[type=text]:focus{border-color:var(--cyan)}
   <div class="lob">
     <div class="memo">NÚCLEO RH · AVALIAÇÃO SITUACIONAL <b>ESC-60</b><br>Módulo 3 — Decisão sob pressão. Toda interação é registrada para fins de desenvolvimento.</div>
     <div>
-      <div class="kicker">Escape room online · 3 minutos · 1 a 6 jogadores</div>
+      <div class="kicker">Escape room online · 5 minutos · 1 a 6 jogadores</div>
       <h1 class="title">ACORDA.</h1>
     </div>
     <p class="pitch">Você acorda numa kitnet que nunca viu. Cabeça explodindo, gosto de sangue na boca, um estranho na cama. A porta está trancada. Olhe em volta, toque nos objetos, converse com o time e saia antes que alguém bata na porta.</p>
@@ -244,7 +250,7 @@ input[type=text]:focus{border-color:var(--cyan)}
       <p class="hint" id="shareHint">Mande o código pros colegas. Eles entram com o mesmo código.</p>
       <div class="tag">Jogadores na sala</div>
       <ul class="roster" id="lobbyRoster"></ul>
-      <button class="btn hot" id="startBtn">Começar · 3:00</button>
+      <button class="btn hot" id="startBtn">Começar · 5:00</button>
       <button class="btn" id="leaveBtn">Trocar de sala</button>
     </div>
   </div>
@@ -254,7 +260,7 @@ input[type=text]:focus{border-color:var(--cyan)}
 <section id="game" class="screen" hidden>
   <div class="hud">
     <div class="l">SALA<b id="hudCode">----</b></div>
-    <div class="timer" id="timer">3:00</div>
+    <div class="timer" id="timer">5:00</div>
     <div class="r">
       <button class="ibtn" id="hintBtn" aria-label="Mostrar objetos clicáveis">?</button>
       <button class="ibtn" id="memBtn" aria-label="Rever memória">MEM</button>
@@ -268,10 +274,6 @@ input[type=text]:focus{border-color:var(--cyan)}
   </div>
   <div class="stage" id="stage">
     <div id="toast" class="toast" hidden></div>
-    <div class="viewname" id="viewName">CAMA</div>
-    <button class="arrow l" id="turnL" aria-label="Virar para a esquerda"><span class="ch">‹</span><span class="nx" id="nxL"></span><span class="pd" id="pdL"></span></button>
-    <button class="arrow r" id="turnR" aria-label="Virar para a direita"><span class="ch">›</span><span class="nx" id="nxR"></span><span class="pd" id="pdR"></span></button>
-    <button class="back" id="backBtn" hidden>Voltar pro quarto</button>
     <div class="here" id="here"></div>
     <div id="sceneWrap">
       <svg id="scene" viewBox="0 0 360 480" role="img" aria-label="Visão em primeira pessoa da kitnet" preserveAspectRatio="xMidYMid meet">
@@ -349,7 +351,7 @@ input[type=text]:focus{border-color:var(--cyan)}
             <rect x="57" y="198" width="28" height="18" fill="#2a2a3a"/>
             <g fill="#f7ecff"><rect x="100" y="170" width="50" height="5"/><rect x="100" y="182" width="40" height="5"/><rect x="100" y="194" width="46" height="5"/></g>
             <rect x="40" y="224" width="120" height="16" fill="#e0102f"/>
-            <text x="46" y="236" font-family="VT323,monospace" font-size="13" fill="#fff">URGENTE · EXECUTIVO SUMIDO</text>
+            <text x="46" y="236" font-family="VT323,K47 VT,monospace" font-size="13" fill="#fff">URGENTE · EXECUTIVO SUMIDO</text>
           </g>
           <rect class="tvglow" x="40" y="156" width="120" height="84" fill="#2de2e6" opacity=".12"/>
           <rect x="94" y="258" width="14" height="6" fill="#0c0414"/>
@@ -366,7 +368,7 @@ input[type=text]:focus{border-color:var(--cyan)}
           <rect x="0" y="0" width="360" height="330" fill="url(#pDoorWall)"/>
           <circle cx="62" cy="96" r="32" fill="#f7ecff" stroke="#0c0414" stroke-width="4"/>
           <g stroke="#0c0414" stroke-linecap="round"><line x1="62" y1="96" x2="62" y2="70" stroke-width="3"/><line x1="62" y1="96" x2="82" y2="96" stroke-width="5"/></g>
-          <g font-family="VT323,monospace" font-size="11" fill="#0c0414" text-anchor="middle"><text x="62" y="76">12</text><text x="86" y="100">3</text><text x="62" y="124">6</text><text x="38" y="100">9</text></g>
+          <g font-family="VT323,K47 VT,monospace" font-size="11" fill="#0c0414" text-anchor="middle"><text x="62" y="76">12</text><text x="86" y="100">3</text><text x="62" y="124">6</text><text x="38" y="100">9</text></g>
           <path d="M40 80 l18 14 l-10 18 M76 72 l-8 20 l14 8" stroke="#c4001d" stroke-width="2" fill="none"/>
           <path d="M44 88 l6 -4 M70 110 l8 4" stroke="#7a9aa3" stroke-width="1.5"/>
           <rect x="112" y="58" width="138" height="272" fill="#0c0414"/>
@@ -402,8 +404,8 @@ input[type=text]:focus{border-color:var(--cyan)}
           <rect x="0" y="0" width="360" height="330" fill="#3a1d6e"/>
           <path d="M0 140 H360" stroke="#ff2e88" stroke-width="3"/><path d="M0 148 H360" stroke="#2de2e6" stroke-width="2"/>
           <rect x="44" y="34" width="132" height="92" fill="#ff2e88" stroke="#0c0414" stroke-width="3" transform="rotate(-3 110 80)"/>
-          <text x="110" y="92" text-anchor="middle" font-family="Rubik Wet Paint,Impact,sans-serif" font-size="30" fill="#ffd23f" transform="rotate(-3 110 80)">MIAMI</text>
-          <text x="110" y="112" text-anchor="middle" font-family="VT323,monospace" font-size="14" fill="#0c0414" transform="rotate(-3 110 80)">NIGHT · 1986</text>
+          <text x="110" y="92" text-anchor="middle" font-family="Rubik Wet Paint,K47 Wet,Impact,sans-serif" font-size="30" fill="#ffd23f" transform="rotate(-3 110 80)">MIAMI</text>
+          <text x="110" y="112" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#0c0414" transform="rotate(-3 110 80)">NIGHT · 1986</text>
           <rect x="6" y="168" width="32" height="162" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
           <rect x="30" y="262" width="232" height="68" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
           <rect x="30" y="232" width="232" height="36" fill="#e8e0f0" stroke="#0c0414" stroke-width="3"/>
@@ -419,7 +421,7 @@ input[type=text]:focus{border-color:var(--cyan)}
           <rect x="276" y="74" width="70" height="258" fill="url(#pTileDark)" opacity=".55"/>
           <rect x="276" y="74" width="70" height="258" fill="#ff2e88" opacity=".2"/>
           <path d="M268 66 L246 80 L246 320 L268 332z" fill="#7a3b1c" stroke="#0c0414" stroke-width="3"/>
-          <rect x="290" y="44" width="42" height="16" fill="#0c0414"/><text x="311" y="57" text-anchor="middle" font-family="VT323,monospace" font-size="15" fill="#2de2e6">WC</text>
+          <rect x="290" y="44" width="42" height="16" fill="#0c0414"/><text x="311" y="57" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="15" fill="#2de2e6">WC</text>
           <path d="M0 330 H360 V480 H0z" fill="url(#gFloor)"/>
           <g class="floorlines"></g>
           <g fill="#c4001d"><circle cx="190" cy="350" r="4"/><circle cx="230" cy="366" r="3"/><circle cx="262" cy="350" r="4"/><circle cx="296" cy="340" r="3"/></g>
@@ -445,10 +447,10 @@ input[type=text]:focus{border-color:var(--cyan)}
           <rect x="212" y="62" width="122" height="134" fill="#9fd9e6" stroke="#0c0414" stroke-width="4"/>
           <path d="M226 80 l30 -10 M230 100 l60 -22" stroke="#f7ecff" stroke-width="3" opacity=".6"/>
           <rect id="fog" x="214" y="64" width="118" height="130" fill="#ffffff" opacity="0"/>
-          <g id="mirrorText" opacity="0" font-family="Rubik Wet Paint,Impact,sans-serif" fill="#c4001d" text-anchor="middle">
+          <g id="mirrorText" opacity="0" font-family="Rubik Wet Paint,K47 Wet,Impact,sans-serif" fill="#c4001d" text-anchor="middle">
             <text x="273" y="118" font-size="30">HORA</text>
             <text x="273" y="152" font-size="30">+ APTO</text>
-            <text x="273" y="180" font-size="13" font-family="VT323,monospace">não esquece, idiota</text>
+            <text x="273" y="180" font-size="13" font-family="VT323,K47 VT,monospace">não esquece, idiota</text>
           </g>
           <rect x="338" y="90" width="18" height="76" fill="#eaeaf2" stroke="#0c0414" stroke-width="2.5"/>
           <path d="M206 228 h134 l-16 34 h-102z" fill="#f4f4f4" stroke="#0c0414" stroke-width="3"/>
@@ -470,6 +472,12 @@ input[type=text]:focus{border-color:var(--cyan)}
         <rect id="overlay" x="0" y="0" width="360" height="480" fill="url(#gVig)"/>
       </svg>
     </div>
+  </div>
+  <div class="navbar">
+    <button class="arrow l" id="turnL" aria-label="Virar para a esquerda"><span class="ch">‹</span><span class="nx" id="nxL"></span><span class="pd" id="pdL"></span></button>
+    <div class="viewname" id="viewName">CAMA</div>
+    <button class="arrow r" id="turnR" aria-label="Virar para a direita"><span class="pd" id="pdR"></span><span class="nx" id="nxR"></span><span class="ch">›</span></button>
+    <button class="back" id="backBtn" hidden>‹ Voltar pro quarto</button>
   </div>
   <div class="inv" id="inv"></div>
 </section>
@@ -522,6 +530,7 @@ input[type=text]:focus{border-color:var(--cyan)}
     <p>Um pedaço da noite volta. <b>Só você lembra disso.</b> Conte pro time pelo chat.</p>
     <div id="clues" style="display:flex;flex-direction:column;gap:10px"></div>
     <p style="font-size:13px">Use as setas (ou arraste pro lado) para virar. Toque nos objetos para examinar. Água e remédio aliviam a ressaca.</p>
+    <p id="memWait" class="clue" style="font-size:18px" hidden></p>
     <button class="btn" id="memClose">Bora</button>
   </div>
 </div>
@@ -529,7 +538,7 @@ input[type=text]:focus{border-color:var(--cyan)}
 <script>
 (() => {
 "use strict";
-const DUR = 180000, CODE = "0347";
+const DUR = 300000, BRIEF_MAX = 45000, CODE = "0347";
 const $ = id => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
 const PALETTE = ["#ff2e88","#2de2e6","#ffd23f","#3dff8b","#b18cff","#ff8a3d"];
@@ -631,6 +640,16 @@ let screen = "lobby", shownMemory = false, endShownFor = null, seenTaps = 0;
 let chatOpen = false, seenChats = 0, unread = 0, toastT = null, repTab = "team";
 let suppressClick = false, swipe = null, padVal = "";
 
+// ---------------- shared clock: every device uses the server's time ----------------
+let clockOffset = 0;
+const now = () => Date.now() + clockOffset;
+async function syncClock(){
+  try{
+    const t0=Date.now(); const r=await fetch("api/ping",{cache:"no-store"}); const t1=Date.now();
+    const j=await r.json(); if(j&&typeof j.now==="number") clockOffset = j.now - (t0+t1)/2;
+  }catch(e){}
+}
+
 // ---------------- network: claude.ai runtime, local server, or solo ----------------
 const net = { kind:"solo", send(){}, presence(){}, leave(){} };
 let db=null, room=null, user=null, downloads=null;
@@ -644,8 +663,8 @@ const capsReady = (async () => {
   }
   try {
     const ctl = new AbortController(); setTimeout(()=>ctl.abort(), 2500);
-    const r = await fetch("/api/ping", {cache:"no-store", signal:ctl.signal});
-    if (r.ok && (await r.json())?.kitnet === 1) net.kind = "local";
+    const r = await fetch("api/ping", {cache:"no-store", signal:ctl.signal});
+    if (r.ok && (await r.json())?.kitnet === 1) { net.kind = "local"; await syncClock(); setInterval(syncClock, 20000); }
   } catch(e){}
 })().finally(renderNet);
 
@@ -668,7 +687,7 @@ function setPeers(list){
 function myPresence(){ return {pk, nick:me.nick, color:me.color, view, at:sheetH}; }
 
 async function connectLocal(){
-  const base = `/api/rooms/${code}`;
+  const base = `api/rooms/${code}`;
   const outbox = [];
   let es = null, flushing = false, presT = null;
   const post = (path, body) => fetch(base+path, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
@@ -735,7 +754,7 @@ async function connectClaude(){
 }
 
 // ---------------- events ----------------
-const KINDS = new Set(["join","start","tap","act","chat"]);
+const KINDS = new Set(["join","start","ready","tap","act","chat"]);
 function valid(e){
   return e && typeof e==="object" && typeof e.id==="string" && e.id.length<48 && typeof e.p==="string" && e.p.length<64
     && typeof e.ts==="number" && isFinite(e.ts) && KINDS.has(e.k);
@@ -750,7 +769,7 @@ function clean(e){
 }
 function ingest(e){ if(!valid(e)||evMap.has(e.id)) return false; evMap.set(e.id,clean(e)); return true; }
 function addEvent(k,data){
-  const e = clean({id:pk.slice(-6)+(seq++).toString(36)+Date.now().toString(36).slice(-5), p:pk, ts:Date.now(), k, ...data});
+  const e = clean({id:pk.slice(-6)+(seq++).toString(36)+now().toString(36).slice(-5), p:pk, ts:now(), k, ...data});
   myEvents.push(e); evMap.set(e.id,e);
   net.send(e);
   recompute();
@@ -760,12 +779,24 @@ function addEvent(k,data){
 // ---------------- fold: the whole shared game, derived from every player's events ----------------
 function fold(){
   const evs=[...evMap.values()].sort((a,b)=>a.ts-b.ts||(a.id<b.id?-1:a.id>b.id?1:0));
-  const s={inv:new Set(),hang:3,water:0,forced:0,wrong:0,wrongBy:{},start:null,end:null,outcome:null,
-    players:new Map(),taps:[],chats:[],acts:[],credit:[],choices:[]};
+  const s={inv:new Set(),hang:3,water:0,forced:0,wrong:0,wrongBy:{},brief:null,start:null,end:null,outcome:null,
+    players:new Map(),readyAt:{},waiting:[],taps:[],chats:[],acts:[],credit:[],choices:[]};
+  // pass 1: who is in, when the host pressed start, who has read the card
   for(const e of evs){
-    if(e.k==="join"){ const p=s.players.get(e.p); if(!p) s.players.set(e.p,{nick:e.nick,color:e.color,ts:e.ts,uid:e.uid||null}); else {p.nick=e.nick;p.color=e.color;} continue; }
-    if(e.k==="chat"){ s.chats.push(e); continue; }
-    if(e.k==="start"){ if(s.start==null) s.start=e.ts; continue; }
+    if(e.k==="join"){ const p=s.players.get(e.p); if(!p) s.players.set(e.p,{nick:e.nick,color:e.color,ts:e.ts,uid:e.uid||null}); else {p.nick=e.nick;p.color=e.color;} }
+    else if(e.k==="chat") s.chats.push(e);
+    else if(e.k==="start"&&s.brief==null) s.brief=e.ts;
+    else if(e.k==="ready"&&s.brief!=null&&e.ts>=s.brief-3000&&s.readyAt[e.p]==null) s.readyAt[e.p]=e.ts;
+  }
+  if(s.brief!=null){
+    const required=[...s.players].filter(([,p])=>p.ts<=s.brief).map(([id])=>id);
+    s.waiting=required.filter(id=>s.readyAt[id]==null);
+    if(!s.waiting.length) s.start=Math.max(s.brief,...required.map(id=>s.readyAt[id]));
+    else if(now()>=s.brief+BRIEF_MAX) s.start=s.brief+BRIEF_MAX;
+  }
+  // pass 2: the game itself, from the moment the clock started
+  for(const e of evs){
+    if(e.k==="join"||e.k==="chat"||e.k==="start"||e.k==="ready") continue;
     if(s.start==null||s.end!=null||e.ts<s.start-3000||e.ts>s.start+DUR) continue;
     if(e.k==="tap"){ s.taps.push(e); continue; }
     if(e.k==="act"){
@@ -787,7 +818,7 @@ function fold(){
       if(s.escaped){ s.end=e.ts; s.outcome="win"; }
     }
   }
-  if(s.start!=null&&s.end==null&&Date.now()>s.start+DUR){ s.end=s.start+DUR; s.outcome="lose"; }
+  if(s.start!=null&&s.end==null&&now()>s.start+DUR){ s.end=s.start+DUR; s.outcome="lose"; }
   s.host = [...s.players.entries()].sort((a,b)=>a[1].ts-b[1].ts)[0]?.[0] || null;
   return s;
 }
@@ -836,7 +867,7 @@ function leave(){
   try{ history.replaceState(null,"",location.pathname); }catch(e){}
   showScreen("lobby"); $("joinCard").hidden=false; $("waitCard").hidden=true; $("lobbyChat").hidden=true;
 }
-$("startBtn").onclick=()=>{ if(S&&S.start==null&&canStart()) addEvent("start",{}); };
+$("startBtn").onclick=()=>{ if(S&&S.brief==null&&canStart()) addEvent("start",{}); };
 $("copyCode").onclick=()=>{
   const link = net.kind==="local" ? location.origin+location.pathname+"#"+code : code;
   copyText(link,$("copyCode"));
@@ -857,7 +888,7 @@ function showScreen(n){
 function recompute(){
   S=fold();
   if(!joined){ showScreen("lobby"); return; }
-  if(S.start==null){
+  if(S.brief==null){
     showScreen("lobby"); $("joinCard").hidden=true; $("waitCard").hidden=false;
     $("codeShow").textContent=code;
     $("copyCode").textContent = net.kind==="local" ? "Copiar link" : "Copiar código";
@@ -866,10 +897,12 @@ function recompute(){
       : net.kind==="claude" ? "Mande o código pros colegas. Eles entram com o mesmo código." : "Sem servidor: só você joga nesta tela.";
     const hostNick=S.players.get(S.host)?.nick||"anfitrião";
     const ok=canStart(), sb=$("startBtn"); sb.disabled=!ok;
-    sb.textContent = ok ? "Começar · 3:00" : `Esperando ${hostNick} começar`;
+    sb.textContent = ok ? "Começar · "+fmt(DUR) : `Esperando ${hostNick} começar`;
   } else if(S.end==null){
     showScreen("game");
-    if(!shownMemory){ shownMemory=true; setView(START_VIEW,0); openMemory(); }
+    if(!shownMemory){ shownMemory=true; setView(START_VIEW,0); openMemory(true); }
+    if(briefing&&S.start!=null){ briefing=false; $("memory").hidden=true; }
+    renderBrief();
     renderGame();
   } else {
     closeSheet(); $("keypad").hidden=true; $("memory").hidden=true;
@@ -921,7 +954,7 @@ function renderPeople(){
 function othersIn(v){ return personRows().filter(r=>!r.me&&r.online&&r.view===v); }
 function renderArrows(){
   const inB = view==="B";
-  $("turnL").hidden=inB; $("turnR").hidden=inB; $("backBtn").hidden=!inB;
+  $("turnL").hidden=inB; $("turnR").hidden=inB; $("viewName").hidden=inB; $("backBtn").hidden=!inB;
   if(inB) return;
   const i=RING.indexOf(view), lv=RING[(i+3)%4], rv=RING[(i+1)%4];
   $("nxL").textContent=VIEWS[lv]; $("nxR").textContent=VIEWS[rv];
@@ -954,9 +987,9 @@ function turn(d){ if(view==="B") return; const i=RING.indexOf(view); setView(RIN
 $("turnL").onclick=()=>turn(-1);
 $("turnR").onclick=()=>turn(1);
 $("backBtn").onclick=()=>setView("O",-1);
-$("stage").addEventListener("pointerdown",e=>{ swipe={x:e.clientX,y:e.clientY,t:Date.now()}; });
+$("stage").addEventListener("pointerdown",e=>{ swipe={x:e.clientX,y:e.clientY,t:now()}; });
 $("stage").addEventListener("pointerup",e=>{
-  if(!swipe) return; const dx=e.clientX-swipe.x, dy=e.clientY-swipe.y, quick=Date.now()-swipe.t<600; swipe=null;
+  if(!swipe) return; const dx=e.clientX-swipe.x, dy=e.clientY-swipe.y, quick=now()-swipe.t<600; swipe=null;
   if(quick&&Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){
     suppressClick=true; setTimeout(()=>suppressClick=false,60);
     if(view==="B"){ if(dx>0) setView("O",-1); } else turn(dx>0?-1:1);
@@ -1029,15 +1062,15 @@ function ripple(x,y,c){
 // each other player's latest tap on this wall, shown as a named crosshair for a few seconds
 function drawCursors(){
   const g=$("cursorLayer"); if(!g||!S) return; g.textContent="";
-  const now=Date.now(), last={};
-  for(const t of S.taps) if(t.p!==pk&&t.vw===view&&now-t.ts<5000) last[t.p]=t;
+  const tnow=now(), last={};
+  for(const t of S.taps) if(t.p!==pk&&t.vw===view&&tnow-t.ts<5000) last[t.p]=t;
   for(const [id,t] of Object.entries(last)){
     const p=S.players.get(id); if(!p) continue;
-    const a=1-Math.max(0,(now-t.ts-3000)/2000);
+    const a=1-Math.max(0,(tnow-t.ts-3000)/2000);
     const gg=document.createElementNS(NS,"g"); gg.setAttribute("opacity",a.toFixed(2));
     const ring=document.createElementNS(NS,"circle"); ring.setAttribute("cx",t.x); ring.setAttribute("cy",t.y); ring.setAttribute("r",9); ring.setAttribute("fill","none"); ring.setAttribute("stroke",p.color); ring.setAttribute("stroke-width","3");
     const cross=document.createElementNS(NS,"path"); cross.setAttribute("d",`M${t.x-15} ${t.y}h8M${t.x+7} ${t.y}h8M${t.x} ${t.y-15}v8M${t.x} ${t.y+7}v8`); cross.setAttribute("stroke",p.color); cross.setAttribute("stroke-width","3");
-    const lbl=document.createElementNS(NS,"text"); lbl.setAttribute("x",Math.min(t.x+13,300)); lbl.setAttribute("y",Math.max(t.y-11,36)); lbl.setAttribute("font-family","VT323,monospace"); lbl.setAttribute("font-size","18"); lbl.setAttribute("fill",p.color);
+    const lbl=document.createElementNS(NS,"text"); lbl.setAttribute("x",Math.min(t.x+13,300)); lbl.setAttribute("y",Math.max(t.y-11,36)); lbl.setAttribute("font-family","VT323,K47 VT,monospace"); lbl.setAttribute("font-size","18"); lbl.setAttribute("fill",p.color);
     lbl.setAttribute("paint-order","stroke"); lbl.setAttribute("stroke","#0c0414"); lbl.setAttribute("stroke-width","4"); lbl.textContent=p.nick;
     gg.append(ring,cross,lbl); g.append(gg);
   }
@@ -1108,13 +1141,28 @@ function myClues(){
   const i=Math.max(0,order.indexOf(pk)), n=Math.min(Math.max(order.length,1),3);
   return [0,1,2].filter(j=>j%n===i%n).map(j=>CLUES[j]);
 }
-function openMemory(){
+let briefing=false;
+function openMemory(isBrief){
+  briefing=!!isBrief;
   const c=$("clues"); c.textContent="";
   myClues().forEach(t=>{ const p=document.createElement("p"); p.className="clue"; p.textContent=t; c.append(p); });
-  $("memory").hidden=false;
+  $("memory").hidden=false; renderBrief();
 }
-$("memBtn").onclick=openMemory;
-$("memClose").onclick=()=>{ $("memory").hidden=true; };
+function renderBrief(){
+  const w=$("memWait"), b=$("memClose");
+  if(!briefing||!S||S.start!=null){ w.hidden=true; b.disabled=false; b.textContent="Bora"; return; }
+  const iAmReady=S.readyAt[pk]!=null;
+  b.disabled=iAmReady; b.textContent=iAmReady?"Pronto ✓":"Bora";
+  const names=S.waiting.filter(id=>id!==pk).map(id=>S.players.get(id)?.nick||"?");
+  const left=Math.max(0,Math.ceil((S.brief+BRIEF_MAX-now())/1000));
+  w.hidden=!iAmReady;
+  w.textContent = names.length ? `Esperando ${names.join(", ")} ler a carta… (o tempo começa sozinho em ${left}s)` : "Todo mundo pronto. Valendo!";
+}
+$("memBtn").onclick=()=>openMemory(false);
+$("memClose").onclick=()=>{
+  if(briefing&&S&&S.start==null){ if(S.readyAt[pk]==null) addEvent("ready",{}); return; }
+  $("memory").hidden=true;
+};
 $("hintBtn").onclick=()=>{ const sv=$("scene"); sv.classList.add("hints"); setTimeout(()=>sv.classList.remove("hints"),2000); };
 
 // ---------------- chat ----------------
@@ -1149,12 +1197,17 @@ function renderChat(){
 
 // ---------------- timer ----------------
 function tick(){
+  if(S&&S.brief!=null&&S.start==null){ $("timer").textContent=fmt(DUR); return; }
   if(!S||S.start==null||S.end!=null) return;
-  const left=S.start+DUR-Date.now();
+  const left=S.start+DUR-now();
   const t=$("timer"); t.textContent=fmt(left); t.classList.toggle("low",left<30000);
   if(left<=0) recompute();
 }
-setInterval(()=>{ tick(); if(screen==="game") drawCursors(); },250);
+setInterval(()=>{
+  tick();
+  if(screen==="game") drawCursors();
+  if(S&&S.brief!=null&&S.start==null){ if(now()>=S.brief+BRIEF_MAX) recompute(); else renderBrief(); }
+},250);
 
 // ---------------- END + REPORT ----------------
 function stats(pid){
@@ -1232,7 +1285,7 @@ function renderReport(){
   r.append(el("div","conf","Confidencial · Núcleo RH · Avaliação situacional ESC-60"));
   r.append(el("h2",null,"Relatório de desempenho · Sala "+code));
   const meta=el("div","meta");
-  [["Resultado",S.outcome==="win"?"Escaparam":"Não escaparam"],["Tempo",fmt(S.end-S.start)+" de 3:00"],["Jogadores",String(S.players.size)],["Anfitrião",S.players.get(S.host)?.nick||"—"],["Cliques",String(S.taps.length)],["Mensagens",String(S.chats.filter(c=>c.ts>=S.start&&c.ts<=S.end).length)],["Erros de senha",String(S.wrong)]]
+  [["Resultado",S.outcome==="win"?"Escaparam":"Não escaparam"],["Tempo",fmt(S.end-S.start)+" de "+fmt(DUR)],["Jogadores",String(S.players.size)],["Anfitrião",S.players.get(S.host)?.nick||"—"],["Cliques",String(S.taps.length)],["Mensagens",String(S.chats.filter(c=>c.ts>=S.start&&c.ts<=S.end).length)],["Erros de senha",String(S.wrong)]]
     .forEach(([k,v])=>{ const s=el("span",null,k+": "); s.append(el("b",null,v)); meta.append(s); });
   r.append(meta);
   const tabs=el("div","tabs"); tabs.setAttribute("role","tablist");
@@ -1279,7 +1332,7 @@ function renderReport(){
   const foot=el("div","repfoot");
   const cp=el("button","btn","Copiar resumo"); cp.onclick=()=>copyText(summaryText(),cp); foot.append(cp);
   if(downloads){ const dl=el("button","btn","Baixar dados (JSON)"); dl.onclick=()=>downloads.save({filename:`kitnet47-${code}.json`,data:JSON.stringify(exportData(),null,2)}).catch(()=>{}); foot.append(dl); }
-  else if(net.kind==="local"){ const a=el("a","btn","Dados brutos (JSON)"); a.href=`/api/rooms/${code}`; a.target="_blank"; a.rel="noopener"; a.style.cssText="text-align:center;text-decoration:none;display:grid;place-items:center"; foot.append(a); }
+  else if(net.kind==="local"){ const a=el("a","btn","Dados brutos (JSON)"); a.href=`api/rooms/${code}`; a.target="_blank"; a.rel="noopener"; a.style.cssText="text-align:center;text-decoration:none;display:grid;place-items:center"; foot.append(a); }
   const again=el("button","btn","Nova partida"); again.onclick=leave; foot.append(again);
   r.append(foot);
 }
