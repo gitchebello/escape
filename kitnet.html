@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Rubik+Wet+Paint&family=VT323&display=swap">
 <style>
-/* Layout: one-screen mobile app — HUD on top, top-down room in the middle, inventory + bottom sheet below. Single neon-night look by choice. */
+/* Layout: one-screen mobile app — HUD + room roster on top, first-person wall view in the middle with turn arrows, pocket below. Single neon-night look by choice. */
 :root{
   --ink:#0c0414; --night:#1b0a2e; --panel:#22103a; --panel-2:#2e1650;
   --pink:#ff2e88; --cyan:#2de2e6; --sun:#ffd23f; --blood:#e0102f; --ok:#3dff8b;
@@ -16,23 +16,23 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{background:var(--ink);color:var(--paper);font-family:var(--f-ui);font-size:15px;overflow:hidden;-webkit-tap-highlight-color:transparent}
-body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:90;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--f-ui);font-size:15px;overflow:hidden;-webkit-tap-highlight-color:transparent}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:90;background:repeating-linear-gradient(0deg,rgba(0,0,0,.2) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
 .screen{position:absolute;inset:0;display:flex;flex-direction:column}
 
 /* ---------- LOBBY ---------- */
 #lobby{overflow:auto;padding-inline:16px;padding-block:24px 32px;align-items:center}
-#lobby::before{content:"";position:fixed;inset:-50%;z-index:-1;background:repeating-conic-gradient(from 0deg at 50% 50%,#2a0b45 0 10deg,#160628 10deg 20deg);animation:spin 60s linear infinite;opacity:.9}
+#lobby::before{content:"";position:fixed;inset:-50%;z-index:-1;background:repeating-conic-gradient(from 0deg at 50% 50%,#2a0b45 0 10deg,#160628 10deg 20deg);animation:spin 60s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .lob{width:100%;max-width:440px;display:flex;flex-direction:column;gap:18px}
 .memo{font-family:var(--f-hud);font-size:15px;line-height:1.15;color:var(--muted);letter-spacing:.04em;border:1px dashed var(--line);padding:8px 10px;background:rgba(12,4,20,.7)}
 .memo b{color:var(--cyan);font-weight:400}
-.title{font-family:var(--f-display);font-weight:400;font-size:clamp(68px,24vw,124px);line-height:.85;margin:6px 0 0;color:var(--pink);text-shadow:4px 0 var(--cyan),-3px 2px var(--sun);transform:rotate(-5deg) skewX(-6deg);text-wrap:balance}
-.kicker{font-family:var(--f-ui);font-weight:700;text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--sun)}
+.title{font-family:var(--f-display);font-weight:400;font-size:clamp(68px,24vw,124px);line-height:.85;margin:6px 0 0;color:var(--pink);text-shadow:4px 0 var(--cyan),-3px 2px var(--sun);transform:rotate(-5deg) skewX(-6deg)}
+.kicker{font-weight:700;text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--sun)}
 .pitch{font-size:16px;line-height:1.5;max-width:60ch;margin:0}
-.card{background:rgba(34,16,58,.92);border:2px solid var(--pink);box-shadow:6px 6px 0 var(--cyan);padding:16px;display:flex;flex-direction:column;gap:12px}
+.card{background:rgba(34,16,58,.94);border:2px solid var(--pink);box-shadow:6px 6px 0 var(--cyan);padding:16px;display:flex;flex-direction:column;gap:12px}
 label{font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .field{display:flex;flex-direction:column;gap:6px}
 input[type=text]{width:100%;background:var(--ink);border:2px solid var(--panel-2);color:var(--paper);font-family:var(--f-hud);font-size:24px;padding:8px 10px;letter-spacing:.06em}
@@ -40,16 +40,25 @@ input[type=text]:focus{border-color:var(--cyan)}
 .row{display:flex;gap:10px;flex-wrap:wrap}
 .row>*{flex:1 1 140px;min-width:0}
 .btn{min-height:50px;border:2px solid var(--cyan);background:transparent;font-weight:700;text-transform:uppercase;letter-spacing:.12em;padding:10px 14px;transition:background .12s,color .12s}
-.btn:hover,.btn:active{background:var(--cyan);color:var(--ink)}
+.btn:hover:not(:disabled),.btn:active:not(:disabled){background:var(--cyan);color:var(--ink)}
 .btn.hot{background:var(--pink);border-color:var(--pink);color:var(--ink)}
-.btn.hot:hover,.btn.hot:active{background:var(--sun);border-color:var(--sun)}
-.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.hot:hover:not(:disabled){background:var(--sun);border-color:var(--sun)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 .hint{font-size:13px;color:var(--muted);margin:0;line-height:1.4}
-.plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-.plist li{display:flex;align-items:center;gap:10px;font-family:var(--f-hud);font-size:22px}
-.dot{width:12px;height:12px;border-radius:50%;flex:none;box-shadow:0 0 8px currentColor}
-.tag{font-family:var(--f-ui);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.net{display:inline-flex;align-items:center;gap:6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.net i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.net.on i{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .codebig{font-family:var(--f-hud);font-size:46px;color:var(--sun);letter-spacing:.2em;line-height:1}
+
+/* roster (lobby + game) */
+.roster{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.roster li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:6px 8px;background:rgba(12,4,20,.55);border-left:4px solid var(--c,#fff)}
+.roster .nm{font-family:var(--f-hud);font-size:22px;line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.roster .st{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:right}
+.crown{display:inline-block;font-family:var(--f-ui);font-size:10px;font-weight:700;letter-spacing:.12em;background:var(--sun);color:var(--ink);padding:1px 5px;margin-left:6px;vertical-align:middle}
+.odot{width:10px;height:10px;border-radius:50%;background:#4a3d5c;flex:none}
+.odot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
 
 /* ---------- GAME ---------- */
 #game{padding-inline:16px;padding-block:8px 0;gap:6px}
@@ -61,42 +70,60 @@ input[type=text]:focus{border-color:var(--cyan)}
 @keyframes blink{50%{opacity:.35}}
 .hud .r{display:flex;justify-content:flex-end;gap:6px}
 .ibtn{position:relative;min-width:44px;height:44px;border:2px solid var(--panel-2);background:var(--panel);display:grid;place-items:center;font-weight:700;font-size:12px;letter-spacing:.08em;padding:0 8px}
-.ibtn.on{border-color:var(--sun);color:var(--sun)}
 .badge{position:absolute;top:-6px;right:-6px;background:var(--pink);color:var(--ink);font-size:11px;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
 .status{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .hang{display:flex;gap:3px;align-items:center}
 .hang i{width:14px;height:8px;background:var(--panel-2);display:block}
 .hang i.f{background:var(--blood)}
-.voices{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
-.vchip{font-family:var(--f-hud);font-size:16px;letter-spacing:0;text-transform:none;padding:0 6px;border:1px solid currentColor;line-height:18px}
+.team{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;min-height:38px}
+.pchip{flex:none;display:flex;align-items:center;gap:6px;border:1px solid var(--c,#fff);padding:2px 8px 2px 6px;background:rgba(12,4,20,.6);line-height:1.1}
+.pchip .nm{font-family:var(--f-hud);font-size:18px;color:var(--c,#fff)}
+.pchip .wh{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pchip.off{opacity:.45}
+.pchip .crown{margin-left:0}
 .stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center}
-#sceneWrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transform-origin:50% 50%}
-#scene{width:100%;height:100%;max-width:100%;display:block;touch-action:manipulation;filter:drop-shadow(0 0 14px rgba(255,46,136,.35))}
+#sceneWrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transform-origin:50% 60%}
+#scene{width:100%;height:100%;display:block;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.turnL{animation:turnL .28s ease-out}.turnR{animation:turnR .28s ease-out}
+@keyframes turnL{from{transform:translateX(-14%);opacity:.2}to{transform:none;opacity:1}}
+@keyframes turnR{from{transform:translateX(14%);opacity:.2}to{transform:none;opacity:1}}
 .hs{fill:transparent;cursor:pointer}
-.hs-mark{fill:none;stroke:var(--sun);stroke-width:2;stroke-dasharray:5 4;opacity:0;transition:opacity .2s}
-.hs-lbl{font-family:var(--f-hud);font-size:13px;fill:var(--sun);opacity:0;pointer-events:none;paint-order:stroke;stroke:#0c0414;stroke-width:3px}
+.hs-mark{fill:none;stroke:var(--sun);stroke-width:2.5;stroke-dasharray:6 5;opacity:0;transition:opacity .2s;pointer-events:none}
+.hs-lbl{font-family:var(--f-hud);font-size:16px;fill:var(--sun);opacity:0;pointer-events:none;paint-order:stroke;stroke:#0c0414;stroke-width:4px}
 .hints .hs-mark,.hints .hs-lbl{opacity:1}
-.hs-g.flash .hs-mark{opacity:1;stroke:var(--cyan)}
-#hero,#peerLayer,#rippleLayer{pointer-events:none}
-#hero{transition:transform .45s cubic-bezier(.3,.7,.2,1)}
-.ripple{fill:none;stroke-width:2;animation:rip .7s ease-out forwards;pointer-events:none}
-@keyframes rip{from{r:2;opacity:1}to{r:22;opacity:0}}
+#overlay,#cursorLayer,#rippleLayer{pointer-events:none}
+.ripple{fill:none;stroke-width:3;animation:rip .7s ease-out forwards}
+@keyframes rip{from{r:3;opacity:1}to{r:30;opacity:0}}
 .steam{animation:steam 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
-@keyframes steam{50%{transform:translateY(-6px) scale(1.15);opacity:.5}}
-.tvglow{animation:flick 1.8s steps(3) infinite}
-@keyframes flick{33%{opacity:.6}66%{opacity:.9}}
-.sway1{animation:sway 4s ease-in-out infinite}
-@keyframes sway{0%,100%{transform:rotate(calc(var(--h)*-.2deg)) translateX(calc(var(--h)*-.6px))}50%{transform:rotate(calc(var(--h)*.2deg)) translateX(calc(var(--h)*.6px))}}
+@keyframes steam{50%{transform:translateY(-10px) scale(1.15);opacity:.45}}
+.tvglow{animation:flick 1.6s steps(3) infinite}
+@keyframes flick{33%{opacity:.75}66%{opacity:.95}}
+.siren{animation:siren .8s steps(2) infinite}
+.siren.b{animation-delay:.4s}
+@keyframes siren{50%{opacity:.15}}
+.sway{animation:sway 4s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(calc(var(--h)*-.25deg)) translateX(calc(var(--h)*-1px))}50%{transform:rotate(calc(var(--h)*.25deg)) translateX(calc(var(--h)*1px))}}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:46px;min-height:96px;border:2px solid var(--pink);background:rgba(12,4,20,.72);color:var(--pink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 2px}
+.arrow.l{left:0}.arrow.r{right:0}
+.arrow:active{background:var(--pink);color:var(--ink)}
+.arrow .ch{font-size:26px;line-height:1;font-weight:700}
+.arrow .nx{font-size:9px;letter-spacing:.06em;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);color:var(--paper)}
+.arrow .pd{display:flex;flex-direction:column;gap:3px}
+.arrow .pd i{width:8px;height:8px;border-radius:50%;display:block}
+.back{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);z-index:5;min-height:44px;padding:0 18px;border:2px solid var(--pink);background:rgba(12,4,20,.8);color:var(--pink);font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.viewname{position:absolute;top:6px;left:50%;transform:translateX(-50%);z-index:4;font-family:var(--f-hud);font-size:20px;letter-spacing:.12em;color:var(--sun);background:rgba(12,4,20,.75);padding:0 10px;white-space:nowrap;pointer-events:none}
+.here{position:absolute;left:50%;bottom:58px;transform:translateX(-50%);z-index:4;display:flex;gap:6px;pointer-events:none;flex-wrap:wrap;justify-content:center;width:80%}
+.here span{font-family:var(--f-hud);font-size:16px;padding:0 6px;background:rgba(12,4,20,.8);border:1px solid currentColor}
 .inv{display:flex;gap:6px;align-items:center;min-height:44px;overflow-x:auto;padding-bottom:8px}
 .inv .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);flex:none}
 .item{flex:none;display:flex;align-items:center;gap:6px;border:1px solid var(--cyan);padding:4px 8px;font-family:var(--f-hud);font-size:19px;color:var(--cyan);background:rgba(45,226,230,.07)}
-.item svg{width:16px;height:16px}
-.inv .empty{font-family:var(--f-hud);font-size:18px;color:var(--panel-2)}
-.toast{position:absolute;left:50%;top:6px;transform:translateX(-50%);max-width:min(92%,420px);background:var(--ink);border:2px solid var(--sun);color:var(--paper);padding:8px 12px;font-size:14px;line-height:1.35;z-index:15;box-shadow:4px 4px 0 var(--pink)}
+.item i{width:12px;height:12px;display:block;border:2px solid var(--ink)}
+.inv .empty{font-family:var(--f-hud);font-size:18px;color:#5a4a70}
+.toast{position:absolute;left:50%;top:34px;transform:translateX(-50%);max-width:min(88%,420px);background:var(--ink);border:2px solid var(--sun);color:var(--paper);padding:8px 12px;font-size:14px;line-height:1.35;z-index:15;box-shadow:4px 4px 0 var(--pink)}
 .toast b{color:var(--sun)}
 
 /* ---------- SHEETS ---------- */
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);border-top:3px solid var(--pink);padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));max-height:66%;overflow:auto;transform:translateY(110%);transition:transform .22s ease-out;box-shadow:0 -12px 40px rgba(0,0,0,.6)}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);border-top:3px solid var(--pink);padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));max-height:62%;overflow:auto;transform:translateY(110%);transition:transform .22s ease-out;box-shadow:0 -12px 40px rgba(0,0,0,.6)}
 .sheet.open{transform:none}
 .sheet-in{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 .sh-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
@@ -111,8 +138,6 @@ input[type=text]:focus{border-color:var(--cyan)}
 .act.exit:hover{background:var(--ok);color:var(--ink)}
 .act small{font-family:var(--f-hud);font-size:15px;opacity:.75;font-weight:400}
 .x{width:44px;height:44px;border:2px solid var(--panel-2);background:transparent;font-size:20px;flex:none}
-
-/* keypad */
 .modal{position:fixed;inset:0;z-index:40;background:rgba(12,4,20,.86);display:grid;place-items:center;padding:16px}
 .pad{width:100%;max-width:300px;background:#11081c;border:3px solid #3a2a4f;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:8px 8px 0 var(--pink)}
 .pad-disp{font-family:var(--f-hud);font-size:52px;letter-spacing:.35em;text-align:center;background:#06210f;color:var(--ok);padding:4px 0 0;min-height:64px;border:2px solid #0f3a1e}
@@ -120,8 +145,6 @@ input[type=text]:focus{border-color:var(--cyan)}
 .keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .key{height:56px;background:#2a1d3a;border:2px solid #3e2d55;font-family:var(--f-hud);font-size:30px}
 .key:active{background:var(--pink);color:var(--ink)}
-
-/* chat */
 #chat{z-index:35}
 .msgs{display:flex;flex-direction:column;gap:6px;max-height:34vh;overflow:auto;padding-right:4px}
 .msg{font-size:14px;line-height:1.35;overflow-wrap:anywhere}
@@ -134,8 +157,6 @@ input[type=text]:focus{border-color:var(--cyan)}
 .send input{font-family:var(--f-ui)!important;font-size:16px!important}
 .send .btn{flex:none}
 .fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:12}
-
-/* memory card */
 .mem{max-width:420px;width:100%;background:var(--paper);color:var(--ink);padding:18px;display:flex;flex-direction:column;gap:12px;transform:rotate(-1.5deg);box-shadow:8px 8px 0 var(--pink)}
 .mem h3{font-family:var(--f-display);font-weight:400;font-size:40px;margin:0;color:var(--blood);line-height:.9}
 .mem p{margin:0;line-height:1.45}
@@ -146,22 +167,23 @@ input[type=text]:focus{border-color:var(--cyan)}
 /* ---------- END / REPORT ---------- */
 #end{overflow:auto;padding-inline:16px;padding-block:20px 40px;align-items:center;background:var(--ink)}
 .endwrap{width:100%;max-width:760px;display:flex;flex-direction:column;gap:20px}
-.verdict{font-family:var(--f-display);font-weight:400;font-size:clamp(56px,17vw,104px);line-height:.85;margin:0;transform:rotate(-4deg);text-wrap:balance}
+.verdict{font-family:var(--f-display);font-weight:400;font-size:clamp(56px,17vw,104px);line-height:.85;margin:0;transform:rotate(-4deg)}
 .verdict.win{color:var(--ok);text-shadow:4px 0 var(--pink)}
 .verdict.lose{color:var(--blood);text-shadow:4px 0 var(--cyan)}
 .story{display:flex;flex-direction:column;gap:6px;font-family:var(--f-hud);font-size:21px;line-height:1.15;margin:0;padding:0;list-style:none}
 .story li::before{content:"› ";color:var(--pink)}
-.rep{background:#f2eef6;color:#1a1424;padding:20px 16px;display:flex;flex-direction:column;gap:18px;font-family:var(--f-ui);border-top:8px solid var(--pink)}
-.rep h2{margin:0;font-size:22px;letter-spacing:.02em;text-wrap:balance}
+.rep{background:#f2eef6;color:#1a1424;padding:20px 16px;display:flex;flex-direction:column;gap:18px;border-top:8px solid var(--pink)}
+.rep h2{margin:0;font-size:22px}
 .rep .conf{font-family:var(--f-hud);font-size:16px;color:#7a1144;letter-spacing:.08em;text-transform:uppercase}
 .rep .meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:#4c4359}
 .rep .meta b{color:#1a1424;font-variant-numeric:tabular-nums}
 .tabs{display:flex;gap:6px;flex-wrap:wrap}
 .tab{border:2px solid #1a1424;background:transparent;padding:6px 12px;font-weight:700;font-size:13px;min-height:40px;display:flex;align-items:center;gap:6px}
 .tab[aria-selected=true]{background:#1a1424;color:#f2eef6}
+.tab .d{width:10px;height:10px;border-radius:50%}
 .pgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
 @media (max-width:620px){.pgrid{grid-template-columns:minmax(0,1fr)}}
-.comp{display:flex;flex-direction:column;gap:10px}
+.comp{display:flex;flex-direction:column;gap:10px;min-width:0}
 .bar{display:grid;grid-template-columns:110px minmax(0,1fr) 38px;align-items:center;gap:8px;font-size:13px}
 .bar .tr{height:10px;background:#ddd5e6;position:relative}
 .bar .fl{position:absolute;inset:0 auto 0 0;background:#1a1424}
@@ -173,19 +195,19 @@ input[type=text]:focus{border-color:var(--cyan)}
 .rep h3{margin:0;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#5d536b}
 .rep ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:14px;line-height:1.4}
 .sig-g{color:#0c6b3a}.sig-r{color:#a10f35}
-.heat{background:#1a1424;width:100%;max-width:100%;aspect-ratio:360/540;display:block}
+.heatgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.heatgrid figure{margin:0;display:flex;flex-direction:column;gap:2px}
+.heatgrid figcaption{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#5d536b}
+.heat{background:#1a1424;width:100%;max-width:100%;aspect-ratio:360/480;display:block}
 .tl{list-style:none!important;padding:0!important}
-.tl li{display:grid;grid-template-columns:48px 14px minmax(0,1fr);gap:8px;align-items:baseline}
+.tl li{display:grid;grid-template-columns:48px 12px minmax(0,1fr);gap:8px;align-items:baseline}
 .tl .tm{font-family:var(--f-hud);font-size:18px;font-variant-numeric:tabular-nums}
-.tl .dot{width:10px;height:10px;box-shadow:none}
+.tl .d{width:10px;height:10px;border-radius:50%}
 .repfoot{display:flex;gap:10px;flex-wrap:wrap}
 .repfoot .btn{border-color:#1a1424;color:#1a1424;flex:1 1 180px}
 .repfoot .btn:hover{background:#1a1424;color:#f2eef6}
 .small{font-size:12px;color:#5d536b;line-height:1.4;margin:0}
-
-@media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
-}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
 <!-- ================= LOBBY ================= -->
@@ -193,10 +215,10 @@ input[type=text]:focus{border-color:var(--cyan)}
   <div class="lob">
     <div class="memo">NÚCLEO RH · AVALIAÇÃO SITUACIONAL <b>ESC-60</b><br>Módulo 3 — Decisão sob pressão. Toda interação é registrada para fins de desenvolvimento.</div>
     <div>
-      <div class="kicker">Escape room online · 3 minutos · 1 a 6 vozes</div>
+      <div class="kicker">Escape room online · 3 minutos · 1 a 6 jogadores</div>
       <h1 class="title">ACORDA.</h1>
     </div>
-    <p class="pitch">Você acordou numa kitnet que nunca viu. Cabeça explodindo, gosto de sangue na boca, um estranho na cama. A porta está trancada. Vocês são as vozes na cabeça dele: conversem, toquem nos objetos e tirem ele daí antes que alguém bata na porta.</p>
+    <p class="pitch">Você acorda numa kitnet que nunca viu. Cabeça explodindo, gosto de sangue na boca, um estranho na cama. A porta está trancada. Olhe em volta, toque nos objetos, converse com o time e saia antes que alguém bata na porta.</p>
 
     <div class="card" id="joinCard">
       <div class="field">
@@ -209,19 +231,19 @@ input[type=text]:focus{border-color:var(--cyan)}
       </div>
       <div class="row">
         <button class="btn hot" id="joinBtn">Entrar na sala</button>
-        <button class="btn" id="newBtn">Gerar código novo</button>
+        <button class="btn" id="newBtn">Criar sala nova</button>
       </div>
-      <p class="hint" id="netHint">Conectando…</p>
+      <span class="net" id="netHint"><i></i><span>Conectando…</span></span>
     </div>
 
     <div class="card" id="waitCard" hidden>
       <div class="row" style="align-items:flex-end">
         <div><div class="tag">Sala</div><div class="codebig" id="codeShow">----</div></div>
-        <button class="btn" id="copyCode" style="flex:0 1 auto">Copiar código</button>
+        <button class="btn" id="copyCode" style="flex:0 1 auto">Copiar link</button>
       </div>
-      <p class="hint">Mande o código pros colegas. Eles entram com o mesmo código. Qualquer pessoa pode começar.</p>
-      <div class="tag">Vozes na sala</div>
-      <ul class="plist" id="lobbyPlayers"></ul>
+      <p class="hint" id="shareHint">Mande o código pros colegas. Eles entram com o mesmo código.</p>
+      <div class="tag">Jogadores na sala</div>
+      <ul class="roster" id="lobbyRoster"></ul>
       <button class="btn hot" id="startBtn">Começar · 3:00</button>
       <button class="btn" id="leaveBtn">Trocar de sala</button>
     </div>
@@ -232,143 +254,220 @@ input[type=text]:focus{border-color:var(--cyan)}
 <section id="game" class="screen" hidden>
   <div class="hud">
     <div class="l">SALA<b id="hudCode">----</b></div>
-    <div class="timer" id="timer" aria-live="off">3:00</div>
+    <div class="timer" id="timer">3:00</div>
     <div class="r">
       <button class="ibtn" id="hintBtn" aria-label="Mostrar objetos clicáveis">?</button>
       <button class="ibtn" id="memBtn" aria-label="Rever memória">MEM</button>
       <button class="ibtn" id="chatBtn" aria-label="Abrir chat">CHAT<span class="badge" id="unread" hidden>0</span></button>
     </div>
   </div>
+  <div class="team" id="team" aria-label="Jogadores na sala"></div>
   <div class="status">
-    <div class="hang" title="Ressaca">Ressaca <span id="hangBar"></span></div>
-    <div class="voices" id="voices"></div>
+    <div class="hang">Ressaca <span id="hangBar" class="hang"></span></div>
+    <span class="net" id="netGame"><i></i><span>solo</span></span>
   </div>
-  <div class="stage">
+  <div class="stage" id="stage">
     <div id="toast" class="toast" hidden></div>
+    <div class="viewname" id="viewName">CAMA</div>
+    <button class="arrow l" id="turnL" aria-label="Virar para a esquerda"><span class="ch">‹</span><span class="nx" id="nxL"></span><span class="pd" id="pdL"></span></button>
+    <button class="arrow r" id="turnR" aria-label="Virar para a direita"><span class="ch">›</span><span class="nx" id="nxR"></span><span class="pd" id="pdR"></span></button>
+    <button class="back" id="backBtn" hidden>Voltar pro quarto</button>
+    <div class="here" id="here"></div>
     <div id="sceneWrap">
-      <svg id="scene" viewBox="0 0 360 540" role="img" aria-label="Kitnet vista de cima">
+      <svg id="scene" viewBox="0 0 360 480" role="img" aria-label="Visão em primeira pessoa da kitnet" preserveAspectRatio="xMidYMid meet">
         <defs>
-          <pattern id="pTile" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#1aa7ad"/><rect width="8" height="8" fill="#d9f3f1"/><rect x="8" y="8" width="8" height="8" fill="#d9f3f1"/></pattern>
-          <pattern id="pKit" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#14101a"/><rect width="10" height="10" fill="#e8c62e"/><rect x="10" y="10" width="10" height="10" fill="#e8c62e"/></pattern>
-          <pattern id="pCarpet" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#6a1b8f"/><circle cx="7" cy="7" r="1.6" fill="#a43bd1"/><circle cx="0" cy="0" r="1.2" fill="#4a0f68"/><circle cx="14" cy="14" r="1.2" fill="#4a0f68"/></pattern>
-          <pattern id="pBlinds" width="12" height="6" patternUnits="userSpaceOnUse"><rect width="12" height="6" fill="#2de2e6"/><rect y="4" width="12" height="2" fill="#178a9a"/></pattern>
+          <pattern id="pCheck" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#14101a"/><rect width="10" height="10" fill="#e8c62e"/><rect x="10" y="10" width="10" height="10" fill="#e8c62e"/></pattern>
+          <pattern id="pTile" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#d9f3f1"/><rect width="18" height="18" fill="none" stroke="#1aa7ad" stroke-width="1.5"/></pattern>
+          <pattern id="pTileDark" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#1aa7ad"/><rect width="11" height="11" fill="#d9f3f1"/><rect x="11" y="11" width="11" height="11" fill="#d9f3f1"/></pattern>
+          <pattern id="pStripe" width="26" height="10" patternUnits="userSpaceOnUse"><rect width="26" height="10" fill="#4a1a7a"/><rect width="6" height="10" fill="#5e2391"/></pattern>
+          <pattern id="pDoorWall" width="30" height="10" patternUnits="userSpaceOnUse"><rect width="30" height="10" fill="#9e1250"/><rect width="3" height="10" fill="#b8175f"/></pattern>
+          <pattern id="pBlinds" width="10" height="9" patternUnits="userSpaceOnUse"><rect width="10" height="9" fill="#f7ecff" opacity=".85"/><rect y="6" width="10" height="3" fill="#ab93cc"/></pattern>
+          <linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a0b45"/><stop offset=".55" stop-color="#ff2e88"/><stop offset="1" stop-color="#ffd23f"/></linearGradient>
+          <linearGradient id="gFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a0f68"/><stop offset="1" stop-color="#7b1fa2"/></linearGradient>
+          <radialGradient id="gVig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".75"/></radialGradient>
         </defs>
-        <g id="art">
-          <!-- floors -->
-          <rect x="8" y="8" width="344" height="524" fill="url(#pCarpet)"/>
-          <rect x="8" y="8" width="144" height="164" fill="url(#pTile)"/>
-          <rect x="152" y="8" width="200" height="132" fill="url(#pKit)"/>
-          <circle cx="232" cy="300" r="58" fill="#ff2e88" opacity=".85"/>
-          <circle cx="232" cy="300" r="44" fill="none" stroke="#ffd23f" stroke-width="3" stroke-dasharray="2 6"/>
-          <!-- blood trail -->
-          <g fill="#c4001d">
-            <circle cx="78" cy="398" r="4"/><circle cx="88" cy="372" r="3"/><circle cx="96" cy="344" r="3.5"/><circle cx="104" cy="310" r="2.5"/><circle cx="110" cy="276" r="3"/><circle cx="114" cy="240" r="2.2"/><circle cx="118" cy="206" r="3"/><circle cx="120" cy="182" r="2"/>
-            <path d="M40 116 q18 -6 26 8 q-10 12 -26 4z" opacity=".9"/>
-          </g>
-          <!-- bathroom -->
-          <rect x="22" y="22" width="64" height="64" fill="#cfe9ef" stroke="#0c0414" stroke-width="3"/>
-          <circle cx="54" cy="54" r="5" fill="#7a9aa3"/>
-          <path d="M26 82 q20 -10 34 2" stroke="#ff2e88" stroke-width="5" fill="none"/>
-          <g id="steam" opacity="0">
-            <circle class="steam" cx="44" cy="44" r="16" fill="#fff" opacity=".75"/>
-            <circle class="steam" cx="66" cy="58" r="13" fill="#fff" opacity=".65" style="animation-delay:.6s"/>
-            <circle class="steam" cx="110" cy="40" r="14" fill="#fff" opacity=".55" style="animation-delay:1.1s"/>
-          </g>
-          <ellipse cx="38" cy="140" rx="13" ry="16" fill="#f4f4f4" stroke="#0c0414" stroke-width="3"/>
-          <rect x="26" y="152" width="24" height="10" fill="#f4f4f4" stroke="#0c0414" stroke-width="3"/>
-          <rect x="102" y="20" width="44" height="28" rx="6" fill="#f4f4f4" stroke="#0c0414" stroke-width="3"/>
-          <ellipse cx="124" cy="34" rx="12" ry="7" fill="#9fc6cf"/>
-          <rect id="mirror" x="98" y="9" width="52" height="7" fill="#2de2e6"/>
-          <!-- kitchen -->
-          <rect x="156" y="12" width="140" height="44" fill="#3b3346" stroke="#0c0414" stroke-width="3"/>
-          <rect x="292" y="12" width="56" height="70" fill="#eaeaf2" stroke="#0c0414" stroke-width="3"/>
-          <rect x="296" y="46" width="48" height="3" fill="#0c0414"/>
-          <rect x="336" y="22" width="4" height="18" fill="#7a7a8a"/>
-          <rect x="244" y="18" width="44" height="32" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
-          <rect x="248" y="22" width="26" height="24" fill="#2de2e6" opacity=".35"/>
-          <circle cx="280" cy="28" r="2.5" fill="#ff2e88"/><circle cx="280" cy="38" r="2.5" fill="#ffd23f"/>
+
+        <!-- ===== N: COZINHA ===== -->
+        <g id="v-N" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#1aa7ad"/>
+          <rect x="0" y="118" width="272" height="94" fill="url(#pCheck)"/>
+          <rect x="10" y="38" width="250" height="72" fill="#7a3b1c" stroke="#0c0414" stroke-width="3"/>
+          <path d="M93 38 V110 M176 38 V110" stroke="#0c0414" stroke-width="3"/>
+          <g fill="#ffd23f"><rect x="80" y="70" width="6" height="14"/><rect x="100" y="70" width="6" height="14"/><rect x="164" y="70" width="6" height="14"/><rect x="184" y="70" width="6" height="14"/></g>
+          <rect x="0" y="208" width="272" height="14" fill="#3b3346" stroke="#0c0414" stroke-width="3"/>
+          <rect x="0" y="222" width="272" height="108" fill="#5a2a16" stroke="#0c0414" stroke-width="3"/>
+          <path d="M90 222 V330 M180 222 V330" stroke="#0c0414" stroke-width="3"/>
+          <g fill="#ffd23f"><rect x="76" y="240" width="6" height="20"/><rect x="98" y="240" width="6" height="20"/><rect x="166" y="240" width="6" height="20"/><rect x="188" y="240" width="6" height="20"/></g>
+          <rect x="158" y="146" width="98" height="62" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <rect x="166" y="154" width="60" height="46" fill="#2de2e6" opacity=".35"/>
+          <path d="M172 160 l20 30" stroke="#f7ecff" stroke-width="2" opacity=".5"/>
+          <circle cx="242" cy="164" r="4" fill="#ff2e88"/><circle cx="242" cy="178" r="4" fill="#ffd23f"/><rect x="236" y="188" width="12" height="8" fill="#3dff8b"/>
           <g id="knife">
-            <rect x="174" y="30" width="16" height="6" rx="2" fill="#2a1a12"/>
-            <path d="M190 30 l38 2 l-4 6 l-34 -2z" fill="#c9ccd6" stroke="#0c0414" stroke-width="1.5"/>
-            <path d="M200 31 l16 1 l-2 4 l-12 -1z" fill="#c4001d"/>
+            <rect x="34" y="194" width="34" height="11" rx="3" fill="#2a1a12" stroke="#0c0414" stroke-width="2"/>
+            <path d="M68 195 l74 3 l-10 8 l-64 -2z" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/>
+            <path d="M86 196 l34 1.5 l-5 6 l-29 -1z" fill="#c4001d"/>
+            <circle cx="104" cy="216" r="2.5" fill="#c4001d"/><circle cx="106" cy="228" r="2" fill="#c4001d"/>
           </g>
-          <rect x="230" y="22" width="8" height="22" rx="3" fill="#2f8f4e" stroke="#0c0414" stroke-width="1.5"/>
-          <!-- trash -->
-          <circle cx="183" cy="179" r="16" fill="#5c5566" stroke="#0c0414" stroke-width="3"/>
-          <circle cx="183" cy="179" r="11" fill="#2a2531"/>
-          <rect x="176" y="168" width="6" height="16" fill="#cde" transform="rotate(30 179 176)"/>
-          <rect x="186" y="172" width="10" height="7" fill="#f5f0c8"/>
-          <!-- clock on wall -->
-          <circle cx="24" cy="250" r="14" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
-          <line x1="24" y1="250" x2="24" y2="239" stroke="#0c0414" stroke-width="2.5"/>
-          <line x1="24" y1="250" x2="32" y2="250" stroke="#0c0414" stroke-width="3"/>
-          <path d="M14 244 l8 6 l-4 8 M30 240 l-4 9" stroke="#c4001d" stroke-width="1.5" fill="none"/>
-          <circle cx="40" cy="268" r="2" fill="#dde"/><circle cx="46" cy="258" r="1.5" fill="#dde"/><circle cx="36" cy="278" r="1.5" fill="#dde"/>
-          <!-- tv -->
-          <rect x="324" y="206" width="22" height="80" fill="#0c0414" stroke="#3a2a4f" stroke-width="2"/>
-          <rect class="tvglow" x="318" y="214" width="6" height="64" fill="#2de2e6" opacity=".8"/>
-          <path d="M318 214 L262 196 L262 296 L318 278z" fill="#2de2e6" opacity=".08"/>
-          <!-- window -->
-          <rect x="342" y="318" width="12" height="86" fill="url(#pBlinds)" stroke="#0c0414" stroke-width="2"/>
-          <path d="M342 318 L300 300 L300 422 L342 404z" fill="#2de2e6" opacity=".07"/>
-          <!-- phone on floor -->
-          <g transform="rotate(24 204 360)">
-            <rect x="196" y="346" width="16" height="28" rx="3" fill="#0c0414" stroke="#f7ecff" stroke-width="1.5"/>
-            <rect x="198" y="349" width="12" height="20" fill="#2de2e6" opacity=".7"/>
-            <path d="M199 352 l8 12" stroke="#0c0414" stroke-width="1"/>
-          </g>
-          <!-- pizza + cans -->
-          <rect x="262" y="432" width="48" height="48" fill="#d9b27a" stroke="#0c0414" stroke-width="3" transform="rotate(-12 286 456)"/>
-          <circle cx="282" cy="452" r="12" fill="#e2482f" opacity=".8"/>
-          <circle cx="246" cy="400" r="5" fill="#c8ccd6" stroke="#0c0414" stroke-width="1.5"/>
-          <circle cx="168" cy="312" r="5" fill="#c8ccd6" stroke="#0c0414" stroke-width="1.5"/>
-          <path d="M150 380 l14 -4 l3 6 l-8 8z" fill="#2f8f4e" stroke="#0c0414" stroke-width="1.5"/>
-          <path d="M168 372 l6 3 M172 390 l5 -2" stroke="#9fe" stroke-width="2"/>
-          <!-- bed + stranger -->
-          <rect x="16" y="396" width="156" height="128" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
-          <rect x="22" y="402" width="144" height="116" fill="#e8e0f0"/>
-          <rect x="26" y="412" width="36" height="46" rx="6" fill="#ffffff" stroke="#0c0414" stroke-width="2"/>
-          <ellipse cx="50" cy="440" rx="26" ry="22" fill="#c4001d" opacity=".85"/>
-          <path d="M60 422 C100 410 150 420 160 450 C162 480 120 500 70 488 C56 470 56 440 60 422z" fill="#5e6fd1" stroke="#0c0414" stroke-width="2.5"/>
-          <path d="M80 440 q30 6 64 0 M84 470 q26 8 60 0" stroke="#3b47a0" stroke-width="2" fill="none"/>
-          <circle cx="52" cy="438" r="13" fill="#c98b6b" stroke="#0c0414" stroke-width="2.5"/>
-          <path d="M40 432 a13 13 0 0 1 24 -2 l-6 4 l-6 -4 l-6 4z" fill="#1b0d08"/>
-          <rect x="90" y="480" width="10" height="44" fill="#c98b6b" stroke="#0c0414" stroke-width="2" transform="rotate(12 95 500)"/>
-          <!-- walls -->
-          <g fill="#0c0414">
-            <rect x="0" y="0" width="360" height="10"/>
-            <rect x="0" y="0" width="10" height="540"/>
-            <rect x="350" y="0" width="10" height="540"/>
-            <rect x="0" y="530" width="226" height="10"/>
-            <rect x="300" y="530" width="60" height="10"/>
-            <rect x="148" y="0" width="8" height="172"/>
-            <rect x="0" y="168" width="96" height="8"/>
-            <rect x="140" y="168" width="16" height="8"/>
-          </g>
-          <g stroke="#ff2e88" stroke-width="1.5" fill="none" opacity=".75">
-            <path d="M10 10 H350 V530 M10 10 V530 H226 M300 530 H350"/>
-          </g>
-          <!-- door -->
-          <g id="door">
-            <rect id="doorSlab" x="226" y="526" width="74" height="12" fill="#7a3b1c" stroke="#0c0414" stroke-width="2"/>
-          </g>
-          <rect x="306" y="508" width="16" height="20" fill="#1b1622" stroke="#0c0414" stroke-width="2"/>
-          <circle id="ledKey" cx="310" cy="513" r="2.4" fill="#e0102f"/>
-          <circle id="ledCode" cx="318" cy="513" r="2.4" fill="#e0102f"/>
-          <rect x="309" y="518" width="10" height="7" fill="#3a2a4f"/>
+          <rect x="128" y="158" width="14" height="50" rx="4" fill="#2f8f4e" stroke="#0c0414" stroke-width="2"/><rect x="131" y="146" width="8" height="14" fill="#2f8f4e" stroke="#0c0414" stroke-width="2"/>
+          <rect x="146" y="176" width="10" height="32" rx="3" fill="#cfe9ef" stroke="#0c0414" stroke-width="2" transform="rotate(14 151 192)"/>
+          <rect x="272" y="52" width="84" height="278" fill="#eaeaf2" stroke="#0c0414" stroke-width="3"/>
+          <path d="M272 150 H356" stroke="#0c0414" stroke-width="3"/>
+          <rect x="282" y="104" width="6" height="36" fill="#7a7a8a"/><rect x="282" y="168" width="6" height="50" fill="#7a7a8a"/>
+          <rect x="304" y="70" width="34" height="40" fill="#fff" stroke="#0c0414" stroke-width="2" transform="rotate(-6 321 90)"/>
+          <rect x="308" y="74" width="26" height="24" fill="#2de2e6" transform="rotate(-6 321 90)"/>
+          <circle cx="322" cy="84" r="6" fill="#c4001d" transform="rotate(-6 321 90)"/>
+          <circle cx="320" cy="200" r="7" fill="#ff2e88"/><circle cx="336" cy="236" r="6" fill="#ffd23f"/>
+          <path d="M0 330 H360 V480 H0z" fill="url(#gFloor)"/>
+          <g class="floorlines"></g>
+          <path d="M16 348 h76 l-9 104 h-58z" fill="#5c5566" stroke="#0c0414" stroke-width="3"/>
+          <ellipse cx="54" cy="348" rx="38" ry="8" fill="#2a2531" stroke="#0c0414" stroke-width="3"/>
+          <rect x="36" y="318" width="10" height="30" fill="#cfe9ef" stroke="#0c0414" stroke-width="2" transform="rotate(-16 41 333)"/>
+          <rect x="58" y="326" width="22" height="16" fill="#f5f0c8" stroke="#0c0414" stroke-width="2" transform="rotate(10 69 334)"/>
+          <rect x="22" y="334" width="14" height="10" fill="#f7ecff" stroke="#0c0414" stroke-width="1.5"/>
         </g>
+
+        <!-- ===== L: TV E JANELA ===== -->
+        <g id="v-L" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pStripe)"/>
+          <rect x="196" y="52" width="150" height="208" fill="#0c0414"/>
+          <rect x="204" y="60" width="134" height="192" fill="url(#gSky)"/>
+          <circle cx="300" cy="206" r="26" fill="#ffd23f" opacity=".9"/>
+          <g fill="#1b0a2e"><rect x="204" y="190" width="26" height="62"/><rect x="230" y="172" width="20" height="80"/><rect x="250" y="200" width="30" height="52"/><rect x="290" y="184" width="22" height="68"/><rect x="312" y="206" width="26" height="46"/></g>
+          <g fill="#ffd23f" opacity=".7"><rect x="234" y="180" width="4" height="4"/><rect x="242" y="196" width="4" height="4"/><rect x="296" y="196" width="4" height="4"/><rect x="214" y="200" width="4" height="4"/></g>
+          <rect x="204" y="60" width="134" height="64" fill="url(#pBlinds)"/>
+          <rect class="siren" x="240" y="240" width="14" height="8" fill="#e0102f"/>
+          <rect class="siren b" x="256" y="240" width="14" height="8" fill="#2d6bff"/>
+          <path d="M196 156 H346" stroke="#0c0414" stroke-width="5"/><path d="M271 52 V260" stroke="#0c0414" stroke-width="5"/>
+          <rect x="188" y="258" width="166" height="12" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+          <rect x="18" y="262" width="164" height="68" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
+          <path d="M100 262 V330" stroke="#0c0414" stroke-width="3"/>
+          <rect x="30" y="146" width="140" height="112" rx="6" fill="#0c0414" stroke="#3a2a4f" stroke-width="3"/>
+          <g id="tvScreen">
+            <rect x="40" y="156" width="120" height="84" fill="#1a5fb4"/>
+            <rect x="50" y="166" width="42" height="50" fill="#e8e0f0"/>
+            <circle cx="71" cy="186" r="12" fill="#c98b6b"/><path d="M59 184 a12 12 0 0 1 24 -2 l-6 2 l-6 -3 l-6 3z" fill="#1b0d08"/>
+            <rect x="57" y="198" width="28" height="18" fill="#2a2a3a"/>
+            <g fill="#f7ecff"><rect x="100" y="170" width="50" height="5"/><rect x="100" y="182" width="40" height="5"/><rect x="100" y="194" width="46" height="5"/></g>
+            <rect x="40" y="224" width="120" height="16" fill="#e0102f"/>
+            <text x="46" y="236" font-family="VT323,monospace" font-size="13" fill="#fff">URGENTE · EXECUTIVO SUMIDO</text>
+          </g>
+          <rect class="tvglow" x="40" y="156" width="120" height="84" fill="#2de2e6" opacity=".12"/>
+          <rect x="94" y="258" width="14" height="6" fill="#0c0414"/>
+          <path d="M0 330 H360 V480 H0z" fill="url(#gFloor)"/>
+          <g class="floorlines"></g>
+          <ellipse cx="180" cy="420" rx="120" ry="34" fill="#ff2e88" opacity=".8"/>
+          <ellipse cx="180" cy="420" rx="92" ry="24" fill="none" stroke="#ffd23f" stroke-width="3" stroke-dasharray="3 8"/>
+          <rect x="250" y="380" width="12" height="20" rx="3" fill="#c8ccd6" stroke="#0c0414" stroke-width="2" transform="rotate(70 256 390)"/>
+          <rect x="90" y="440" width="12" height="20" rx="3" fill="#c8ccd6" stroke="#0c0414" stroke-width="2"/>
+        </g>
+
+        <!-- ===== S: PORTA ===== -->
+        <g id="v-S" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pDoorWall)"/>
+          <circle cx="62" cy="96" r="32" fill="#f7ecff" stroke="#0c0414" stroke-width="4"/>
+          <g stroke="#0c0414" stroke-linecap="round"><line x1="62" y1="96" x2="62" y2="70" stroke-width="3"/><line x1="62" y1="96" x2="82" y2="96" stroke-width="5"/></g>
+          <g font-family="VT323,monospace" font-size="11" fill="#0c0414" text-anchor="middle"><text x="62" y="76">12</text><text x="86" y="100">3</text><text x="62" y="124">6</text><text x="38" y="100">9</text></g>
+          <path d="M40 80 l18 14 l-10 18 M76 72 l-8 20 l14 8" stroke="#c4001d" stroke-width="2" fill="none"/>
+          <path d="M44 88 l6 -4 M70 110 l8 4" stroke="#7a9aa3" stroke-width="1.5"/>
+          <rect x="112" y="58" width="138" height="272" fill="#0c0414"/>
+          <rect id="doorSlab" x="120" y="66" width="122" height="264" fill="#7a3b1c" stroke="#0c0414" stroke-width="3"/>
+          <rect x="134" y="84" width="94" height="96" fill="none" stroke="#5a2a16" stroke-width="4"/>
+          <rect x="134" y="200" width="94" height="112" fill="none" stroke="#5a2a16" stroke-width="4"/>
+          <circle cx="181" cy="108" r="5" fill="#0c0414" stroke="#ffd23f" stroke-width="2"/>
+          <rect x="212" y="148" width="20" height="14" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/><rect x="220" y="152" width="4" height="7" fill="#0c0414"/>
+          <circle cx="222" cy="204" r="9" fill="#ffd23f" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M150 230 q6 -12 14 -2 q4 -14 10 0 q6 -10 10 2 q4 14 -10 22 q-18 4 -24 -22z" fill="#c4001d" opacity=".85"/>
+          <rect x="256" y="166" width="34" height="52" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <circle id="ledKey" cx="266" cy="176" r="3.5" fill="#e0102f"/>
+          <circle id="ledCode" cx="280" cy="176" r="3.5" fill="#e0102f"/>
+          <g fill="#3a2a4f"><rect x="261" y="186" width="7" height="6"/><rect x="270" y="186" width="7" height="6"/><rect x="279" y="186" width="7" height="6"/><rect x="261" y="195" width="7" height="6"/><rect x="270" y="195" width="7" height="6"/><rect x="279" y="195" width="7" height="6"/><rect x="261" y="204" width="7" height="6"/><rect x="270" y="204" width="7" height="6"/><rect x="279" y="204" width="7" height="6"/></g>
+          <rect x="300" y="70" width="8" height="8" fill="#ffd23f"/>
+          <path d="M304 78 q-22 30 -10 90 q22 10 34 -4 q8 -58 -24 -86z" fill="#ff2e88" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M0 330 H360 V480 H0z" fill="url(#gFloor)"/>
+          <g class="floorlines"></g>
+          <g fill="#c4001d"><circle cx="150" cy="350" r="4"/><circle cx="130" cy="372" r="5"/><circle cx="110" cy="400" r="4"/><circle cx="90" cy="430" r="6"/><circle cx="76" cy="462" r="5"/></g>
+          <g fill="#dde"><circle cx="58" cy="344" r="2"/><circle cx="70" cy="352" r="1.5"/><circle cx="44" cy="350" r="1.8"/></g>
+          <path d="M14 392 L92 378 L106 430 L26 446z" fill="#d9b27a" stroke="#0c0414" stroke-width="3"/>
+          <circle cx="60" cy="410" r="14" fill="#e2482f" opacity=".85"/>
+          <g transform="rotate(-18 196 418)">
+            <rect x="176" y="396" width="40" height="66" rx="6" fill="#0c0414" stroke="#f7ecff" stroke-width="2"/>
+            <rect x="181" y="402" width="30" height="50" fill="#2de2e6" opacity=".85"/>
+            <path d="M184 406 l22 40 M200 404 l-12 22" stroke="#0c0414" stroke-width="1.5"/>
+            <rect x="185" y="430" width="22" height="7" fill="#f7ecff"/>
+          </g>
+        </g>
+
+        <!-- ===== O: CAMA ===== -->
+        <g id="v-O" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#3a1d6e"/>
+          <path d="M0 140 H360" stroke="#ff2e88" stroke-width="3"/><path d="M0 148 H360" stroke="#2de2e6" stroke-width="2"/>
+          <rect x="44" y="34" width="132" height="92" fill="#ff2e88" stroke="#0c0414" stroke-width="3" transform="rotate(-3 110 80)"/>
+          <text x="110" y="92" text-anchor="middle" font-family="Rubik Wet Paint,Impact,sans-serif" font-size="30" fill="#ffd23f" transform="rotate(-3 110 80)">MIAMI</text>
+          <text x="110" y="112" text-anchor="middle" font-family="VT323,monospace" font-size="14" fill="#0c0414" transform="rotate(-3 110 80)">NIGHT · 1986</text>
+          <rect x="6" y="168" width="32" height="162" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
+          <rect x="30" y="262" width="232" height="68" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
+          <rect x="30" y="232" width="232" height="36" fill="#e8e0f0" stroke="#0c0414" stroke-width="3"/>
+          <ellipse cx="70" cy="230" rx="34" ry="15" fill="#ffffff" stroke="#0c0414" stroke-width="2.5"/>
+          <ellipse cx="74" cy="236" rx="30" ry="12" fill="#c4001d" opacity=".9"/>
+          <path d="M92 230 C130 196 210 196 256 226 L256 262 L92 262z" fill="#5e6fd1" stroke="#0c0414" stroke-width="3"/>
+          <path d="M120 222 q40 -10 90 6 M110 246 q60 -8 140 2" stroke="#3b47a0" stroke-width="2.5" fill="none"/>
+          <circle cx="76" cy="216" r="17" fill="#c98b6b" stroke="#0c0414" stroke-width="3"/>
+          <path d="M60 212 a17 17 0 0 1 32 -4 l-7 4 l-8 -5 l-8 5z" fill="#1b0d08"/>
+          <path d="M66 224 l8 -3" stroke="#c4001d" stroke-width="3"/>
+          <path d="M150 258 q6 40 2 78 l14 0 q4 -40 -2 -78z" fill="#c98b6b" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="268" y="66" width="86" height="266" fill="#0c0414"/>
+          <rect x="276" y="74" width="70" height="258" fill="url(#pTileDark)" opacity=".55"/>
+          <rect x="276" y="74" width="70" height="258" fill="#ff2e88" opacity=".2"/>
+          <path d="M268 66 L246 80 L246 320 L268 332z" fill="#7a3b1c" stroke="#0c0414" stroke-width="3"/>
+          <rect x="290" y="44" width="42" height="16" fill="#0c0414"/><text x="311" y="57" text-anchor="middle" font-family="VT323,monospace" font-size="15" fill="#2de2e6">WC</text>
+          <path d="M0 330 H360 V480 H0z" fill="url(#gFloor)"/>
+          <g class="floorlines"></g>
+          <g fill="#c4001d"><circle cx="190" cy="350" r="4"/><circle cx="230" cy="366" r="3"/><circle cx="262" cy="350" r="4"/><circle cx="296" cy="340" r="3"/></g>
+          <path d="M140 344 l20 -6 l4 8 l-12 10z" fill="#2f8f4e" stroke="#0c0414" stroke-width="2"/>
+          <path d="M162 330 l8 4 M168 352 l8 -2" stroke="#9fe" stroke-width="2.5"/>
+          <rect x="40" y="380" width="70" height="40" rx="4" fill="#ff2e88" stroke="#0c0414" stroke-width="3" transform="rotate(-8 75 400)"/>
+        </g>
+
+        <!-- ===== B: BANHEIRO ===== -->
+        <g id="v-B" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pTile)"/>
+          <rect x="18" y="38" width="156" height="300" fill="#cfe9ef" opacity=".55" stroke="#0c0414" stroke-width="3"/>
+          <path d="M96 38 V24 H130" stroke="#7a7a8a" stroke-width="5" fill="none"/>
+          <ellipse cx="96" cy="58" rx="22" ry="8" fill="#9aa0ad" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M22 40 q22 60 6 140 q18 70 4 154 l22 0 q10 -90 -4 -150 q14 -70 -6 -144z" fill="#ff2e88" stroke="#0c0414" stroke-width="2.5"/>
+          <ellipse cx="100" cy="330" rx="12" ry="4" fill="#7a9aa3"/>
+          <g id="steam" opacity="0">
+            <circle class="steam" cx="80" cy="110" r="34" fill="#fff" opacity=".8"/>
+            <circle class="steam" cx="130" cy="170" r="30" fill="#fff" opacity=".7" style="animation-delay:.6s"/>
+            <circle class="steam" cx="230" cy="110" r="28" fill="#fff" opacity=".55" style="animation-delay:1.1s"/>
+            <circle class="steam" cx="290" cy="150" r="34" fill="#fff" opacity=".5" style="animation-delay:.3s"/>
+          </g>
+          <rect x="212" y="62" width="122" height="134" fill="#9fd9e6" stroke="#0c0414" stroke-width="4"/>
+          <path d="M226 80 l30 -10 M230 100 l60 -22" stroke="#f7ecff" stroke-width="3" opacity=".6"/>
+          <rect id="fog" x="214" y="64" width="118" height="130" fill="#ffffff" opacity="0"/>
+          <g id="mirrorText" opacity="0" font-family="Rubik Wet Paint,Impact,sans-serif" fill="#c4001d" text-anchor="middle">
+            <text x="273" y="118" font-size="30">HORA</text>
+            <text x="273" y="152" font-size="30">+ APTO</text>
+            <text x="273" y="180" font-size="13" font-family="VT323,monospace">não esquece, idiota</text>
+          </g>
+          <rect x="338" y="90" width="18" height="76" fill="#eaeaf2" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M206 228 h134 l-16 34 h-102z" fill="#f4f4f4" stroke="#0c0414" stroke-width="3"/>
+          <ellipse cx="273" cy="236" rx="46" ry="6" fill="#9fc6cf"/>
+          <rect x="268" y="210" width="10" height="20" fill="#9aa0ad" stroke="#0c0414" stroke-width="2"/>
+          <rect x="258" y="262" width="30" height="68" fill="#f4f4f4" stroke="#0c0414" stroke-width="3"/>
+          <path d="M0 330 H360 V480 H0z" fill="url(#pTileDark)"/>
+          <g class="floorlines" opacity=".4"></g>
+          <path d="M200 400 q40 -20 90 0 q10 30 -20 46 q-50 10 -76 -10z" fill="#ff2e88" stroke="#0c0414" stroke-width="3"/>
+          <path d="M226 412 q20 -6 34 4" stroke="#c4001d" stroke-width="8" fill="none"/>
+        </g>
+
+        <rect x="0" y="0" width="360" height="22" fill="#0c0414"/>
+        <rect x="100" y="8" width="160" height="5" rx="2" fill="#ff2e88"/>
+        <rect x="100" y="6" width="160" height="9" rx="4" fill="#ff2e88" opacity=".25"/>
         <g id="hsLayer"></g>
-        <g id="peerLayer"></g>
         <g id="rippleLayer"></g>
-        <g id="hero" style="transform:translate(210px,270px)">
-          <g id="heroRot">
-            <ellipse cx="0" cy="0" rx="15" ry="10" fill="#ff2e88" stroke="#0c0414" stroke-width="2.5"/>
-            <path d="M-12 -2 h24" stroke="#ffd23f" stroke-width="2"/>
-            <circle cx="0" cy="0" r="7.5" fill="#d79a75" stroke="#0c0414" stroke-width="2"/>
-            <path d="M-7 -1 a7.5 7.5 0 0 1 14 0 q-7 -3 -14 0z" fill="#3a1d0e"/>
-            <circle cx="4" cy="-3" r="1.4" fill="#c4001d"/>
-          </g>
-        </g>
+        <g id="cursorLayer"></g>
+        <rect id="overlay" x="0" y="0" width="360" height="480" fill="url(#gVig)"/>
       </svg>
     </div>
   </div>
@@ -378,19 +477,15 @@ input[type=text]:focus{border-color:var(--cyan)}
 <!-- ================= END ================= -->
 <section id="end" class="screen" hidden>
   <div class="endwrap">
-    <h2 class="verdict" id="verdict">VOCÊ SAIU.</h2>
+    <h2 class="verdict" id="verdict">VOCÊS SAÍRAM.</h2>
     <ul class="story" id="story"></ul>
     <div class="rep" id="report"></div>
   </div>
 </section>
 
-<!-- hotspot sheet -->
 <div class="sheet" id="sheet" aria-hidden="true">
   <div class="sheet-in">
-    <div class="sh-top">
-      <h2 class="sh-title" id="shTitle">—</h2>
-      <button class="x" id="shClose" aria-label="Fechar">×</button>
-    </div>
+    <div class="sh-top"><h2 class="sh-title" id="shTitle">—</h2><button class="x" id="shClose" aria-label="Fechar">×</button></div>
     <p class="sh-desc" id="shDesc"></p>
     <p class="sh-res" id="shRes" hidden></p>
     <div class="acts" id="shActs"></div>
@@ -398,13 +493,9 @@ input[type=text]:focus{border-color:var(--cyan)}
   </div>
 </div>
 
-<!-- chat sheet -->
 <div class="sheet" id="chat" aria-hidden="true">
   <div class="sheet-in">
-    <div class="sh-top">
-      <h2 class="sh-title">Vozes</h2>
-      <button class="x" id="chatClose" aria-label="Fechar chat">×</button>
-    </div>
+    <div class="sh-top"><h2 class="sh-title">Chat da sala</h2><button class="x" id="chatClose" aria-label="Fechar chat">×</button></div>
     <div class="msgs" id="msgs"></div>
     <div class="chips" id="chips"></div>
     <form class="send" id="sendForm">
@@ -418,7 +509,7 @@ input[type=text]:focus{border-color:var(--cyan)}
 
 <div class="modal" id="keypad" hidden>
   <div class="pad">
-    <div class="tag" style="color:#ab93cc">TRAVA ELETRÔNICA · 4 DÍGITOS</div>
+    <div class="tag">TRAVA ELETRÔNICA · 4 DÍGITOS</div>
     <div class="pad-disp" id="padDisp">____</div>
     <div class="keys" id="keys"></div>
     <button class="btn" id="padClose">Fechar</button>
@@ -430,7 +521,7 @@ input[type=text]:focus{border-color:var(--cyan)}
     <h3>flash.</h3>
     <p>Um pedaço da noite volta. <b>Só você lembra disso.</b> Conte pro time pelo chat.</p>
     <div id="clues" style="display:flex;flex-direction:column;gap:10px"></div>
-    <p style="font-size:13px">Toque nos objetos da kitnet para examinar. A ressaca embaça a visão; água e remédio ajudam.</p>
+    <p style="font-size:13px">Use as setas (ou arraste pro lado) para virar. Toque nos objetos para examinar. Água e remédio aliviam a ressaca.</p>
     <button class="btn" id="memClose">Bora</button>
   </div>
 </div>
@@ -440,6 +531,7 @@ input[type=text]:focus{border-color:var(--cyan)}
 "use strict";
 const DUR = 180000, CODE = "0347";
 const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
 const PALETTE = ["#ff2e88","#2de2e6","#ffd23f","#3dff8b","#b18cff","#ff8a3d"];
 const CLUES = [
   "O relógio caiu na briga. Você lembra do vidro voando… Os ponteiros pararam ali. Que horas eram?",
@@ -448,38 +540,44 @@ const CLUES = [
 ];
 const QUICK = ["Achei uma pista!","Vem pra cá","Qual a senha?","Deixa comigo","Não mexe nisso","Tá vivo?"];
 
+// camera: four walls you turn between, plus the bathroom reached from the bed wall
+const VIEWS = { N:"Cozinha", L:"TV e janela", S:"Porta", O:"Cama", B:"Banheiro" };
+const RING = ["N","L","S","O"];
+const START_VIEW = "O";
+
 const HS = {
-  chuveiro:{n:"Chuveiro",r:[18,18,74,74],st:[66,104]},
-  espelho:{n:"Pia e espelho",r:[96,8,54,48],st:[122,90]},
-  bancada:{n:"Bancada",r:[158,12,82,50],st:[200,94]},
-  micro:{n:"Micro-ondas",r:[240,12,50,46],st:[264,94]},
-  geladeira:{n:"Geladeira",r:[290,10,60,76],st:[304,112]},
-  lixo:{n:"Lixo",r:[160,156,46,46],st:[208,214]},
-  relogio:{n:"Relógio",r:[8,226,44,50],st:[64,252]},
-  tv:{n:"TV",r:[306,200,46,92],st:[286,246]},
-  janela:{n:"Janela",r:[322,312,32,98],st:[300,362]},
-  celular:{n:"Celular",r:[180,338,48,48],st:[228,322]},
-  cama:{n:"Cama",r:[14,392,160,136],st:[198,452]},
-  porta:{n:"Porta",r:[222,500,110,40],st:[264,490]}
+  bancada:{v:"N",n:"Bancada",r:[28,186,124,38]},
+  micro:{v:"N",n:"Micro-ondas",r:[154,140,108,74]},
+  geladeira:{v:"N",n:"Geladeira",r:[268,48,92,286]},
+  lixo:{v:"N",n:"Lixo",r:[8,312,96,146]},
+  tv:{v:"L",n:"TV",r:[24,140,152,124]},
+  janela:{v:"L",n:"Janela",r:[192,48,158,226]},
+  relogio:{v:"S",n:"Relógio",r:[24,58,78,78]},
+  porta:{v:"S",n:"Porta",r:[110,56,186,276]},
+  celular:{v:"S",n:"Celular",r:[160,384,76,92]},
+  cama:{v:"O",n:"Cama",r:[4,160,262,180]},
+  banheiro:{v:"O",n:"Banheiro",r:[244,40,112,294],nav:"B"},
+  chuveiro:{v:"B",n:"Chuveiro",r:[14,20,166,322]},
+  espelho:{v:"B",n:"Pia e espelho",r:[204,56,154,276]}
 };
-const HS_COUNT = Object.keys(HS).length;
+const OBJ = Object.keys(HS).filter(k=>!HS[k].nav);
+const HS_COUNT = OBJ.length;
 
 const DESC = {
-  chuveiro:s=>s.showerOn?"Vapor tomando o banheiro. O espelho ao lado começa a embaçar.":"Box encardido. Uma toalha cor-de-rosa no chão. Rosa não era a cor original.",
-  espelho:s=>s.showerOn?(s.mirrorRead?"No vapor do espelho, escrito com o dedo: HORA + APTO. NÃO ESQUECE, IDIOTA.":"O vapor revela letras escritas com o dedo no espelho…"):"Sua cara está péssima. Olho roxo. Tem marca de dedo no vidro, mas seco não dá pra ler.",
+  chuveiro:s=>s.showerOn?"Vapor tomando o banheiro. O espelho ao lado começa a embaçar.":"Box encardido. Cortina rosa rasgada. Rosa não era a cor original.",
+  espelho:s=>s.showerOn?(s.mirrorRead?"No vapor do espelho, escrito com o dedo: HORA + APTO. NÃO ESQUECE, IDIOTA.":"O vapor revela letras escritas com o dedo no espelho…"):"Sua cara está péssima. Olho roxo. Tem marca de dedo no vidro, mas seco não dá pra ler. Do lado, um armarinho.",
   bancada:s=>s.knifeTaken?"Marca de faca no balcão. Ela não está mais aqui.":"Uma faca de cozinha largada. A lâmina está suja. Não é ketchup.",
   micro:()=>"Micro-ondas velho, manchado. Ainda funciona, pelo barulho.",
   geladeira:s=>s.iceTaken?"Cerveja, limão murcho e um balde vazio.":"Cheiro azedo. Cerveja, limão e um balde com um bloco de gelo. Tem algo metálico lá dentro.",
   lixo:s=>s.trash?"Garrafas, luvas de látex usadas e o envelope do apto 47.":"Lixo transbordando. Garrafas de vodka, papel, fita adesiva.",
   relogio:s=>s.clock?"Parado em 3:00. Vidro trincado com sangue.":"Relógio de parede espatifado. Os ponteiros pararam.",
   tv:s=>s.tv?"Jornal: executivo da Halden Corp desaparecido depois da festa da firma. A foto é o cara da cama.":"TV ligada, sem som. Jornal da manhã. A foto de um homem de terno.",
-  janela:()=>"Quarto andar. Uma viatura parada lá embaixo. Ninguém olhou pra cima. Ainda.",
+  janela:()=>"Quarto andar. Uma viatura parada lá embaixo, giroflex ligado. Ninguém olhou pra cima. Ainda.",
   celular:s=>"Tela rachada, 4% de bateria. "+(s.deleted?"A conversa com “R.” está vazia.":"Mensagem de “R.”: “Limpa tudo antes das 9. Ninguém pode saber. Pago o dobro.”"),
   cama:s=>s.pulse?"Um homem que você nunca viu. Respira, fraco. Corte fundo na testa. O travesseiro está encharcado.":"Um homem que você nunca viu, de bruços. O travesseiro está vermelho. Ele respira? Você não sabe.",
   porta:s=>`Porta blindada. Tranca de chave em cima${s.keyUsed?" (aberta)":""}. Teclado de 4 dígitos${s.codeOk?" (luz verde)":""}.`
 };
 
-// a = action id. key: milestone credited to whoever did it. grey/good: ethical signal for the report.
 const ACT = {
   shower_on:{h:"chuveiro",l:"Ligar no quente",can:s=>!s.showerOn,run:s=>{s.showerOn=true},msg:"A água sai pelando. O banheiro enche de vapor.",key:"Ligou o chuveiro (revela o espelho)"},
   shower_off:{h:"chuveiro",l:"Desligar",can:s=>s.showerOn,run:s=>{s.showerOn=false},msg:"Silêncio. Só o pinga-pinga."},
@@ -514,40 +612,127 @@ const ITEMS = {
   carteira:{n:"carteira do Renato",c:"#c58b4e"}, remedio:{n:"remédio sem nome",c:"#3dff8b"}
 };
 
-// ---------------- identity & connection ----------------
+// ---------------- identity ----------------
 const store = {
   get(k){try{return sessionStorage.getItem(k)}catch(e){return null}},
   set(k,v){try{sessionStorage.setItem(k,v)}catch(e){}},
   del(k){try{sessionStorage.removeItem(k)}catch(e){}}
 };
 const rid = n => Array.from(crypto.getRandomValues(new Uint8Array(n)),b=>"ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[b%32]).join("");
-let pk = store.get("k47.pk"); if(!pk){pk="v"+rid(10).toLowerCase(); store.set("k47.pk",pk);}
-let me = {pk, nick:"", color:PALETTE[0], uid:null};
-let db=null, room=null, user=null, downloads=null, named=null, code=null;
-let unsubDb=null, unsubRoom=[];
-const evMap = new Map();
-let myEvents = [];
-let seq = 0;
-let S = null;
-let peers = [];
-let joined = false;
+let pk = store.get("k47.pk"); if(!pk){ pk="v"+rid(10).toLowerCase(); store.set("k47.pk",pk); }
+const me = {pk, nick:"", color:PALETTE[0], uid:null};
 
-const capsReady = Promise.all([
-  window.claude?.use?.("db") ?? null,
-  window.claude?.use?.("room") ?? null,
-  window.claude?.use?.("user") ?? null,
-  window.claude?.use?.("downloads") ?? null
-].map(p=>Promise.resolve(p).catch(()=>null))).then(async ([d,r,u,dl])=>{
-  db=d; room=r; user=u; downloads=dl;
-  if(user){ try{ me.uid = await user.id(); }catch(e){} }
-  netHint();
-});
-function netHint(){
-  const h=$("netHint");
-  if(db||room) h.textContent="Multiplayer ativo. Todo mundo com o mesmo código cai na mesma kitnet.";
-  else h.textContent="Multiplayer indisponível nesta visualização. Dá pra jogar solo, e o relatório sai no final do mesmo jeito.";
+// ---------------- state ----------------
+const evMap = new Map();
+let myEvents = [], seq = 0, S = null, joined = false, code = null;
+let view = START_VIEW, sheetH = null, lastRes = null;
+let peerMap = new Map();   // pk -> {nick,color,view,at,online}
+let screen = "lobby", shownMemory = false, endShownFor = null, seenTaps = 0;
+let chatOpen = false, seenChats = 0, unread = 0, toastT = null, repTab = "team";
+let suppressClick = false, swipe = null, padVal = "";
+
+// ---------------- network: claude.ai runtime, local server, or solo ----------------
+const net = { kind:"solo", send(){}, presence(){}, leave(){} };
+let db=null, room=null, user=null, downloads=null;
+
+const capsReady = (async () => {
+  const use = n => Promise.resolve(window.claude?.use?.(n) ?? null).catch(()=>null);
+  if (window.claude?.use) {
+    [db, room, user, downloads] = await Promise.all([use("db"), use("room"), use("user"), use("downloads")]);
+    if (user) { try { me.uid = await user.id(); } catch(e){} }
+    if (db || room) { net.kind = "claude"; return; }
+  }
+  try {
+    const ctl = new AbortController(); setTimeout(()=>ctl.abort(), 2500);
+    const r = await fetch("/api/ping", {cache:"no-store", signal:ctl.signal});
+    if (r.ok && (await r.json())?.kitnet === 1) net.kind = "local";
+  } catch(e){}
+})().finally(renderNet);
+
+function renderNet(){
+  const on = net.kind !== "solo";
+  const txt = net.kind==="local" ? "Servidor da sala conectado" : net.kind==="claude" ? "Multiplayer ativo" : "Sem servidor: modo solo";
+  for (const id of ["netHint","netGame"]) { const el=$(id); el.classList.toggle("on",on); el.querySelector("span").textContent = id==="netGame" ? (on?"online":"solo") : txt; }
 }
-setTimeout(()=>{ if($("netHint").textContent==="Conectando…") netHint(); }, 4000);
+
+function setPeers(list){
+  const m = new Map();
+  for (const p of list||[]) {
+    if (!p || typeof p.pk!=="string") continue;
+    m.set(p.pk, {nick:String(p.nick||"").slice(0,14), color:/^#[0-9a-f]{6}$/i.test(p.color)?p.color:"#ffffff",
+      view:VIEWS[p.view]?p.view:null, at:HS[p.at]?p.at:null, online:p.online!==false});
+  }
+  peerMap = m;
+  renderPeople();
+}
+function myPresence(){ return {pk, nick:me.nick, color:me.color, view, at:sheetH}; }
+
+async function connectLocal(){
+  const base = `/api/rooms/${code}`;
+  const outbox = [];
+  let es = null, flushing = false, presT = null;
+  const post = (path, body) => fetch(base+path, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+  async function flushOut(){
+    if (flushing) return; flushing = true;
+    while (outbox.length && joined !== null) {
+      try { const r = await post("/ev", outbox[0]); if (!r.ok && r.status!==400) throw 0; outbox.shift(); }
+      catch(e){ await new Promise(r=>setTimeout(r,1500)); if (!code) break; }
+    }
+    flushing = false;
+  }
+  net.send = e => { outbox.push(e); flushOut(); };
+  net.presence = () => { clearTimeout(presT); presT = setTimeout(()=>post("/presence", myPresence()).catch(()=>{}), 60); };
+  await new Promise(resolve => {
+    es = new EventSource(`${base}/stream?pk=${encodeURIComponent(pk)}`);
+    let first = true;
+    es.addEventListener("init", ev => {
+      const d = JSON.parse(ev.data);
+      const have = new Set();
+      (d.events||[]).forEach(e => { have.add(e.id); ingest(e); if (e.p===pk && !myEvents.some(x=>x.id===e.id)) myEvents.push(clean(e)); });
+      // anything of mine the server missed (offline moments) goes back up
+      myEvents.filter(e=>!have.has(e.id) && !outbox.includes(e)).forEach(e=>outbox.push(e));
+      flushOut();
+      setPeers(d.peers);
+      post("/presence", myPresence()).catch(()=>{});
+      if (first) { first = false; resolve(); } else recompute();
+    });
+    es.addEventListener("ev", ev => { if (ingest(JSON.parse(ev.data))) recompute(); });
+    es.addEventListener("peers", ev => setPeers(JSON.parse(ev.data)));
+    setTimeout(resolve, 4000);
+  });
+  net.leave = () => { es?.close(); };
+}
+
+async function connectClaude(){
+  let named = null, unsubDb = null, unsubs = [];
+  if (db) {
+    try {
+      const snap = await db.collection(`sessions/${code}/p`).get();
+      snap.docs.forEach(d => { const ev=d.data()?.ev; if (Array.isArray(ev)) ev.forEach(e=>{ ingest(e); if (valid(e) && e.p===pk && !myEvents.some(x=>x.id===e.id)) myEvents.push(clean(e)); }); });
+    } catch(e){}
+    unsubDb = db.collection(`sessions/${code}/p`).onSnapshot(snap => {
+      let ch=false; snap.docs.forEach(d=>{ const ev=d.data()?.ev; if (Array.isArray(ev)) ev.forEach(e=>{ if (ingest(e)) ch=true; }); });
+      if (ch) recompute();
+    }, ()=>{});
+  }
+  let flushT=null, writing=false, pending=false;
+  async function flush(){
+    if (!db) return; if (writing){ pending=true; return; }
+    writing=true;
+    try { await db.doc(`sessions/${code}/p/${pk}`).set({nick:me.nick,color:me.color,ev:myEvents.slice(-700)}); } catch(e){}
+    writing=false; if (pending){ pending=false; flush(); }
+  }
+  if (room) {
+    try {
+      named = await room.join("k47-"+code.toLowerCase());
+      unsubs.push(named.on("ev", m => { if (!m.sameTab && ingest(m.data)) recompute(); }));
+      unsubs.push(named.onPeers(ch => setPeers(ch.peers.filter(p=>p.presence?.pk).map(p=>({...p.presence, online:true})))));
+    } catch(e){ named = null; }
+  }
+  net.send = e => { clearTimeout(flushT); flushT=setTimeout(flush,200); named?.emit("ev", e).catch(()=>{}); };
+  net.presence = () => { named?.presence(myPresence()).catch(()=>{}); };
+  net.leave = () => { unsubDb?.(); unsubs.forEach(u=>u()); named?.leave().catch(()=>{}); };
+}
 
 // ---------------- events ----------------
 const KINDS = new Set(["join","start","tap","act","chat"]);
@@ -557,35 +742,22 @@ function valid(e){
 }
 function clean(e){
   const o={id:e.id,p:e.p,ts:e.ts,k:e.k};
-  if(e.k==="join"){o.nick=String(e.nick||"").slice(0,14)||"Voz"; o.color=/^#[0-9a-f]{6}$/i.test(e.color)?e.color:PALETTE[0]; if(typeof e.uid==="string") o.uid=e.uid.slice(0,80);}
-  if(e.k==="tap"){o.x=+e.x||0;o.y=+e.y||0;o.h=HS[e.h]?e.h:null;}
-  if(e.k==="act"){o.a=String(e.a||"").slice(0,20); if(e.v!=null) o.v=String(e.v).slice(0,6);}
-  if(e.k==="chat"){o.m=String(e.m||"").slice(0,160);}
+  if(e.k==="join"){ o.nick=String(e.nick||"").slice(0,14)||"Jogador"; o.color=/^#[0-9a-f]{6}$/i.test(e.color)?e.color:PALETTE[0]; if(typeof e.uid==="string") o.uid=e.uid.slice(0,80); }
+  if(e.k==="tap"){ o.x=+e.x||0; o.y=+e.y||0; o.h=HS[e.h]?e.h:null; o.vw=VIEWS[e.vw]?e.vw:null; }
+  if(e.k==="act"){ o.a=String(e.a||"").slice(0,20); if(e.v!=null) o.v=String(e.v).slice(0,6); }
+  if(e.k==="chat"){ o.m=String(e.m||"").slice(0,160); }
   return o;
 }
-function ingest(e){ if(!valid(e)) return false; if(evMap.has(e.id)) return false; evMap.set(e.id,clean(e)); return true; }
+function ingest(e){ if(!valid(e)||evMap.has(e.id)) return false; evMap.set(e.id,clean(e)); return true; }
 function addEvent(k,data){
-  const e = clean({id:pk.slice(-6)+(seq++).toString(36)+Date.now().toString(36).slice(-5),p:pk,ts:Date.now(),k,...data});
+  const e = clean({id:pk.slice(-6)+(seq++).toString(36)+Date.now().toString(36).slice(-5), p:pk, ts:Date.now(), k, ...data});
   myEvents.push(e); evMap.set(e.id,e);
-  scheduleFlush();
-  if(named) named.emit("ev",e).catch(()=>{});
+  net.send(e);
   recompute();
   return e;
 }
-let flushT=null, writing=false, pending=false;
-function myDoc(){ return db.doc(`sessions/${code}/p/${pk}`); }
-function scheduleFlush(){ if(!db||!code) return; clearTimeout(flushT); flushT=setTimeout(flush,220); }
-async function flush(){
-  if(!db||!code) return;
-  if(writing){pending=true;return;}
-  writing=true;
-  try{ await myDoc().set({nick:me.nick,color:me.color,ev:myEvents.slice(-700)}); }
-  catch(err){ console.warn("save failed",err?.code); }
-  writing=false;
-  if(pending){pending=false;flush();}
-}
 
-// ---------------- fold: derive the whole shared game from all events ----------------
+// ---------------- fold: the whole shared game, derived from every player's events ----------------
 function fold(){
   const evs=[...evMap.values()].sort((a,b)=>a.ts-b.ts||(a.id<b.id?-1:a.id>b.id?1:0));
   const s={inv:new Set(),hang:3,water:0,forced:0,wrong:0,wrongBy:{},start:null,end:null,outcome:null,
@@ -616,215 +788,271 @@ function fold(){
     }
   }
   if(s.start!=null&&s.end==null&&Date.now()>s.start+DUR){ s.end=s.start+DUR; s.outcome="lose"; }
+  s.host = [...s.players.entries()].sort((a,b)=>a[1].ts-b[1].ts)[0]?.[0] || null;
   return s;
 }
 
-// ---------------- join / lobby ----------------
+// ---------------- lobby ----------------
 const nickIn=$("nick"), roomIn=$("room");
 nickIn.value = store.get("k47.nick")||"";
-roomIn.value = (location.hash||"").replace("#","").toUpperCase().slice(0,6) || store.get("k47.code") || rid(4);
-$("newBtn").onclick=()=>{ roomIn.value=rid(4); roomIn.focus(); };
+roomIn.value = (location.hash||"").replace("#","").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,6) || store.get("k47.code") || "";
+$("newBtn").onclick=()=>{ roomIn.value=rid(4); join(); };
 roomIn.addEventListener("input",()=>{ roomIn.value=roomIn.value.toUpperCase().replace(/[^A-Z0-9]/g,""); });
 $("joinBtn").onclick=join;
 nickIn.addEventListener("keydown",e=>{ if(e.key==="Enter") join(); });
 roomIn.addEventListener("keydown",e=>{ if(e.key==="Enter") join(); });
 
+let joining=false;
 async function join(){
+  if(joining||joined) return;
   const nick=nickIn.value.trim().slice(0,14);
-  const c=roomIn.value.trim().toUpperCase();
   if(!nick){ nickIn.focus(); nickIn.placeholder="Precisa de um apelido"; return; }
+  if(!roomIn.value) roomIn.value=rid(4);
+  const c=roomIn.value.trim().toUpperCase();
   if(!/^[A-Z0-9]{3,6}$/.test(c)){ roomIn.focus(); roomIn.value=""; roomIn.placeholder="3 a 6 letras/números"; return; }
-  $("joinBtn").disabled=true; $("joinBtn").textContent="Entrando…";
+  joining=true; $("joinBtn").disabled=true; $("newBtn").disabled=true; $("joinBtn").textContent="Entrando…";
   await capsReady;
   me.nick=nick; code=c; store.set("k47.nick",nick); store.set("k47.code",c);
-  evMap.clear(); myEvents=[]; seq=0;
-  if(db){
-    try{ const d=await myDoc().get(); if(d.exists){ const ev=d.data().ev; if(Array.isArray(ev)) for(const e of ev){ if(valid(e)){ const ce=clean(e); myEvents.push(ce); evMap.set(ce.id,ce);} } } }catch(e){}
-    try{
-      const snap=await db.collection(`sessions/${code}/p`).get();
-      snap.docs.forEach(d=>{ const ev=d.data()?.ev; if(Array.isArray(ev)) ev.forEach(ingest); });
-    }catch(e){}
-  }
-  // pick a colour nobody in this room has yet
+  evMap.clear(); myEvents=[]; seq=0; view=START_VIEW;
+  try{ if(net.kind==="local") history.replaceState(null,"","#"+c); }catch(e){}
+  if(net.kind==="local") await connectLocal();
+  else if(net.kind==="claude") await connectClaude();
   const taken=new Set([...evMap.values()].filter(e=>e.k==="join"&&e.p!==pk).map(e=>e.color));
   const mine=[...evMap.values()].find(e=>e.k==="join"&&e.p===pk);
-  me.color = mine?.color || PALETTE.find(c=>!taken.has(c)) || PALETTE[Math.floor(Math.random()*PALETTE.length)];
-  if(db){
-    unsubDb = db.collection(`sessions/${code}/p`).onSnapshot(snap=>{
-      let ch=false; snap.docs.forEach(d=>{ const ev=d.data()?.ev; if(Array.isArray(ev)) ev.forEach(e=>{ if(ingest(e)) ch=true; }); });
-      if(ch) recompute();
-    }, err=>console.warn("db",err?.code));
-  }
-  if(room){
-    try{
-      named = await room.join("k47-"+code.toLowerCase());
-      unsubRoom.push(named.on("ev",m=>{ if(m.sameTab) return; if(ingest(m.data)) recompute(); }));
-      unsubRoom.push(named.onPeers(ch=>{ peers=ch.peers; renderPeers(); }));
-      named.presence({pk,nick:me.nick,color:me.color,at:null}).catch(()=>{});
-    }catch(e){ named=null; }
-  }
-  joined=true;
-  addEvent("join",{nick:me.nick,color:me.color,uid:me.uid||undefined});
-  $("joinBtn").disabled=false; $("joinBtn").textContent="Entrar na sala";
+  me.color = mine?.color || PALETTE.find(x=>!taken.has(x)) || PALETTE[Math.floor(Math.random()*PALETTE.length)];
+  joined=true; joining=false;
+  if(!mine||mine.nick!==me.nick) addEvent("join",{nick:me.nick,color:me.color,uid:me.uid||undefined});
+  else recompute();
+  net.presence();
+  $("joinBtn").disabled=false; $("newBtn").disabled=false; $("joinBtn").textContent="Entrar na sala";
 }
 $("leaveBtn").onclick=leave;
 function leave(){
-  unsubDb?.(); unsubDb=null; unsubRoom.forEach(u=>u()); unsubRoom=[];
-  named?.leave().catch(()=>{}); named=null; peers=[];
-  joined=false; code=null; evMap.clear(); myEvents=[];
-  closeSheet(); closeChat();
-  roomIn.value=rid(4); store.del("k47.code");
-  shownMemory=false; lastTapCount=0; seenChats=0; unread=0; endShownFor=null; S=null;
-  $("lobbyChat").hidden=true;
-  showScreen("lobby"); $("joinCard").hidden=false; $("waitCard").hidden=true;
+  net.leave(); net.send=()=>{}; net.presence=()=>{}; net.leave=()=>{};
+  joined=false; code=null; evMap.clear(); myEvents=[]; peerMap=new Map(); S=null;
+  shownMemory=false; seenTaps=0; seenChats=0; unread=0; endShownFor=null;
+  closeSheet(); closeChat(); $("keypad").hidden=true; $("memory").hidden=true;
+  roomIn.value=""; store.del("k47.code");
+  try{ history.replaceState(null,"",location.pathname); }catch(e){}
+  showScreen("lobby"); $("joinCard").hidden=false; $("waitCard").hidden=true; $("lobbyChat").hidden=true;
 }
-$("startBtn").onclick=()=>{ if(S&&S.start==null) addEvent("start",{}); };
-$("copyCode").onclick=()=>copyText(code,$("copyCode"));
-
+$("startBtn").onclick=()=>{ if(S&&S.start==null&&canStart()) addEvent("start",{}); };
+$("copyCode").onclick=()=>{
+  const link = net.kind==="local" ? location.origin+location.pathname+"#"+code : code;
+  copyText(link,$("copyCode"));
+};
 function copyText(t,btn){
-  const done=()=>{ const o=btn.textContent; btn.textContent="Copiado"; setTimeout(()=>btn.textContent=o,1400); };
-  try{ navigator.clipboard.writeText(t).then(done,()=>{ btn.textContent=t.length<12?t:"Selecione e copie"; }); }catch(e){}
+  const o=btn.textContent;
+  const done=()=>{ btn.textContent="Copiado"; setTimeout(()=>btn.textContent=o,1400); };
+  try{ navigator.clipboard.writeText(t).then(done,()=>{ btn.textContent=t; }); }catch(e){ btn.textContent=t; }
 }
+const isOnline = id => id===pk || !!peerMap.get(id)?.online;
+function canStart(){ return net.kind==="solo" || S.host===pk || !isOnline(S.host); }
 
 // ---------------- screens ----------------
-let screen="lobby";
 function showScreen(n){
-  if(screen===n) return; screen=n;
-  ["lobby","game","end"].forEach(id=>$(id).hidden=(id!==n));
+  if(screen!==n){ screen=n; ["lobby","game","end"].forEach(id=>$(id).hidden=(id!==n)); }
   $("lobbyChat").hidden = !(joined && n!=="game");
 }
-
-let shownMemory=false, endShownFor=null, lastTapCount=0, prevPos=[210,270];
 function recompute(){
   S=fold();
   if(!joined){ showScreen("lobby"); return; }
-  $("lobbyChat").hidden = screen==="game";
   if(S.start==null){
     showScreen("lobby"); $("joinCard").hidden=true; $("waitCard").hidden=false;
-    $("codeShow").textContent=code; renderLobby();
+    $("codeShow").textContent=code;
+    $("copyCode").textContent = net.kind==="local" ? "Copiar link" : "Copiar código";
+    $("shareHint").textContent = net.kind==="local"
+      ? "Mande o link pros colegas (mesma rede ou Tailscale). Quem abrir cai direto nesta sala."
+      : net.kind==="claude" ? "Mande o código pros colegas. Eles entram com o mesmo código." : "Sem servidor: só você joga nesta tela.";
+    const hostNick=S.players.get(S.host)?.nick||"anfitrião";
+    const ok=canStart(), sb=$("startBtn"); sb.disabled=!ok;
+    sb.textContent = ok ? "Começar · 3:00" : `Esperando ${hostNick} começar`;
   } else if(S.end==null){
-    showScreen("game"); renderGame();
-    if(!shownMemory){ shownMemory=true; openMemory(); }
+    showScreen("game");
+    if(!shownMemory){ shownMemory=true; setView(START_VIEW,0); openMemory(); }
+    renderGame();
   } else {
     closeSheet(); $("keypad").hidden=true; $("memory").hidden=true;
-    showScreen("end"); if(endShownFor!==code+S.end){ endShownFor=code+S.end; renderEnd(); } else renderEndChat();
+    showScreen("end"); if(endShownFor!==code+S.end){ endShownFor=code+S.end; renderEnd(); }
   }
-  renderChat();
-}
-function onlineSet(){ return new Set(peers.map(p=>p.presence?.pk).filter(Boolean)); }
-function renderLobby(){
-  const ul=$("lobbyPlayers"); ul.textContent="";
-  const on=onlineSet();
-  for(const [id,p] of S.players){
-    const li=document.createElement("li");
-    const d=document.createElement("span"); d.className="dot"; d.style.background=p.color; d.style.color=p.color;
-    const n=document.createElement("span"); n.textContent=p.nick;
-    const t=document.createElement("span"); t.className="tag"; t.textContent= id===pk?"você":(on.has(id)?"online":(named?"saiu?":""));
-    li.append(d,n,t); ul.append(li);
-  }
+  renderPeople(); renderChat();
 }
 
-// ---------------- game render ----------------
-function buildHotspots(){
-  const g=$("hsLayer"); g.textContent="";
-  const NS="http://www.w3.org/2000/svg";
-  for(const [id,h] of Object.entries(HS)){
-    const [x,y,w,hh]=h.r;
-    const gg=document.createElementNS(NS,"g"); gg.setAttribute("class","hs-g"); gg.dataset.h=id;
-    const m=document.createElementNS(NS,"rect"); Object.entries({x:x+2,y:y+2,width:w-4,height:hh-4,rx:4,class:"hs-mark"}).forEach(([k,v])=>m.setAttribute(k,v));
-    const r=document.createElementNS(NS,"rect"); Object.entries({x,y,width:w,height:hh,class:"hs"}).forEach(([k,v])=>r.setAttribute(k,v)); r.dataset.h=id;
-    const t=document.createElementNS(NS,"text"); t.setAttribute("x",x+w/2); t.setAttribute("y",Math.min(y+hh+11,536)); t.setAttribute("text-anchor","middle"); t.setAttribute("class","hs-lbl"); t.textContent=h.n;
-    gg.append(m,r,t); g.append(gg);
+// ---------------- people: roster in lobby + team bar in game ----------------
+function personRows(){
+  if(!S) return [];
+  const rows=[...S.players.entries()].map(([id,p])=>{
+    const pr=peerMap.get(id);
+    return {id,nick:p.nick,color:p.color,host:id===S.host,me:id===pk,online:isOnline(id),
+      view:id===pk?view:pr?.view, at:id===pk?sheetH:pr?.at};
+  });
+  return rows.sort((a,b)=>(b.host-a.host)||(b.me-a.me)||(b.online-a.online));
+}
+function renderPeople(){
+  if(!S||!joined) return;
+  const rows=personRows();
+  if(screen==="lobby"){
+    const ul=$("lobbyRoster"); ul.textContent="";
+    rows.forEach(r=>{
+      const li=document.createElement("li"); li.style.setProperty("--c",r.color);
+      const d=document.createElement("span"); d.className="odot"+(r.online?" on":"");
+      const n=document.createElement("span"); n.className="nm"; n.textContent=r.nick+(r.me?" (você)":"");
+      if(r.host){ const c=document.createElement("span"); c.className="crown"; c.textContent="CRIOU A SALA"; n.append(c); }
+      const st=document.createElement("span"); st.className="st"; st.textContent=r.online?"online":"offline";
+      li.append(d,n,st); ul.append(li);
+    });
+  }
+  if(screen==="game"){
+    const t=$("team"); t.textContent="";
+    rows.forEach(r=>{
+      const c=document.createElement("div"); c.className="pchip"+(r.online?"":" off"); c.style.setProperty("--c",r.color);
+      const d=document.createElement("span"); d.className="odot"+(r.online?" on":"");
+      const box=document.createElement("div");
+      const n=document.createElement("div"); n.className="nm"; n.textContent=r.nick+(r.me?" (você)":"");
+      const w=document.createElement("div"); w.className="wh";
+      w.textContent = !r.online ? "offline" : (r.at ? "→ "+HS[r.at].n : (r.view ? VIEWS[r.view] : "na sala"));
+      if(r.host){ const cr=document.createElement("span"); cr.className="crown"; cr.textContent="HOST"; w.prepend(cr," "); }
+      box.append(n,w); c.append(d,box); t.append(c);
+    });
+    renderArrows(); renderHere();
+    if(sheetH) renderWho();
   }
 }
-buildHotspots();
-
-function fmt(ms){ ms=Math.max(0,ms); const t=Math.ceil(ms/1000); return Math.floor(t/60)+":"+String(t%60).padStart(2,"0"); }
-function renderGame(){
-  $("hudCode").textContent=code;
-  // hangover
-  const hb=$("hangBar"); hb.textContent=""; for(let i=0;i<4;i++){ const b=document.createElement("i"); if(i<S.hang) b.className="f"; hb.append(b); }
-  const w=$("sceneWrap"); w.style.setProperty("--h",S.hang); w.classList.toggle("sway1",S.hang>0);
-  $("scene").style.filter=`blur(${(S.hang*0.22).toFixed(2)}px) saturate(${1+S.hang*.12}) drop-shadow(0 0 14px rgba(255,46,136,.35))`;
-  // scene state
-  $("steam").setAttribute("opacity",S.showerOn?"1":"0");
-  $("knife").style.display=S.knifeTaken?"none":"";
-  $("mirror").setAttribute("fill",S.showerOn?"#ffffff":"#2de2e6");
-  $("ledKey").setAttribute("fill",S.keyUsed?"#3dff8b":"#e0102f");
-  $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
-  // inventory
-  const inv=$("inv"); inv.textContent="";
-  const l=document.createElement("span"); l.className="lbl"; l.textContent="Bolso"; inv.append(l);
-  if(!S.inv.size){ const e=document.createElement("span"); e.className="empty"; e.textContent="vazio"; inv.append(e); }
-  for(const it of S.inv){ const d=document.createElement("span"); d.className="item"; d.innerHTML=`<svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" fill="${ITEMS[it].c}" stroke="#0c0414" stroke-width="2"/></svg>`; d.append(ITEMS[it].n); inv.append(d); }
-  // hero: follows the latest tap from any voice
-  if(S.taps.length!==lastTapCount){
-    const newTaps=S.taps.slice(lastTapCount); lastTapCount=S.taps.length;
-    newTaps.slice(-4).forEach(t=>ripple(t.x,t.y,S.players.get(t.p)?.color||"#fff"));
-    const t=S.taps[S.taps.length-1];
-    const pos=t.h?HS[t.h].st:[Math.min(330,Math.max(30,t.x)),Math.min(500,Math.max(30,t.y))];
-    const ang=Math.atan2(pos[1]-prevPos[1],pos[0]-prevPos[0])*180/Math.PI;
-    if(Math.hypot(pos[0]-prevPos[0],pos[1]-prevPos[1])>2) $("heroRot").setAttribute("transform",`rotate(${ang.toFixed(0)})`);
-    $("hero").style.transform=`translate(${pos[0]}px,${pos[1]}px)`; prevPos=pos;
-  }
-  renderVoices(); renderPeers(); tick();
-  if(sheetH) renderSheet();
-}
-function ripple(x,y,c){
-  const NS="http://www.w3.org/2000/svg", r=document.createElementNS(NS,"circle");
-  r.setAttribute("cx",x); r.setAttribute("cy",y); r.setAttribute("r",2); r.setAttribute("class","ripple"); r.setAttribute("stroke",c);
-  $("rippleLayer").append(r); setTimeout(()=>r.remove(),800);
-}
-function renderVoices(){
-  const v=$("voices"); v.textContent=""; const on=onlineSet();
-  for(const [id,p] of S.players){
-    const c=document.createElement("span"); c.className="vchip"; c.style.color=p.color; c.style.opacity=(id===pk||on.has(id)||!named)?1:.4;
-    c.textContent=p.nick+(id===pk?" (você)":""); v.append(c);
+function othersIn(v){ return personRows().filter(r=>!r.me&&r.online&&r.view===v); }
+function renderArrows(){
+  const inB = view==="B";
+  $("turnL").hidden=inB; $("turnR").hidden=inB; $("backBtn").hidden=!inB;
+  if(inB) return;
+  const i=RING.indexOf(view), lv=RING[(i+3)%4], rv=RING[(i+1)%4];
+  $("nxL").textContent=VIEWS[lv]; $("nxR").textContent=VIEWS[rv];
+  for(const [id,v] of [["pdL",lv],["pdR",rv]]){
+    const box=$(id); box.textContent="";
+    const ps=othersIn(v); if(v==="O") ps.push(...othersIn("B"));
+    ps.slice(0,4).forEach(p=>{ const d=document.createElement("i"); d.style.background=p.color; d.title=p.nick; box.append(d); });
   }
 }
-function renderPeers(){
-  if(screen==="lobby"&&S){ renderLobby(); return; }
-  const g=$("peerLayer"); if(!g) return; g.textContent="";
-  const NS="http://www.w3.org/2000/svg"; const count={};
-  for(const p of peers){
-    if(p.sameTab) continue; const at=p.presence?.at; if(!HS[at]) continue;
-    const i=count[at]=(count[at]||0)+1; const [x,y]=HS[at].st;
-    const c=/^#[0-9a-f]{6}$/i.test(p.presence.color)?p.presence.color:"#fff";
-    const ring=document.createElementNS(NS,"circle"); ring.setAttribute("cx",x-14+i*12); ring.setAttribute("cy",y-18); ring.setAttribute("r",6); ring.setAttribute("fill","none"); ring.setAttribute("stroke",c); ring.setAttribute("stroke-width","2.5");
-    const t=document.createElementNS(NS,"text"); t.setAttribute("x",x-14+i*12); t.setAttribute("y",y-15); t.setAttribute("text-anchor","middle"); t.setAttribute("font-size","8"); t.setAttribute("font-family","VT323,monospace"); t.setAttribute("fill",c);
-    t.textContent=String(p.presence.nick||"?").slice(0,1).toUpperCase();
-    g.append(ring,t);
-  }
-  if(sheetH) renderWho();
+function renderHere(){
+  const h=$("here"); h.textContent="";
+  othersIn(view).forEach(p=>{ const s=document.createElement("span"); s.style.color=p.color; s.textContent=p.nick+" aqui"; h.append(s); });
 }
 
-// scene taps
+// ---------------- camera ----------------
+function setView(v,dir){
+  if(!VIEWS[v]) return;
+  view=v;
+  document.querySelectorAll("#scene .view").forEach(g=>g.style.display=(g.id==="v-"+v)?"":"none");
+  document.querySelectorAll("#hsLayer .hs-g").forEach(g=>g.style.display=(HS[g.dataset.h].v===v)?"":"none");
+  $("viewName").textContent=VIEWS[v].toUpperCase();
+  const w=$("scene"); w.classList.remove("turnL","turnR"); void w.getBoundingClientRect();
+  if(dir) w.classList.add(dir<0?"turnL":"turnR");
+  closeSheet();
+  drawCursors();
+  net.presence();
+  renderPeople();
+}
+function turn(d){ if(view==="B") return; const i=RING.indexOf(view); setView(RING[(i+d+4)%4], d); }
+$("turnL").onclick=()=>turn(-1);
+$("turnR").onclick=()=>turn(1);
+$("backBtn").onclick=()=>setView("O",-1);
+$("stage").addEventListener("pointerdown",e=>{ swipe={x:e.clientX,y:e.clientY,t:Date.now()}; });
+$("stage").addEventListener("pointerup",e=>{
+  if(!swipe) return; const dx=e.clientX-swipe.x, dy=e.clientY-swipe.y, quick=Date.now()-swipe.t<600; swipe=null;
+  if(quick&&Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){
+    suppressClick=true; setTimeout(()=>suppressClick=false,60);
+    if(view==="B"){ if(dx>0) setView("O",-1); } else turn(dx>0?-1:1);
+  }
+});
+
+// floor perspective lines, generated once per view
+document.querySelectorAll("#scene .floorlines").forEach(g=>{
+  let d="";
+  for(let i=-9;i<=9;i++) d+=`M${180+i*26} 330 L${180+i*90} 480 `;
+  [342,358,380,410,450].forEach(y=>d+=`M0 ${y} H360 `);
+  const p=document.createElementNS(NS,"path"); p.setAttribute("d",d); p.setAttribute("stroke","#0c0414"); p.setAttribute("stroke-width","1.5"); p.setAttribute("opacity",".35"); p.setAttribute("fill","none");
+  g.append(p);
+});
+
+// hotspots
+for(const [id,h] of Object.entries(HS)){
+  const [x,y,w,hh]=h.r;
+  const gg=document.createElementNS(NS,"g"); gg.setAttribute("class","hs-g"); gg.dataset.h=id;
+  const m=document.createElementNS(NS,"rect"); Object.entries({x:x+3,y:y+3,width:w-6,height:hh-6,rx:6,class:"hs-mark"}).forEach(([k,v])=>m.setAttribute(k,v));
+  const r=document.createElementNS(NS,"rect"); Object.entries({x,y,width:w,height:hh,class:"hs"}).forEach(([k,v])=>r.setAttribute(k,v)); r.dataset.h=id;
+  const t=document.createElementNS(NS,"text"); t.setAttribute("x",x+w/2); t.setAttribute("y",y+hh/2+5); t.setAttribute("text-anchor","middle"); t.setAttribute("class","hs-lbl"); t.textContent=h.n;
+  gg.append(m,r,t); $("hsLayer").append(gg);
+}
+
 function svgPoint(ev){
   const svg=$("scene"), pt=svg.createSVGPoint(); pt.x=ev.clientX; pt.y=ev.clientY;
-  const m=svg.getScreenCTM(); if(!m) return {x:0,y:0};
+  const m=svg.getScreenCTM(); if(!m) return {x:-1,y:-1};
   const p=pt.matrixTransform(m.inverse()); return {x:Math.round(p.x),y:Math.round(p.y)};
 }
 $("scene").addEventListener("click",ev=>{
-  if(!S||S.start==null||S.end!=null) return;
+  if(suppressClick||!S||S.start==null||S.end!=null) return;
   const h=ev.target?.dataset?.h||null; const {x,y}=svgPoint(ev);
-  if(x<0||y<0||x>360||y>540) return;
-  const mine=S.taps.filter(t=>t.p===pk).length;
-  if(mine<300) addEvent("tap",{x,y,h});
-  else ripple(x,y,me.color);
+  if(x<0||y<0||x>360||y>480) return;
+  if(S.taps.filter(t=>t.p===pk).length<300) addEvent("tap",{x,y,h,vw:view});
+  if(h&&HS[h].nav){ setView(HS[h].nav,1); return; }
   if(h) openSheet(h);
 });
 
+// ---------------- game render ----------------
+function fmt(ms){ ms=Math.max(0,ms); const t=Math.ceil(ms/1000); return Math.floor(t/60)+":"+String(t%60).padStart(2,"0"); }
+function renderGame(){
+  $("hudCode").textContent=code;
+  const hb=$("hangBar"); hb.textContent=""; for(let i=0;i<4;i++){ const b=document.createElement("i"); if(i<S.hang) b.className="f"; hb.append(b); }
+  const w=$("sceneWrap"); w.style.setProperty("--h",S.hang); w.classList.toggle("sway",S.hang>0);
+  $("scene").style.filter=`blur(${(S.hang*0.18).toFixed(2)}px) saturate(${1+S.hang*.1})`;
+  $("steam").setAttribute("opacity",S.showerOn?"1":"0");
+  $("fog").setAttribute("opacity",S.showerOn?".55":"0");
+  $("mirrorText").setAttribute("opacity",S.showerOn?"1":"0");
+  $("knife").style.display=S.knifeTaken?"none":"";
+  $("ledKey").setAttribute("fill",S.keyUsed?"#3dff8b":"#e0102f");
+  $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
+  const inv=$("inv"); inv.textContent="";
+  const l=document.createElement("span"); l.className="lbl"; l.textContent="Bolso"; inv.append(l);
+  if(!S.inv.size){ const e=document.createElement("span"); e.className="empty"; e.textContent="vazio"; inv.append(e); }
+  for(const it of S.inv){ const d=document.createElement("span"); d.className="item"; const sw=document.createElement("i"); sw.style.background=ITEMS[it].c; d.append(sw,ITEMS[it].n); inv.append(d); }
+  if(S.taps.length>seenTaps){
+    S.taps.slice(seenTaps).forEach(t=>{ if(t.vw===view) ripple(t.x,t.y,S.players.get(t.p)?.color||"#fff"); });
+    seenTaps=S.taps.length;
+  }
+  drawCursors();
+  tick();
+  if(sheetH) renderSheet();
+}
+function ripple(x,y,c){
+  const r=document.createElementNS(NS,"circle");
+  r.setAttribute("cx",x); r.setAttribute("cy",y); r.setAttribute("r",3); r.setAttribute("class","ripple"); r.setAttribute("stroke",c);
+  $("rippleLayer").append(r); setTimeout(()=>r.remove(),800);
+}
+// each other player's latest tap on this wall, shown as a named crosshair for a few seconds
+function drawCursors(){
+  const g=$("cursorLayer"); if(!g||!S) return; g.textContent="";
+  const now=Date.now(), last={};
+  for(const t of S.taps) if(t.p!==pk&&t.vw===view&&now-t.ts<5000) last[t.p]=t;
+  for(const [id,t] of Object.entries(last)){
+    const p=S.players.get(id); if(!p) continue;
+    const a=1-Math.max(0,(now-t.ts-3000)/2000);
+    const gg=document.createElementNS(NS,"g"); gg.setAttribute("opacity",a.toFixed(2));
+    const ring=document.createElementNS(NS,"circle"); ring.setAttribute("cx",t.x); ring.setAttribute("cy",t.y); ring.setAttribute("r",9); ring.setAttribute("fill","none"); ring.setAttribute("stroke",p.color); ring.setAttribute("stroke-width","3");
+    const cross=document.createElementNS(NS,"path"); cross.setAttribute("d",`M${t.x-15} ${t.y}h8M${t.x+7} ${t.y}h8M${t.x} ${t.y-15}v8M${t.x} ${t.y+7}v8`); cross.setAttribute("stroke",p.color); cross.setAttribute("stroke-width","3");
+    const lbl=document.createElementNS(NS,"text"); lbl.setAttribute("x",Math.min(t.x+13,300)); lbl.setAttribute("y",Math.max(t.y-11,36)); lbl.setAttribute("font-family","VT323,monospace"); lbl.setAttribute("font-size","18"); lbl.setAttribute("fill",p.color);
+    lbl.setAttribute("paint-order","stroke"); lbl.setAttribute("stroke","#0c0414"); lbl.setAttribute("stroke-width","4"); lbl.textContent=p.nick;
+    gg.append(ring,cross,lbl); g.append(gg);
+  }
+}
+
 // ---------------- hotspot sheet ----------------
-let sheetH=null, lastRes=null;
 function openSheet(h){
   sheetH=h; lastRes=null; renderSheet();
   $("sheet").classList.add("open"); $("sheet").setAttribute("aria-hidden","false");
-  named?.presence({at:h}).catch(()=>{});
+  net.presence(); renderPeople();
 }
 function closeSheet(){
   if(!sheetH) return; sheetH=null;
   $("sheet").classList.remove("open"); $("sheet").setAttribute("aria-hidden","true");
-  named?.presence({at:null}).catch(()=>{});
+  net.presence(); renderPeople();
 }
 $("shClose").onclick=closeSheet;
 function renderSheet(){
@@ -835,50 +1063,44 @@ function renderSheet(){
   const box=$("shActs"); box.textContent="";
   for(const [id,a] of Object.entries(ACT)){
     if(a.h!==h||!a.can(S)) continue;
-    const b=document.createElement("button"); b.className="act"+(id==="exit"?" exit":"");
-    b.textContent=a.l;
+    const b=document.createElement("button"); b.className="act"+(id==="exit"?" exit":""); b.textContent=a.l;
     if(id==="code_ui"&&S.wrong){ const sm=document.createElement("small"); sm.textContent=S.wrong+" erro"+(S.wrong>1?"s":""); b.append(sm); }
-    b.onclick=()=>doAct(id);
-    box.append(b);
+    b.onclick=()=>doAct(id); box.append(b);
   }
   if(!box.children.length){ const p=document.createElement("p"); p.className="hint"; p.textContent="Nada mais pra fazer aqui por enquanto."; box.append(p); }
   renderWho();
 }
 function renderWho(){
-  const names=peers.filter(p=>!p.sameTab&&p.presence?.at===sheetH).map(p=>String(p.presence.nick||"alguém").slice(0,14));
+  const names=personRows().filter(r=>!r.me&&r.online&&r.at===sheetH).map(r=>r.nick);
   $("shWho").textContent=names.length?("Também olhando aqui: "+names.join(", ")):"";
 }
 function doAct(id){
   const a=ACT[id]; if(!a||!a.can(S)) return;
   if(a.ui==="keypad"){ openPad(); return; }
   addEvent("act",{a:id});
-  lastRes=a.msg||null;
-  renderSheet();
+  lastRes=a.msg||null; renderSheet();
 }
 
 // ---------------- keypad ----------------
-let padVal="";
-(function buildPad(){
-  const k=$("keys");
-  ["1","2","3","4","5","6","7","8","9","⌫","0","OK"].forEach(c=>{
-    const b=document.createElement("button"); b.className="key"; b.textContent=c; b.setAttribute("aria-label",c==="⌫"?"Apagar":c);
-    b.onclick=()=>padPress(c); k.append(b);
-  });
-})();
+["1","2","3","4","5","6","7","8","9","⌫","0","OK"].forEach(c=>{
+  const b=document.createElement("button"); b.className="key"; b.textContent=c; b.setAttribute("aria-label",c==="⌫"?"Apagar":c);
+  b.onclick=()=>padPress(c); $("keys").append(b);
+});
 function openPad(){ padVal=""; drawPad(); $("keypad").hidden=false; }
 function drawPad(bad){ const d=$("padDisp"); d.textContent=(padVal+"____").slice(0,4); d.classList.toggle("bad",!!bad); }
 function padPress(c){
   if(c==="⌫"){ padVal=padVal.slice(0,-1); drawPad(); return; }
   if(c==="OK"){
     if(padVal.length!==4) return;
-    addEvent("act",{a:"code",v:padVal});
-    if(padVal===CODE){ drawPad(); $("padDisp").textContent="OK"; setTimeout(()=>{$("keypad").hidden=true; lastRes="Bip-bip. Luz verde no teclado."; renderSheet();},500); }
-    else { drawPad(true); $("padDisp").textContent="ERRO"; padVal=""; setTimeout(()=>drawPad(),700); }
+    const v=padVal; padVal="";
+    addEvent("act",{a:"code",v});
+    if(v===CODE){ $("padDisp").textContent="OK"; setTimeout(()=>{ $("keypad").hidden=true; lastRes="Bip-bip. Luz verde no teclado."; renderSheet(); },500); }
+    else { drawPad(true); $("padDisp").textContent="ERRO"; setTimeout(()=>drawPad(),700); }
     return;
   }
   if(padVal.length<4){ padVal+=c; drawPad(); }
 }
-$("padClose").onclick=()=>{$("keypad").hidden=true;};
+$("padClose").onclick=()=>{ $("keypad").hidden=true; };
 
 // ---------------- memory ----------------
 function myClues(){
@@ -892,39 +1114,35 @@ function openMemory(){
   $("memory").hidden=false;
 }
 $("memBtn").onclick=openMemory;
-$("memClose").onclick=()=>{$("memory").hidden=true;};
-
-// hint toggle — long-press free: tap the timer to flash hotspots briefly
-$("hintBtn").addEventListener("click",()=>{ const sv=$("scene"); sv.classList.add("hints"); setTimeout(()=>sv.classList.remove("hints"),1800); });
+$("memClose").onclick=()=>{ $("memory").hidden=true; };
+$("hintBtn").onclick=()=>{ const sv=$("scene"); sv.classList.add("hints"); setTimeout(()=>sv.classList.remove("hints"),2000); };
 
 // ---------------- chat ----------------
-let chatOpen=false, seenChats=0, unread=0;
 QUICK.forEach(q=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=q; b.onclick=()=>sendChat(q); $("chips").append(b); });
-function openChat(){ chatOpen=true; $("chat").classList.add("open"); $("chat").setAttribute("aria-hidden","false"); renderChat(); const m=$("msgs"); m.scrollTop=m.scrollHeight; }
+function openChat(){ chatOpen=true; unread=0; $("chat").classList.add("open"); $("chat").setAttribute("aria-hidden","false"); renderChat(); }
 function closeChat(){ chatOpen=false; $("chat").classList.remove("open"); $("chat").setAttribute("aria-hidden","true"); }
 $("chatBtn").onclick=openChat; $("lobbyChat").onclick=openChat; $("chatClose").onclick=closeChat;
 $("sendForm").addEventListener("submit",e=>{ e.preventDefault(); const v=$("chatInput").value.trim(); if(v){ sendChat(v); $("chatInput").value=""; } });
-function sendChat(m){ if(!joined) return; addEvent("chat",{m}); }
-let toastT=null;
+function sendChat(m){ if(joined) addEvent("chat",{m}); }
 function renderChat(){
   if(!S) return;
-  const box=$("msgs"); const atBottom=box.scrollTop+box.clientHeight>=box.scrollHeight-20;
-  box.textContent="";
+  const box=$("msgs"); box.textContent="";
   if(!S.chats.length){ const p=document.createElement("p"); p.className="hint"; p.textContent="Ninguém falou nada ainda. Contem o que lembram e o que estão vendo."; box.append(p); }
   for(const c of S.chats.slice(-80)){
     const p=S.players.get(c.p); const d=document.createElement("div"); d.className="msg";
-    const t=document.createElement("span"); t.className="t"; t.textContent=S.start&&c.ts>=S.start?fmt(c.ts-S.start).replace(/^/,"+"):"lobby";
-    const w=document.createElement("span"); w.className="who"; w.style.color=p?.color||"#fff"; w.textContent=(p?.nick||"Voz")+":";
+    const t=document.createElement("span"); t.className="t"; t.textContent=S.start&&c.ts>=S.start?"+"+fmt(c.ts-S.start):"lobby";
+    const w=document.createElement("span"); w.className="who"; w.style.color=p?.color||"#fff"; w.textContent=(p?.nick||"?")+":";
     d.append(t,w,document.createTextNode(c.m)); box.append(d);
   }
-  if(atBottom||chatOpen) box.scrollTop=box.scrollHeight;
+  box.scrollTop=box.scrollHeight;
   const fresh=S.chats.slice(seenChats); seenChats=S.chats.length;
   const incoming=fresh.filter(c=>c.p!==pk);
-  if(chatOpen){ unread=0; } else unread+=incoming.length;
+  if(chatOpen) unread=0; else unread+=incoming.length;
   $("unread").hidden=!unread; $("unread").textContent=unread;
+  $("lobbyChat").textContent = unread ? `Chat (${unread})` : "Chat";
   if(incoming.length&&!chatOpen&&screen==="game"){
     const c=incoming[incoming.length-1], p=S.players.get(c.p);
-    const tt=$("toast"); tt.textContent=""; const b=document.createElement("b"); b.textContent=(p?.nick||"Voz")+": "; tt.append(b,document.createTextNode(c.m)); tt.hidden=false;
+    const tt=$("toast"); tt.textContent=""; const b=document.createElement("b"); b.textContent=(p?.nick||"?")+": "; tt.append(b,document.createTextNode(c.m)); tt.hidden=false;
     clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,3500);
   }
 }
@@ -936,28 +1154,26 @@ function tick(){
   const t=$("timer"); t.textContent=fmt(left); t.classList.toggle("low",left<30000);
   if(left<=0) recompute();
 }
-setInterval(tick,250);
+setInterval(()=>{ tick(); if(screen==="game") drawCursors(); },250);
 
 // ---------------- END + REPORT ----------------
 function stats(pid){
-  const taps=S.taps.filter(t=>t.p===pid), acts=S.acts.filter(a=>a.p===pid);
-  const okActs=acts.filter(a=>a.ok);
-  const visited=new Set(taps.map(t=>t.h).filter(Boolean));
+  const taps=S.taps.filter(t=>t.p===pid), acts=S.acts.filter(a=>a.p===pid), okActs=acts.filter(a=>a.ok);
+  const visited=new Set(taps.map(t=>t.h).filter(h=>h&&!HS[h].nav));
+  const walls=new Set(taps.map(t=>t.vw).filter(Boolean));
   const first=taps.length?Math.max(0,(taps[0].ts-S.start)/1000):null;
   const chats=S.chats.filter(c=>c.p===pid&&c.ts>=S.start&&c.ts<=S.end).length;
-  const lobbyChats=S.chats.filter(c=>c.p===pid&&c.ts<S.start).length;
   const credits=S.credit.filter(c=>c.p===pid), choices=S.choices.filter(c=>c.p===pid);
-  const wrong=S.wrongBy[pid]||0;
-  const solo=S.players.size<2;
+  const wrong=S.wrongBy[pid]||0, solo=S.players.size<2;
   const goods=choices.filter(c=>c.g).length, greys=choices.filter(c=>!c.g).length;
   const sc={
-    Iniciativa: Math.round(Math.min(100, (first==null?0:Math.max(0,50-first*2.5)) + Math.min(50,okActs.length*6))),
+    Iniciativa: Math.round(Math.min(100,(first==null?0:Math.max(0,50-first*2.5))+Math.min(50,okActs.length*6))),
     Exploração: Math.round(visited.size/HS_COUNT*100),
     Comunicação: solo?null:Math.min(100,chats*18),
     Resolução: Math.min(100,credits.length*22),
     Integridade: Math.max(0,Math.min(100,70+goods*15-greys*22))
   };
-  return {taps,okActs,acts,visited,first,chats,lobbyChats,credits,choices,wrong,sc,solo,goods,greys};
+  return {taps,acts,okActs,visited,walls,first,chats,credits,choices,wrong,sc,solo};
 }
 function signals(st){
   const out=[];
@@ -965,7 +1181,7 @@ function signals(st){
   else if(st.first!=null&&st.first>20) out.push(["r","Demorou "+st.first.toFixed(0)+" s para a primeira ação."]);
   else if(st.first==null) out.push(["r","Não interagiu com a kitnet."]);
   if(st.visited.size>=9) out.push(["g","Explorou quase todo o ambiente ("+st.visited.size+"/"+HS_COUNT+")."]);
-  else if(st.visited.size<=3) out.push(["r","Explorou pouco ("+st.visited.size+"/"+HS_COUNT+" pontos)."]);
+  else if(st.visited.size<=3) out.push(["r","Explorou pouco ("+st.visited.size+"/"+HS_COUNT+" objetos)."]);
   if(!st.solo){ if(st.chats>=4) out.push(["g","Comunicou ativamente ("+st.chats+" mensagens no jogo)."]); else if(st.chats===0) out.push(["r","Não falou com o time durante o desafio."]); }
   if(st.credits.length>=3) out.push(["g","Destravou "+st.credits.length+" etapas-chave."]);
   if(st.wrong>=3) out.push(["r",st.wrong+" tentativas erradas de senha (tentativa e erro)."]);
@@ -976,8 +1192,7 @@ function signals(st){
 }
 function storyLines(){
   const L=[];
-  if(S.outcome==="win") L.push("A porta abre. Corredor vazio. Escada. Rua. Ar.");
-  else L.push("A maçaneta gira por fora. “Bom dia”, diz uma voz que você reconhece do RH.");
+  L.push(S.outcome==="win"?"A porta abre. Corredor vazio. Escada. Rua. Ar.":"A maçaneta gira por fora. “Bom dia”, diz uma voz que você reconhece do RH.");
   if(S.samu) L.push("Sirenes subindo a rua. Alguém vai cuidar do cara da cama.");
   else if(S.pulse) L.push("Você sabia que ele respirava. E saiu mesmo assim.");
   else L.push("Ninguém checou se o homem da cama estava vivo.");
@@ -989,100 +1204,104 @@ function storyLines(){
   if(S.tv) L.push("Halden Corp. A festa da firma. Você trabalha lá também, não trabalha?");
   return L;
 }
-let repTab="team";
 function renderEnd(){
   const v=$("verdict"); v.className="verdict "+(S.outcome==="win"?"win":"lose");
   v.textContent=S.outcome==="win"?"VOCÊS SAÍRAM.":"TARDE DEMAIS.";
-  const st=$("story"); st.textContent=""; storyLines().forEach(t=>{const li=document.createElement("li"); li.textContent=t; st.append(li);});
+  const st=$("story"); st.textContent=""; storyLines().forEach(t=>{ const li=document.createElement("li"); li.textContent=t; st.append(li); });
   repTab="team"; renderReport();
 }
-function renderEndChat(){}
 function el(tag,cls,txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
-function heatmap(filter){
-  const NS="http://www.w3.org/2000/svg";
-  const svg=document.createElementNS(NS,"svg"); svg.setAttribute("viewBox","0 0 360 540"); svg.setAttribute("class","heat"); svg.setAttribute("role","img"); svg.setAttribute("aria-label","Mapa de cliques");
-  const defs=document.querySelector("#scene defs").cloneNode(true); svg.append(defs);
-  const art=$("art").cloneNode(true); art.removeAttribute("id"); art.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id")); art.setAttribute("opacity",".32"); svg.append(art);
-  S.taps.filter(t=>!filter||t.p===filter).forEach(t=>{
-    const c=document.createElementNS(NS,"circle"); c.setAttribute("cx",t.x); c.setAttribute("cy",t.y); c.setAttribute("r",6);
-    c.setAttribute("fill",S.players.get(t.p)?.color||"#fff"); c.setAttribute("fill-opacity",".55"); c.setAttribute("stroke","#0c0414"); c.setAttribute("stroke-width","1");
-    svg.append(c);
-  });
-  return svg;
+function heatGrid(filter){
+  const grid=el("div","heatgrid");
+  const defs=document.querySelector("#scene defs");
+  for(const v of ["N","L","S","O","B"]){
+    const fig=el("figure");
+    const svg=document.createElementNS(NS,"svg"); svg.setAttribute("viewBox","0 0 360 480"); svg.setAttribute("class","heat"); svg.setAttribute("role","img"); svg.setAttribute("aria-label","Cliques em "+VIEWS[v]);
+    svg.append(defs.cloneNode(true));
+    const art=$("v-"+v).cloneNode(true); art.removeAttribute("id"); art.style.display=""; art.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id")); art.setAttribute("opacity",".35"); svg.append(art);
+    const taps=S.taps.filter(t=>t.vw===v&&(!filter||t.p===filter));
+    taps.forEach(t=>{ const c=document.createElementNS(NS,"circle"); c.setAttribute("cx",t.x); c.setAttribute("cy",t.y); c.setAttribute("r",11);
+      c.setAttribute("fill",S.players.get(t.p)?.color||"#fff"); c.setAttribute("fill-opacity",".6"); c.setAttribute("stroke","#0c0414"); c.setAttribute("stroke-width","2"); svg.append(c); });
+    fig.append(svg, el("figcaption",null,VIEWS[v]+" · "+taps.length));
+    grid.append(fig);
+  }
+  return grid;
 }
 function renderReport(){
   const r=$("report"); r.textContent="";
-  const dur=(S.end-S.start)/1000;
   r.append(el("div","conf","Confidencial · Núcleo RH · Avaliação situacional ESC-60"));
   r.append(el("h2",null,"Relatório de desempenho · Sala "+code));
   const meta=el("div","meta");
-  [["Resultado",S.outcome==="win"?"Escaparam":"Não escaparam"],["Tempo",fmt(dur*1000)+" de 3:00"],["Vozes",String(S.players.size)],["Cliques",String(S.taps.length)],["Mensagens",String(S.chats.filter(c=>c.ts>=S.start&&c.ts<=S.end).length)],["Erros de senha",String(S.wrong)]]
+  [["Resultado",S.outcome==="win"?"Escaparam":"Não escaparam"],["Tempo",fmt(S.end-S.start)+" de 3:00"],["Jogadores",String(S.players.size)],["Anfitrião",S.players.get(S.host)?.nick||"—"],["Cliques",String(S.taps.length)],["Mensagens",String(S.chats.filter(c=>c.ts>=S.start&&c.ts<=S.end).length)],["Erros de senha",String(S.wrong)]]
     .forEach(([k,v])=>{ const s=el("span",null,k+": "); s.append(el("b",null,v)); meta.append(s); });
   r.append(meta);
   const tabs=el("div","tabs"); tabs.setAttribute("role","tablist");
   const mk=(id,label,color)=>{ const b=el("button","tab"); b.setAttribute("role","tab"); b.setAttribute("aria-selected",String(repTab===id));
-    if(color){ const d=el("span","dot"); d.style.background=color; d.style.color=color; d.style.width="10px"; d.style.height="10px"; b.append(d); }
-    b.append(label); b.onclick=()=>{repTab=id; renderReport();}; tabs.append(b); };
+    if(color){ const d=el("span","d"); d.style.background=color; b.append(d); }
+    b.append(label); b.onclick=()=>{ repTab=id; renderReport(); }; tabs.append(b); };
   mk("team","Time");
   for(const [id,p] of S.players) mk(id,p.nick+(id===pk?" (você)":""),p.color);
   r.append(tabs);
-
+  const g=el("div","pgrid"), left=el("div","comp"), right=el("div","comp");
   if(repTab==="team"){
-    const g=el("div","pgrid");
-    const left=el("div","comp");
     left.append(el("h3",null,"Linha do tempo"));
     const tl=el("ul","tl");
     const items=[...S.credit.map(c=>({...c,kind:"k"})),...S.choices.map(c=>({...c,kind:c.g?"g":"r"}))].sort((a,b)=>a.ts-b.ts);
     if(!items.length) tl.append(el("li",null,"Nenhuma etapa concluída."));
     items.forEach(it=>{ const p=S.players.get(it.p); const li=el("li");
       li.append(el("span","tm","+"+fmt(it.ts-S.start)));
-      const d=el("span","dot"); d.style.background=p?.color||"#999"; li.append(d);
-      const t=el("span",it.kind==="g"?"sig-g":it.kind==="r"?"sig-r":"", (p?.nick||"?")+" — "+it.t); li.append(t); tl.append(li); });
-    left.append(tl);
-    left.append(el("h3",null,"Comparativo"));
-    const tbl=el("ul");
-    for(const [id,p] of S.players){ const st=stats(id); tbl.append(el("li",null,`${p.nick}: ${st.taps.length} cliques · ${st.visited.size}/${HS_COUNT} pontos · ${st.credits.length} etapas · ${st.chats} msgs · ${st.choices.filter(c=>!c.g).length} escolhas questionáveis`)); }
-    left.append(tbl);
-    const right=el("div","comp"); right.append(el("h3",null,"Onde o time clicou")); right.append(heatmap(null));
-    g.append(left,right); r.append(g);
+      const d=el("span","d"); d.style.background=p?.color||"#999"; li.append(d);
+      li.append(el("span",it.kind==="g"?"sig-g":it.kind==="r"?"sig-r":"",(p?.nick||"?")+" — "+it.t)); tl.append(li); });
+    left.append(tl, el("h3",null,"Comparativo"));
+    const cmp=el("ul");
+    for(const [id,p] of S.players){ const st=stats(id); cmp.append(el("li",null,`${p.nick}${id===S.host?" (anfitrião)":""}: ${st.taps.length} cliques · ${st.visited.size}/${HS_COUNT} objetos · ${st.walls.size}/5 paredes · ${st.credits.length} etapas · ${st.chats} msgs · ${st.choices.filter(c=>!c.g).length} escolhas questionáveis`)); }
+    left.append(cmp);
+    right.append(el("h3",null,"Onde o time clicou"), heatGrid(null));
   } else {
-    const p=S.players.get(repTab); const st=stats(repTab);
-    const g=el("div","pgrid");
-    const left=el("div","comp");
+    const p=S.players.get(repTab), st=stats(repTab);
     const facts=el("div","facts");
-    [[st.taps.length,"cliques"],[st.visited.size+"/"+HS_COUNT,"pontos vistos"],[st.first==null?"—":st.first.toFixed(1)+"s","1ª ação"],[st.okActs.length,"ações"],[st.solo?"—":st.chats,"mensagens"],[st.wrong,"senhas erradas"]]
+    [[st.taps.length,"cliques"],[st.visited.size+"/"+HS_COUNT,"objetos vistos"],[st.first==null?"—":st.first.toFixed(1)+"s","1ª ação"],[st.okActs.length,"ações"],[st.solo?"—":st.chats,"mensagens"],[st.wrong,"senhas erradas"]]
       .forEach(([n,k])=>{ const f=el("div","fact"); f.append(el("div","n",String(n)),el("div","k",k)); facts.append(f); });
-    left.append(facts);
-    left.append(el("h3",null,"Competências observadas"));
+    left.append(facts, el("h3",null,"Competências observadas"));
     for(const [k,v] of Object.entries(st.sc)){
-      const b=el("div","bar"); b.append(el("span",null,k)); const tr=el("div","tr"); const fl=el("div","fl"); fl.style.width=(v==null?0:v)+"%"; tr.append(fl); b.append(tr, el("span","v",v==null?"—":String(v))); left.append(b);
+      const b=el("div","bar"); b.append(el("span",null,k)); const tr=el("div","tr"); const fl=el("div","fl"); fl.style.width=(v==null?0:v)+"%"; tr.append(fl); b.append(tr,el("span","v",v==null?"—":String(v))); left.append(b);
     }
-    left.append(el("p","small","Integridade parte de 70 e muda conforme escolhas de socorro (+) ou de ocultação e apropriação (−). Comunicação não se aplica a partidas solo."));
+    left.append(el("p","small","Integridade parte de 70 e muda com escolhas de socorro (+) ou de ocultação e apropriação (−). Comunicação não se aplica a partidas solo."));
     left.append(el("h3",null,"Sinais"));
     const ul=el("ul"); signals(st).forEach(([c,t])=>ul.append(el("li",c==="g"?"sig-g":c==="r"?"sig-r":"",t))); left.append(ul);
     if(st.credits.length){ left.append(el("h3",null,"Etapas destravadas")); const u2=el("ul"); st.credits.forEach(c=>u2.append(el("li",null,"+"+fmt(c.ts-S.start)+" · "+c.t))); left.append(u2); }
-    const right=el("div","comp"); right.append(el("h3",null,"Onde "+p.nick+" clicou")); right.append(heatmap(repTab));
-    const seq=el("ul"); seq.style.maxHeight="180px"; seq.style.overflow="auto";
-    st.taps.slice(0,60).forEach(t=>seq.append(el("li",null,"+"+fmt(t.ts-S.start)+" · "+(t.h?HS[t.h].n:`chão (${t.x},${t.y})`))));
-    right.append(el("h3",null,"Sequência de cliques")); right.append(seq);
-    g.append(left,right); r.append(g);
+    right.append(el("h3",null,"Onde "+p.nick+" clicou"), heatGrid(repTab));
+    const seqL=el("ul"); seqL.style.maxHeight="180px"; seqL.style.overflow="auto";
+    st.taps.slice(0,80).forEach(t=>seqL.append(el("li",null,"+"+fmt(t.ts-S.start)+" · "+(VIEWS[t.vw]||"?")+" · "+(t.h?HS[t.h].n:`parede (${t.x},${t.y})`))));
+    right.append(el("h3",null,"Sequência de cliques"), seqL);
   }
+  g.append(left,right); r.append(g);
   const foot=el("div","repfoot");
   const cp=el("button","btn","Copiar resumo"); cp.onclick=()=>copyText(summaryText(),cp); foot.append(cp);
-  if(downloads){ const dl=el("button","btn","Baixar dados (JSON)"); dl.onclick=()=>{ downloads.save({filename:`kitnet47-${code}.json`,data:JSON.stringify(exportData(),null,2)}).catch(()=>{}); }; foot.append(dl); }
+  if(downloads){ const dl=el("button","btn","Baixar dados (JSON)"); dl.onclick=()=>downloads.save({filename:`kitnet47-${code}.json`,data:JSON.stringify(exportData(),null,2)}).catch(()=>{}); foot.append(dl); }
+  else if(net.kind==="local"){ const a=el("a","btn","Dados brutos (JSON)"); a.href=`/api/rooms/${code}`; a.target="_blank"; a.rel="noopener"; a.style.cssText="text-align:center;text-decoration:none;display:grid;place-items:center"; foot.append(a); }
   const again=el("button","btn","Nova partida"); again.onclick=leave; foot.append(again);
   r.append(foot);
 }
 function exportData(){
-  const players=[...S.players].map(([id,p])=>{ const st=stats(id); return {voz:id,uid:p.uid,apelido:p.nick,competencias:st.sc,cliques:st.taps.map(t=>({t:+((t.ts-S.start)/1000).toFixed(2),x:t.x,y:t.y,ponto:t.h})),acoes:st.acts.map(a=>({t:+((a.ts-S.start)/1000).toFixed(2),acao:a.a,valor:a.v,efeito:a.ok})),mensagens:st.chats,etapas:st.credits.map(c=>c.t),escolhas:st.choices.map(c=>c.t),sinais:signals(st).map(x=>x[1])}; });
-  return {sala:code,resultado:S.outcome,duracao_s:(S.end-S.start)/1000,erros_senha:S.wrong,jogadores:players,chat:S.chats.map(c=>({t:+((c.ts-S.start)/1000).toFixed(1),voz:c.p,msg:c.m}))};
+  const players=[...S.players].map(([id,p])=>{ const st=stats(id); return {jogador:id,uid:p.uid,apelido:p.nick,anfitriao:id===S.host,competencias:st.sc,
+    cliques:st.taps.map(t=>({t:+((t.ts-S.start)/1000).toFixed(2),parede:t.vw,x:t.x,y:t.y,objeto:t.h})),
+    acoes:st.acts.map(a=>({t:+((a.ts-S.start)/1000).toFixed(2),acao:a.a,valor:a.v,efeito:a.ok})),
+    mensagens:st.chats,etapas:st.credits.map(c=>c.t),escolhas:st.choices.map(c=>c.t),sinais:signals(st).map(x=>x[1])}; });
+  return {sala:code,resultado:S.outcome,duracao_s:(S.end-S.start)/1000,erros_senha:S.wrong,jogadores:players,chat:S.chats.map(c=>({t:+((c.ts-S.start)/1000).toFixed(1),jogador:c.p,msg:c.m}))};
 }
 function summaryText(){
   const lines=[`KITNET 47 · Sala ${code} · ${S.outcome==="win"?"Escaparam":"Não escaparam"} em ${fmt(S.end-S.start)}`];
-  for(const [id,p] of S.players){ const st=stats(id); lines.push(`\n${p.nick}: `+Object.entries(st.sc).map(([k,v])=>`${k} ${v==null?"—":v}`).join(" · ")); signals(st).forEach(s=>lines.push("  - "+s[1])); }
+  for(const [id,p] of S.players){ const st=stats(id); lines.push(`\n${p.nick}${id===S.host?" (anfitrião)":""}: `+Object.entries(st.sc).map(([k,v])=>`${k} ${v==null?"—":v}`).join(" · ")); signals(st).forEach(s=>lines.push("  - "+s[1])); }
   return lines.join("\n");
 }
 
-window.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeSheet(); closeChat(); $("keypad").hidden=true; $("memory").hidden=true; } });
+window.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){ closeSheet(); closeChat(); $("keypad").hidden=true; $("memory").hidden=true; }
+  if(screen==="game"&&!chatOpen&&document.activeElement?.tagName!=="INPUT"){ if(e.key==="ArrowLeft") turn(-1); if(e.key==="ArrowRight") turn(1); }
+});
+setView(START_VIEW,0);
+// arriving through a shared link (#CODE) with a saved nickname: drop straight into the room
+capsReady.then(()=>{ if(location.hash.length>1&&nickIn.value.trim()&&!joined) join(); });
 })();
 </script>
