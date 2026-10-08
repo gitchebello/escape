@@ -13,7 +13,7 @@ const DATA_DIR = path.join(ROOT, "data");
 const FONTS = path.join(ROOT, "fonts");
 const DATA = path.join(DATA_DIR, "rooms.json");
 const CODE_RE = /^[A-Z0-9]{3,6}$/;
-const KINDS = new Set(["join", "start", "ready", "tap", "act", "chat"]);
+const KINDS = new Set(["join", "story", "start", "ready", "tap", "act", "chat"]);
 const MAX_EVENTS = 6000;
 
 // rooms[code] = { created, events: [] }

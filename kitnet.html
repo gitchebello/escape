@@ -56,6 +56,15 @@ input[type=text]:focus{border-color:var(--cyan)}
 .tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .codebig{font-family:var(--f-hud);font-size:46px;color:var(--sun);letter-spacing:.2em;line-height:1}
 
+/* story picker */
+.stories{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.story{display:flex;flex-direction:column;gap:2px;text-align:left;border:2px solid var(--panel-2);background:rgba(12,4,20,.6);padding:10px 12px;min-height:56px}
+.story b{font-family:var(--f-hud);font-weight:400;font-size:24px;line-height:1;color:var(--paper)}
+.story span{font-size:12px;color:var(--muted);line-height:1.35}
+.story[aria-pressed=true]{border-color:var(--sun);box-shadow:4px 4px 0 var(--pink)}
+.story[aria-pressed=true] b{color:var(--sun)}
+.story:disabled{cursor:default}
+.story:disabled:not([aria-pressed=true]){opacity:.5}
 /* roster (lobby + game) */
 .roster{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .roster li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:6px 8px;background:rgba(12,4,20,.55);border-left:4px solid var(--c,#fff)}
@@ -224,7 +233,7 @@ input[type=text]:focus{border-color:var(--cyan)}
       <div class="kicker">Escape room online · 5 minutos · 1 a 6 jogadores</div>
       <h1 class="title">ACORDA.</h1>
     </div>
-    <p class="pitch">Você acorda numa kitnet que nunca viu. Cabeça explodindo, gosto de sangue na boca, um estranho na cama. A porta está trancada. Olhe em volta, toque nos objetos, converse com o time e saia antes que alguém bata na porta.</p>
+    <p class="pitch" id="pitch">Você acorda numa kitnet que nunca viu. Cabeça explodindo, gosto de sangue na boca, um estranho na cama. A porta está trancada. Olhe em volta, toque nos objetos, converse com o time e saia antes que alguém bata na porta.</p>
 
     <div class="card" id="joinCard">
       <div class="field">
@@ -248,6 +257,9 @@ input[type=text]:focus{border-color:var(--cyan)}
         <button class="btn" id="copyCode" style="flex:0 1 auto">Copiar link</button>
       </div>
       <p class="hint" id="shareHint">Mande o código pros colegas. Eles entram com o mesmo código.</p>
+      <div class="tag">História</div>
+      <div class="stories" id="storyPick"></div>
+      <p class="hint" id="storyHint"></p>
       <div class="tag">Jogadores na sala</div>
       <ul class="roster" id="lobbyRoster"></ul>
       <button class="btn hot" id="startBtn">Começar · 5:00</button>
@@ -289,6 +301,81 @@ input[type=text]:focus{border-color:var(--cyan)}
           <radialGradient id="gVig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".75"/></radialGradient>
         </defs>
 
+        <g id="views"></g>
+
+        <rect x="0" y="0" width="360" height="22" fill="#0c0414"/>
+        <rect x="100" y="8" width="160" height="5" rx="2" fill="#ff2e88"/>
+        <rect x="100" y="6" width="160" height="9" rx="4" fill="#ff2e88" opacity=".25"/>
+        <g id="hsLayer"></g>
+        <g id="rippleLayer"></g>
+        <g id="cursorLayer"></g>
+        <rect id="overlay" x="0" y="0" width="360" height="480" fill="url(#gVig)"/>
+      </svg>
+    </div>
+  </div>
+  <div class="navbar">
+    <button class="arrow l" id="turnL" aria-label="Virar para a esquerda"><span class="ch">‹</span><span class="nx" id="nxL"></span><span class="pd" id="pdL"></span></button>
+    <div class="viewname" id="viewName">CAMA</div>
+    <button class="arrow r" id="turnR" aria-label="Virar para a direita"><span class="pd" id="pdR"></span><span class="nx" id="nxR"></span><span class="ch">›</span></button>
+    <button class="back" id="backBtn" hidden>‹ Voltar pro quarto</button>
+  </div>
+  <div class="inv" id="inv"></div>
+</section>
+
+<!-- ================= END ================= -->
+<section id="end" class="screen" hidden>
+  <div class="endwrap">
+    <h2 class="verdict" id="verdict">VOCÊS SAÍRAM.</h2>
+    <ul class="story" id="story"></ul>
+    <div class="rep" id="report"></div>
+  </div>
+</section>
+
+<div class="sheet" id="sheet" aria-hidden="true">
+  <div class="sheet-in">
+    <div class="sh-top"><h2 class="sh-title" id="shTitle">—</h2><button class="x" id="shClose" aria-label="Fechar">×</button></div>
+    <p class="sh-desc" id="shDesc"></p>
+    <p class="sh-res" id="shRes" hidden></p>
+    <div class="acts" id="shActs"></div>
+    <div class="sh-who" id="shWho"></div>
+  </div>
+</div>
+
+<div class="sheet" id="chat" aria-hidden="true">
+  <div class="sheet-in">
+    <div class="sh-top"><h2 class="sh-title">Chat da sala</h2><button class="x" id="chatClose" aria-label="Fechar chat">×</button></div>
+    <div class="msgs" id="msgs"></div>
+    <div class="chips" id="chips"></div>
+    <form class="send" id="sendForm">
+      <input type="text" id="chatInput" maxlength="160" autocomplete="off" placeholder="Fala com o time…">
+      <button class="btn hot" type="submit">Enviar</button>
+    </form>
+  </div>
+</div>
+
+<button class="btn hot fab" id="lobbyChat" hidden>Chat</button>
+
+<div class="modal" id="keypad" hidden>
+  <div class="pad">
+    <div class="tag">TRAVA ELETRÔNICA · 4 DÍGITOS</div>
+    <div class="pad-disp" id="padDisp">____</div>
+    <div class="keys" id="keys"></div>
+    <button class="btn" id="padClose">Fechar</button>
+  </div>
+</div>
+
+<div class="modal" id="memory" hidden>
+  <div class="mem">
+    <h3>flash.</h3>
+    <p>Um pedaço da noite volta. <b>Só você lembra disso.</b> Conte pro time pelo chat.</p>
+    <div id="clues" style="display:flex;flex-direction:column;gap:10px"></div>
+    <p style="font-size:13px">Use as setas (ou arraste pro lado) para virar. Toque nos objetos para examinar. Água e remédio aliviam a ressaca.</p>
+    <p id="memWait" class="clue" style="font-size:18px" hidden></p>
+    <button class="btn" id="memClose">Bora</button>
+  </div>
+</div>
+
+<template id="art-kitnet"><svg xmlns="http://www.w3.org/2000/svg">
         <!-- ===== N: COZINHA ===== -->
         <g id="v-N" class="view">
           <rect x="0" y="0" width="360" height="330" fill="#1aa7ad"/>
@@ -463,98 +550,310 @@ input[type=text]:focus{border-color:var(--cyan)}
           <path d="M226 412 q20 -6 34 4" stroke="#c4001d" stroke-width="8" fill="none"/>
         </g>
 
-        <rect x="0" y="0" width="360" height="22" fill="#0c0414"/>
-        <rect x="100" y="8" width="160" height="5" rx="2" fill="#ff2e88"/>
-        <rect x="100" y="6" width="160" height="9" rx="4" fill="#ff2e88" opacity=".25"/>
-        <g id="hsLayer"></g>
-        <g id="rippleLayer"></g>
-        <g id="cursorLayer"></g>
-        <rect id="overlay" x="0" y="0" width="360" height="480" fill="url(#gVig)"/>
-      </svg>
-    </div>
-  </div>
-  <div class="navbar">
-    <button class="arrow l" id="turnL" aria-label="Virar para a esquerda"><span class="ch">‹</span><span class="nx" id="nxL"></span><span class="pd" id="pdL"></span></button>
-    <div class="viewname" id="viewName">CAMA</div>
-    <button class="arrow r" id="turnR" aria-label="Virar para a direita"><span class="pd" id="pdR"></span><span class="nx" id="nxR"></span><span class="ch">›</span></button>
-    <button class="back" id="backBtn" hidden>‹ Voltar pro quarto</button>
-  </div>
-  <div class="inv" id="inv"></div>
-</section>
+</svg></template>
+<template id="art-escritorio"><svg xmlns="http://www.w3.org/2000/svg">
+        <!-- ===== N: MESAS ===== -->
+        <g id="v-N" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#1d2357"/>
+          <rect x="0" y="30" width="360" height="110" fill="#0c0414"/>
+          <rect x="6" y="36" width="348" height="98" fill="url(#gSky)" opacity=".85"/>
+          <g fill="#1b0a2e"><rect x="6" y="90" width="40" height="44"/><rect x="46" y="70" width="30" height="64"/><rect x="80" y="96" width="50" height="38"/><rect x="140" y="60" width="26" height="74"/><rect x="170" y="84" width="44" height="50"/><rect x="220" y="66" width="36" height="68"/><rect x="262" y="92" width="40" height="42"/><rect x="306" y="74" width="48" height="60"/></g>
+          <g fill="#ffd23f" opacity=".7"><rect x="54" y="80" width="4" height="4"/><rect x="148" y="72" width="4" height="4"/><rect x="230" y="78" width="4" height="4"/><rect x="316" y="86" width="4" height="4"/><rect x="180" y="96" width="4" height="4"/></g>
+          <path d="M120 36 V134 M240 36 V134" stroke="#0c0414" stroke-width="5"/>
+          <path d="M0 140 H360" stroke="#2de2e6" stroke-width="3"/>
+          <rect x="0" y="226" width="160" height="12" fill="#c9ccd6" stroke="#0c0414" stroke-width="3"/>
+          <rect x="14" y="238" width="96" height="92" fill="#3b3346" stroke="#0c0414" stroke-width="3"/>
+          <path d="M14 268 H110 M14 298 H110" stroke="#0c0414" stroke-width="3"/>
+          <g fill="#ffd23f"><rect x="54" y="250" width="16" height="5"/><rect x="54" y="280" width="16" height="5"/><rect x="54" y="310" width="16" height="5"/></g>
+          <rect x="30" y="160" width="76" height="56" fill="#0c0414" stroke="#3a2a4f" stroke-width="3"/><rect x="62" y="216" width="10" height="10" fill="#3a2a4f"/>
+          <rect x="116" y="196" width="26" height="30" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/><circle cx="129" cy="208" r="5" fill="#ff8a3d"/>
+          <rect x="120" y="230" width="18" height="10" fill="#f7ecff" opacity=".0"/>
+          <rect x="170" y="226" width="190" height="12" fill="#c9ccd6" stroke="#0c0414" stroke-width="3"/>
+          <rect x="330" y="238" width="24" height="92" fill="#3b3346" stroke="#0c0414" stroke-width="3"/>
+          <rect x="194" y="142" width="104" height="72" fill="#0c0414" stroke="#3a2a4f" stroke-width="3"/>
+          <rect x="200" y="148" width="92" height="60" fill="#1a5fb4"/>
+          <g fill="#f7ecff" opacity=".85"><rect x="210" y="160" width="60" height="5"/><rect x="210" y="172" width="44" height="5"/></g><rect x="226" y="188" width="40" height="10" fill="#2de2e6"/>
+          <rect x="240" y="214" width="12" height="12" fill="#3a2a4f"/>
+          <rect x="206" y="228" width="80" height="7" fill="#2a2531" stroke="#0c0414" stroke-width="1.5"/>
+          <rect x="280" y="230" width="14" height="10" fill="#ffd23f" transform="rotate(12 287 235)"/>
+          <rect x="306" y="214" width="36" height="14" rx="3" fill="#e0102f" stroke="#0c0414" stroke-width="2"/><rect x="310" y="206" width="28" height="9" rx="3" fill="#e0102f" stroke="#0c0414" stroke-width="2"/>
+          <path d="M0 330 H360 V480 H0z" fill="#2b2f5e"/>
+          <g class="floorlines"></g>
+          <rect x="270" y="384" width="80" height="54" fill="#3b3346" stroke="#0c0414" stroke-width="3"/>
+          <rect x="278" y="342" width="64" height="44" fill="#c9ccd6" stroke="#0c0414" stroke-width="3"/>
+          <rect x="290" y="374" width="40" height="6" fill="#0c0414"/><circle cx="334" cy="352" r="3" fill="#3dff8b"/>
+          <g id="printPaper" style="display:none"><rect x="292" y="356" width="36" height="22" fill="#f7ecff" stroke="#0c0414" stroke-width="1.5"/><rect x="296" y="360" width="10" height="12" fill="#2de2e6"/></g>
+          <g><rect x="60" y="360" width="5" height="5" fill="#ff2e88"/><rect x="140" y="400" width="4" height="4" fill="#2de2e6"/><rect x="200" y="370" width="5" height="5" fill="#ffd23f"/><rect x="100" y="440" width="5" height="5" fill="#ff2e88"/><rect x="220" y="450" width="4" height="4" fill="#2de2e6"/></g>
+          <g fill="#c4001d"><circle cx="160" cy="352" r="3"/><circle cx="130" cy="384" r="4"/><circle cx="104" cy="420" r="3"/></g>
+          <path d="M170 400 l26 -6 l4 8 l-16 12z" fill="#2f8f4e" stroke="#0c0414" stroke-width="2"/>
+        </g>
 
-<!-- ================= END ================= -->
-<section id="end" class="screen" hidden>
-  <div class="endwrap">
-    <h2 class="verdict" id="verdict">VOCÊS SAÍRAM.</h2>
-    <ul class="story" id="story"></ul>
-    <div class="rep" id="report"></div>
-  </div>
-</section>
+        <!-- ===== L: CORREDOR ===== -->
+        <g id="v-L" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#1d2357"/>
+          <path d="M0 40 H360" stroke="#ff2e88" stroke-width="3"/>
+          <rect x="20" y="118" width="70" height="80" fill="#e0102f" stroke="#0c0414" stroke-width="3"/>
+          <text x="55" y="148" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="16" fill="#fff">FOGO</text>
+          <rect x="44" y="158" width="22" height="26" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <rect x="34" y="214" width="40" height="70" rx="10" fill="#e0102f" stroke="#0c0414" stroke-width="3"/><rect x="46" y="204" width="16" height="12" fill="#0c0414"/>
+          <rect x="140" y="48" width="214" height="284" fill="#0c0414"/>
+          <rect x="146" y="54" width="202" height="278" fill="#ff2e88" opacity=".18"/>
+          <rect x="146" y="54" width="202" height="110" fill="url(#pBlinds)" opacity=".7"/>
+          <rect x="196" y="222" width="140" height="14" fill="#3a1f14" opacity=".85"/>
+          <circle cx="236" cy="212" r="14" fill="#0c0414" opacity=".85"/><path d="M214 234 q20 -22 52 -6 l0 8 l-52 0z" fill="#0c0414" opacity=".85"/>
+          <path d="M146 54 V332 M247 54 V332" stroke="#c9ccd6" stroke-width="3" opacity=".6"/>
+          <rect x="254" y="64" width="88" height="20" fill="#0c0414"/><text x="298" y="79" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="15" fill="#ffd23f">DIRETORIA</text>
+          <circle cx="256" cy="200" r="5" fill="#ffd23f"/>
+          <rect x="96" y="292" width="30" height="40" fill="#7a3b1c" stroke="#0c0414" stroke-width="2"/>
+          <path d="M111 292 q-20 -40 -6 -70 q8 30 6 70 q10 -40 26 -60 q-6 40 -26 60z" fill="#2f8f4e" stroke="#0c0414" stroke-width="2"/>
+          <path d="M0 330 H360 V480 H0z" fill="#2b2f5e"/>
+          <g class="floorlines"></g>
+          <g fill="#c4001d"><circle cx="250" cy="352" r="4"/><circle cx="210" cy="380" r="5"/><circle cx="160" cy="418" r="4"/><circle cx="118" cy="458" r="5"/></g>
+        </g>
 
-<div class="sheet" id="sheet" aria-hidden="true">
-  <div class="sheet-in">
-    <div class="sh-top"><h2 class="sh-title" id="shTitle">—</h2><button class="x" id="shClose" aria-label="Fechar">×</button></div>
-    <p class="sh-desc" id="shDesc"></p>
-    <p class="sh-res" id="shRes" hidden></p>
-    <div class="acts" id="shActs"></div>
-    <div class="sh-who" id="shWho"></div>
-  </div>
-</div>
+        <!-- ===== S: ELEVADOR ===== -->
+        <g id="v-S" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#2b2f5e"/>
+          <rect x="96" y="40" width="210" height="292" fill="#0c0414"/>
+          <rect x="110" y="70" width="140" height="262" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+          <path d="M180 70 V332" stroke="#0c0414" stroke-width="3"/>
+          <path d="M120 84 l20 40 M196 92 l30 60" stroke="#f7ecff" stroke-width="3" opacity=".4"/>
+          <rect x="150" y="46" width="60" height="20" fill="#1b0a2e"/><text x="180" y="62" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="18" fill="#e0102f">▲ 12</text>
+          <path d="M188 182 q8 -14 16 -2 q4 -14 10 0 q6 -10 10 4 q2 16 -12 22 q-20 2 -24 -24z" fill="#c4001d" opacity=".85"/>
+          <rect x="258" y="160" width="40" height="44" fill="#1b1622" stroke="#0c0414" stroke-width="3"/><rect x="266" y="168" width="24" height="14" fill="#3a2a4f"/><circle id="ledKey" cx="278" cy="194" r="4" fill="#e0102f"/>
+          <rect x="258" y="210" width="40" height="56" fill="#1b1622" stroke="#0c0414" stroke-width="3"/><circle id="ledCode" cx="278" cy="218" r="3.5" fill="#e0102f"/>
+          <g fill="#3a2a4f"><rect x="263" y="226" width="8" height="7"/><rect x="274" y="226" width="8" height="7"/><rect x="285" y="226" width="8" height="7"/><rect x="263" y="237" width="8" height="7"/><rect x="274" y="237" width="8" height="7"/><rect x="285" y="237" width="8" height="7"/><rect x="263" y="248" width="8" height="7"/><rect x="274" y="248" width="8" height="7"/><rect x="285" y="248" width="8" height="7"/></g>
+          <rect x="10" y="118" width="80" height="62" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <g font-family="VT323,K47 VT,monospace" font-size="12" fill="#0c0414" text-anchor="middle"><text x="50" y="136">FORA DO</text><text x="50" y="150">HORÁRIO:</text><text x="50" y="168" fill="#e0102f">CRACHÁ+CÓDIGO</text></g>
+          <path d="M0 330 H360 V480 H0z" fill="#2b2f5e"/>
+          <g class="floorlines"></g>
+          <g><rect x="80" y="380" width="5" height="5" fill="#ff2e88"/><rect x="250" y="420" width="5" height="5" fill="#ffd23f"/><rect x="170" y="450" width="4" height="4" fill="#2de2e6"/></g>
+          <path d="M210 360 l24 -6 l4 8 l-14 12z" fill="#2f8f4e" stroke="#0c0414" stroke-width="2"/>
+        </g>
 
-<div class="sheet" id="chat" aria-hidden="true">
-  <div class="sheet-in">
-    <div class="sh-top"><h2 class="sh-title">Chat da sala</h2><button class="x" id="chatClose" aria-label="Fechar chat">×</button></div>
-    <div class="msgs" id="msgs"></div>
-    <div class="chips" id="chips"></div>
-    <form class="send" id="sendForm">
-      <input type="text" id="chatInput" maxlength="160" autocomplete="off" placeholder="Fala com o time…">
-      <button class="btn hot" type="submit">Enviar</button>
-    </form>
-  </div>
-</div>
+        <!-- ===== O: COPA ===== -->
+        <g id="v-O" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#1aa7ad"/>
+          <rect x="8" y="34" width="106" height="128" fill="#0c0414"/>
+          <rect x="14" y="40" width="94" height="116" fill="url(#gSky)"/>
+          <g fill="#1b0a2e"><rect x="14" y="110" width="24" height="46"/><rect x="40" y="96" width="20" height="60"/><rect x="64" y="118" width="44" height="38"/></g>
+          <rect class="siren" x="52" y="148" width="10" height="6" fill="#e0102f"/><rect class="siren b" x="64" y="148" width="10" height="6" fill="#2d6bff"/>
+          <rect x="0" y="236" width="270" height="12" fill="#3b3346" stroke="#0c0414" stroke-width="3"/>
+          <rect x="0" y="248" width="270" height="82" fill="#7a3b1c" stroke="#0c0414" stroke-width="3"/>
+          <path d="M90 248 V330 M180 248 V330" stroke="#0c0414" stroke-width="3"/>
+          <g fill="#ffd23f"><rect x="76" y="264" width="6" height="18"/><rect x="98" y="264" width="6" height="18"/></g>
+          <rect x="24" y="170" width="74" height="66" fill="#2a2531" stroke="#0c0414" stroke-width="3"/>
+          <rect x="36" y="180" width="50" height="20" fill="#2de2e6" opacity=".5"/>
+          <rect x="52" y="210" width="18" height="22" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <path d="M56 206 q4 -8 0 -14 M64 206 q4 -8 0 -14" stroke="#fff" stroke-width="2" opacity=".6" fill="none"/>
+          <rect x="124" y="48" width="140" height="112" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+          <g font-family="VT323,K47 VT,monospace" fill="#2d6bff" font-size="14"><text x="132" y="68">METAS Q4: +30%</text><text x="132" y="84">FESTA SEXTA!!!</text></g>
+          <g id="regra" style="display:none" font-family="VT323,K47 VT,monospace" fill="#e0102f" font-size="14"><text x="132" y="110">CÓD. ELEVADOR</text><text x="132" y="126">FORA DO HORÁRIO =</text><text x="132" y="142">ANO DE FUNDAÇÃO</text></g>
+          <g id="calendario" transform="rotate(4 194 125)">
+            <rect x="148" y="92" width="92" height="66" fill="#ff2e88" stroke="#0c0414" stroke-width="2"/>
+            <text x="194" y="114" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="15" fill="#0c0414">HALDEN 2026</text>
+            <g fill="#f7ecff"><rect x="158" y="122" width="10" height="8"/><rect x="172" y="122" width="10" height="8"/><rect x="186" y="122" width="10" height="8"/><rect x="200" y="122" width="10" height="8"/><rect x="214" y="122" width="10" height="8"/><rect x="158" y="136" width="10" height="8"/><rect x="172" y="136" width="10" height="8"/><rect x="186" y="136" width="10" height="8"/><rect x="200" y="136" width="10" height="8"/></g>
+          </g>
+          <rect x="272" y="48" width="84" height="282" fill="#eaeaf2" stroke="#0c0414" stroke-width="3"/>
+          <path d="M272 150 H356" stroke="#0c0414" stroke-width="3"/>
+          <rect x="282" y="104" width="6" height="36" fill="#7a7a8a"/><rect x="282" y="168" width="6" height="50" fill="#7a7a8a"/>
+          <rect x="298" y="70" width="44" height="24" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/><text x="320" y="86" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="11" fill="#0c0414">NÃO MEXA</text>
+          <rect x="140" y="196" width="14" height="40" rx="4" fill="#2f8f4e" stroke="#0c0414" stroke-width="2"/><rect x="143" y="184" width="8" height="14" fill="#ffd23f"/>
+          <path d="M0 330 H360 V480 H0z" fill="#2b2f5e"/>
+          <g class="floorlines"></g>
+          <path d="M60 400 q40 -10 70 6 q-20 20 -70 10z" fill="#7a3b1c" opacity=".7"/>
+        </g>
 
-<button class="btn hot fab" id="lobbyChat" hidden>Chat</button>
+        <!-- ===== D: DIRETORIA ===== -->
+        <g id="v-D" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#3a1d6e"/>
+          <rect x="0" y="0" width="360" height="330" fill="#ff2e88" opacity=".08"/>
+          <rect x="224" y="56" width="126" height="72" fill="#ffd23f" stroke="#0c0414" stroke-width="3"/>
+          <rect x="232" y="64" width="110" height="56" fill="none" stroke="#7a5a10" stroke-width="2"/>
+          <g font-family="VT323,K47 VT,monospace" font-size="16" fill="#0c0414" text-anchor="middle"><text x="287" y="88">HALDEN CORP</text><text x="287" y="108">DESDE 1986</text></g>
+          <rect x="20" y="40" width="100" height="70" fill="#2de2e6" stroke="#0c0414" stroke-width="3"/>
+          <path d="M22 108 l28 -38 l20 24 l14 -14 l34 28z" fill="#ff2e88"/>
+          <rect x="66" y="146" width="74" height="94" rx="8" fill="#0c0414" stroke="#3a2a4f" stroke-width="3"/>
+          <path d="M60 238 q20 -42 72 -38 q30 4 40 38z" fill="#2a2a3a" stroke="#0c0414" stroke-width="3"/>
+          <ellipse cx="126" cy="230" rx="21" ry="14" fill="#c98b6b" stroke="#0c0414" stroke-width="3"/>
+          <path d="M108 224 q18 -14 36 0" stroke="#9aa0ad" stroke-width="6" fill="none"/>
+          <g id="bandageArt" style="display:none"><path d="M110 222 q16 -8 32 0" stroke="#f7ecff" stroke-width="7" fill="none"/></g>
+          <rect x="30" y="240" width="300" height="20" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
+          <rect x="40" y="260" width="280" height="70" fill="#5a2a16" stroke="#0c0414" stroke-width="3"/>
+          <ellipse cx="148" cy="244" rx="30" ry="5" fill="#c4001d"/>
+          <path d="M146 250 v22 M166 250 v14" stroke="#c4001d" stroke-width="4"/>
+          <path d="M160 238 l12 -54 h76 l-6 54z" fill="#0c0414" stroke="#3a2a4f" stroke-width="3"/>
+          <path d="M174 190 h66 l-5 42 h-68z" fill="#1a5fb4"/>
+          <rect x="186" y="200" width="44" height="6" fill="#f7ecff"/><rect x="196" y="214" width="26" height="10" fill="#3dff8b"/>
+          <rect x="150" y="236" width="104" height="6" fill="#3a2a4f"/>
+          <path d="M112 238 q8 18 34 22" stroke="#2de2e6" stroke-width="3" fill="none"/>
+          <rect id="dirBadge" x="140" y="254" width="16" height="22" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <path d="M0 330 H360 V480 H0z" fill="#2b2f5e"/>
+          <g class="floorlines"></g>
+          <g id="trofeuArt">
+            <path d="M66 424 h46 l-6 -14 h-34z" fill="#3a1f14" stroke="#0c0414" stroke-width="2"/>
+            <path d="M78 410 v-20 h22 v20z" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/>
+            <path d="M70 372 h38 q0 20 -19 22 q-19 -2 -19 -22z" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/>
+            <path d="M68 420 q12 -10 26 0" stroke="#c4001d" stroke-width="6" fill="none"/>
+          </g>
+          <g fill="#c4001d"><circle cx="124" cy="402" r="4"/><circle cx="160" cy="432" r="3"/><circle cx="190" cy="360" r="3"/></g>
+        </g>
+</svg></template>
 
-<div class="modal" id="keypad" hidden>
-  <div class="pad">
-    <div class="tag">TRAVA ELETRÔNICA · 4 DÍGITOS</div>
-    <div class="pad-disp" id="padDisp">____</div>
-    <div class="keys" id="keys"></div>
-    <button class="btn" id="padClose">Fechar</button>
-  </div>
-</div>
+<template id="art-motel"><svg xmlns="http://www.w3.org/2000/svg">
+        <!-- ===== N: CAMA ===== -->
+        <g id="v-N" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#6a1b8f"/>
+          <rect x="0" y="22" width="360" height="40" fill="#b18cff" opacity=".45"/>
+          <path d="M0 62 H360" stroke="#ff2e88" stroke-width="3"/>
+          <text x="196" y="122" text-anchor="middle" font-family="Rubik Wet Paint,K47 Wet,Impact,sans-serif" font-size="40" fill="#ff2e88" stroke="#ffd23f" stroke-width="1">FLAMINGO</text>
+          <path d="M44 172 q-10 -40 20 -40 q20 0 10 20 q-10 16 -10 40 v40" stroke="#ff2e88" stroke-width="5" fill="none"/>
+          <path d="M64 232 l-10 34 M64 232 l8 34" stroke="#ff2e88" stroke-width="3"/>
+          <ellipse cx="180" cy="232" rx="150" ry="70" fill="#ff2e88" stroke="#0c0414" stroke-width="3"/>
+          <ellipse cx="180" cy="292" rx="162" ry="50" fill="#d1006f" stroke="#0c0414" stroke-width="3"/>
+          <ellipse cx="180" cy="284" rx="140" ry="36" fill="#ff5fa8"/>
+          <ellipse cx="116" cy="250" rx="30" ry="12" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <ellipse cx="244" cy="250" rx="30" ry="12" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <g id="bagArt">
+            <rect x="112" y="248" width="134" height="44" rx="14" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+            <path d="M130 254 q50 -26 100 0" stroke="#3a2a4f" stroke-width="5" fill="none"/>
+            <g id="cashPeek" style="display:none"><rect x="148" y="242" width="24" height="12" fill="#3dff8b" stroke="#0c0414" stroke-width="1.5" transform="rotate(-12 160 248)"/><rect x="176" y="240" width="24" height="12" fill="#3dff8b" stroke="#0c0414" stroke-width="1.5" transform="rotate(8 188 246)"/><rect x="202" y="244" width="22" height="12" fill="#3dff8b" stroke="#0c0414" stroke-width="1.5" transform="rotate(-4 213 250)"/></g>
+          </g>
+          <rect x="292" y="252" width="62" height="78" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
+          <rect x="298" y="224" width="48" height="28" rx="4" fill="#e8dcc0" stroke="#0c0414" stroke-width="2"/>
+          <rect x="302" y="214" width="40" height="11" rx="4" fill="#e8dcc0" stroke="#0c0414" stroke-width="2"/>
+          <circle cx="322" cy="238" r="4" fill="#e0102f"/>
+          <path d="M0 330 H360 V480 H0z" fill="#2a0b45"/>
+          <g class="floorlines"></g>
+          <rect x="40" y="382" width="62" height="16" fill="#2de2e6" stroke="#0c0414" stroke-width="2" transform="rotate(-20 71 390)"/>
+          <ellipse cx="280" cy="420" rx="34" ry="14" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/>
+          <rect x="270" y="388" width="10" height="30" rx="3" fill="#2f8f4e" stroke="#0c0414" stroke-width="2" transform="rotate(16 275 403)"/>
+        </g>
 
-<div class="modal" id="memory" hidden>
-  <div class="mem">
-    <h3>flash.</h3>
-    <p>Um pedaço da noite volta. <b>Só você lembra disso.</b> Conte pro time pelo chat.</p>
-    <div id="clues" style="display:flex;flex-direction:column;gap:10px"></div>
-    <p style="font-size:13px">Use as setas (ou arraste pro lado) para virar. Toque nos objetos para examinar. Água e remédio aliviam a ressaca.</p>
-    <p id="memWait" class="clue" style="font-size:18px" hidden></p>
-    <button class="btn" id="memClose">Bora</button>
-  </div>
-</div>
+        <!-- ===== L: FRIGOBAR E TV ===== -->
+        <g id="v-L" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pStripe)"/>
+          <rect x="24" y="74" width="184" height="132" rx="6" fill="#0c0414" stroke="#3a2a4f" stroke-width="3"/>
+          <rect x="34" y="84" width="164" height="102" fill="#ff2e88" opacity=".4"/>
+          <text x="116" y="142" text-anchor="middle" font-family="Rubik Wet Paint,K47 Wet,Impact,sans-serif" font-size="22" fill="#ffd23f">CANAL 69</text>
+          <g id="tvNews" style="display:none">
+            <rect x="34" y="84" width="164" height="102" fill="#1a5fb4"/>
+            <rect x="44" y="94" width="40" height="46" fill="#e8e0f0"/><circle cx="64" cy="110" r="10" fill="#c98b6b"/>
+            <g fill="#f7ecff"><rect x="92" y="100" width="90" height="5"/><rect x="92" y="112" width="70" height="5"/></g>
+            <rect x="34" y="168" width="164" height="18" fill="#e0102f"/>
+            <text x="40" y="181" font-family="VT323,K47 VT,monospace" font-size="13" fill="#fff">KITNET · HALDEN · POLÍCIA</text>
+          </g>
+          <rect class="tvglow" x="34" y="84" width="164" height="102" fill="#2de2e6" opacity=".12"/>
+          <path d="M116 206 v20 M96 226 h40" stroke="#3a2a4f" stroke-width="4"/>
+          <rect x="226" y="200" width="122" height="130" fill="#eaeaf2" stroke="#0c0414" stroke-width="3"/>
+          <rect x="236" y="214" width="8" height="40" fill="#7a7a8a"/>
+          <rect x="250" y="168" width="12" height="32" rx="3" fill="#2de2e6" stroke="#0c0414" stroke-width="2"/>
+          <rect x="268" y="176" width="12" height="24" rx="3" fill="#e0102f" stroke="#0c0414" stroke-width="2"/>
+          <rect x="286" y="180" width="18" height="20" rx="2" fill="#c58b4e" stroke="#0c0414" stroke-width="2"/>
+          <rect x="256" y="230" width="84" height="46" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/>
+          <g font-family="VT323,K47 VT,monospace" font-size="11" fill="#0c0414"><text x="261" y="244">ÁGUA ...... 8</text><text x="261" y="256">ENERGÉTICO 18</text><text x="261" y="268">WHISKY .... 45</text></g>
+          <path d="M0 330 H360 V480 H0z" fill="#2a0b45"/>
+          <g class="floorlines"></g>
+          <path d="M180 440 q-50 -40 -20 -60 q20 -10 20 14 q0 -24 20 -14 q30 20 -20 60z" fill="#ff2e88" opacity=".8"/>
+        </g>
+
+        <!-- ===== S: GARAGEM ===== -->
+        <g id="v-S" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#2a2531"/>
+          <rect x="40" y="40" width="252" height="292" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+          <path d="M40 64 H292 M40 88 H292 M40 112 H292 M40 136 H292 M40 160 H292 M40 184 H292 M40 208 H292 M40 232 H292 M40 256 H292 M40 280 H292 M40 304 H292" stroke="#5c5566" stroke-width="3"/>
+          <rect x="126" y="142" width="80" height="28" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/>
+          <text x="166" y="162" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="18" fill="#0c0414">SAÍDA ▲</text>
+          <rect x="8" y="60" width="28" height="32" fill="#1b1622" stroke="#0c0414" stroke-width="2"/>
+          <circle id="ledRemote" cx="22" cy="72" r="4" fill="#e0102f"/>
+          <rect x="296" y="128" width="60" height="114" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
+          <rect x="304" y="148" width="44" height="40" fill="#ffd23f" opacity=".85" stroke="#0c0414" stroke-width="2"/>
+          <text x="326" y="174" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="15" fill="#0c0414">R$380</text>
+          <circle id="ledPaid" cx="326" cy="212" r="4.5" fill="#e0102f"/>
+          <path d="M0 330 H360 V480 H0z" fill="#3b3346"/>
+          <g class="floorlines"></g>
+          <ellipse cx="170" cy="420" rx="72" ry="16" fill="#0c0414" opacity=".5"/>
+          <path d="M70 480 q20 -80 40 -150 M250 480 q-20 -80 -40 -150" stroke="#0c0414" stroke-width="10" opacity=".25" fill="none"/>
+        </g>
+
+        <!-- ===== O: CLOSET ===== -->
+        <g id="v-O" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#6a1b8f"/>
+          <rect x="20" y="50" width="230" height="282" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
+          <rect x="30" y="60" width="210" height="142" fill="#1b0a2e"/>
+          <path d="M36 80 H234" stroke="#c9ccd6" stroke-width="4"/>
+          <path d="M60 80 l-16 84 h44z" fill="#ff2e88" stroke="#0c0414" stroke-width="2"/>
+          <path d="M126 80 l-14 74 h36z" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <rect x="36" y="216" width="110" height="98" fill="#5c5566" stroke="#0c0414" stroke-width="3"/>
+          <rect x="106" y="230" width="30" height="42" fill="#1b1622" stroke="#0c0414" stroke-width="2"/>
+          <circle id="ledSafe" cx="121" cy="238" r="3.5" fill="#e0102f"/>
+          <g fill="#3a2a4f"><rect x="110" y="246" width="6" height="5"/><rect x="118" y="246" width="6" height="5"/><rect x="126" y="246" width="6" height="5"/><rect x="110" y="254" width="6" height="5"/><rect x="118" y="254" width="6" height="5"/><rect x="126" y="254" width="6" height="5"/><rect x="110" y="262" width="6" height="5"/><rect x="118" y="262" width="6" height="5"/><rect x="126" y="262" width="6" height="5"/></g>
+          <circle cx="70" cy="264" r="13" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+          <g id="cofreOpen" style="display:none">
+            <rect x="36" y="216" width="110" height="98" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+            <rect id="walletArt" x="60" y="278" width="42" height="26" fill="#c58b4e" stroke="#0c0414" stroke-width="2"/>
+          </g>
+          <rect x="258" y="50" width="98" height="282" fill="#0c0414"/>
+          <rect x="266" y="58" width="82" height="274" fill="url(#pTileDark)" opacity=".5"/>
+          <rect x="266" y="58" width="82" height="274" fill="#ff2e88" opacity=".25"/>
+          <rect x="284" y="26" width="46" height="18" fill="#0c0414"/><text x="307" y="40" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="15" fill="#2de2e6">WC</text>
+          <path d="M0 330 H360 V480 H0z" fill="#2a0b45"/>
+          <g class="floorlines"></g>
+          <path d="M120 382 q40 -20 80 0 l20 40 q-60 20 -110 0z" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M200 402 l60 10 l-4 30 l-60 -6z" fill="#2a2a3a" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M160 386 l6 40 l8 -40z" fill="#2de2e6" stroke="#0c0414" stroke-width="1.5"/>
+        </g>
+
+        <!-- ===== B: BANHEIRO ===== -->
+        <g id="v-B" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pTile)"/>
+          <rect x="0" y="0" width="360" height="330" fill="#ff2e88" opacity=".3"/>
+          <rect x="110" y="40" width="122" height="100" fill="#9fd9e6" stroke="#0c0414" stroke-width="4"/>
+          <path d="M171 122 q-40 -30 -14 -50 q14 -8 14 10 q0 -18 14 -10 q26 20 -14 50z" fill="none" stroke="#c4001d" stroke-width="4"/>
+          <rect x="14" y="222" width="244" height="108" rx="20" fill="#f4f4f4" stroke="#0c0414" stroke-width="3"/>
+          <rect x="26" y="224" width="220" height="30" rx="10" fill="#bfefff"/>
+          <g id="pauloTub">
+            <circle cx="72" cy="208" r="18" fill="#9fb4c8" stroke="#0c0414" stroke-width="3"/>
+            <path d="M56 202 a18 18 0 0 1 32 -4 l-6 4 l-8 -4 l-8 4z" fill="#1b0d08"/>
+            <path d="M140 224 q20 -30 40 -10 l-4 10z" fill="#9fb4c8" stroke="#0c0414" stroke-width="2.5"/>
+          </g>
+          <g fill="#e8fbff" stroke="#9fd9e6" stroke-width="2"><rect x="40" y="214" width="16" height="16" transform="rotate(14 48 222)"/><rect x="96" y="212" width="14" height="14"/><rect x="200" y="214" width="16" height="16" transform="rotate(-10 208 222)"/><rect x="226" y="218" width="12" height="12"/><rect x="118" y="216" width="12" height="12"/></g>
+          <rect x="300" y="72" width="10" height="10" fill="#ffd23f"/>
+          <path d="M305 82 q-30 20 -26 120 h56 q4 -100 -30 -120z" fill="#ff2e88" stroke="#0c0414" stroke-width="3"/>
+          <path d="M290 122 h30" stroke="#ffd23f" stroke-width="3"/>
+          <path d="M0 330 H360 V480 H0z" fill="url(#pTileDark)"/>
+          <g class="floorlines" opacity=".4"></g>
+          <ellipse cx="200" cy="362" rx="60" ry="10" fill="#bfefff" opacity=".6"/>
+          <g id="pauloFloor" style="display:none">
+            <ellipse cx="170" cy="420" rx="112" ry="30" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+            <circle cx="76" cy="410" r="18" fill="#c9a08a" stroke="#0c0414" stroke-width="3"/>
+            <path d="M60 404 a18 18 0 0 1 32 -4 l-6 4 l-8 -4 l-8 4z" fill="#1b0d08"/>
+          </g>
+        </g>
+</svg></template>
 
 <script>
 (() => {
 "use strict";
-const DUR = 300000, BRIEF_MAX = 45000, CODE = "0347";
+const DUR = 300000, BRIEF_MAX = 45000;
 const $ = id => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
 const PALETTE = ["#ff2e88","#2de2e6","#ffd23f","#3dff8b","#b18cff","#ff8a3d"];
-const CLUES = [
+const QUICK = ["Achei uma pista!","Vem pra cá","Qual a senha?","Deixa comigo","Não mexe nisso","Tá vivo?"];
+
+// ---------------- stories: each one is data — walls, hotspots, actions, clues, endings ----------------
+const STORIES = {
+kitnet:{
+  id:"kitnet", name:"Kitnet 47", short:"Uma kitnet estranha, um homem sangrando na cama e uma porta blindada.",
+  pitch:"Você acorda numa kitnet que nunca viu. Cabeça explodindo, gosto de sangue na boca, um estranho na cama. A porta está trancada. Olhe em volta, toque nos objetos, converse com o time e saia antes que alguém bata na porta.",
+  views:{ N:"Cozinha", L:"TV e janela", S:"Porta", O:"Cama", B:"Banheiro" }, ring:["N","L","S","O"], start:"O", backTo:"O", back:"‹ Voltar pro quarto",
+  code:"0347", codeCredit:"Acertou a senha da porta",
+  clues:[
   "O relógio caiu na briga. Você lembra do vidro voando… Os ponteiros pararam ali. Que horas eram?",
   "Você escondeu algo pequeno, de metal, no gelo. Pra ninguém achar. Nem você.",
   "A senha da porta sempre foi a HORA + o NÚMERO DO APÊ. Quatro dígitos."
-];
-const QUICK = ["Achei uma pista!","Vem pra cá","Qual a senha?","Deixa comigo","Não mexe nisso","Tá vivo?"];
-
-// camera: four walls you turn between, plus the bathroom reached from the bed wall
-const VIEWS = { N:"Cozinha", L:"TV e janela", S:"Porta", O:"Cama", B:"Banheiro" };
-const RING = ["N","L","S","O"];
-const START_VIEW = "O";
-
-const HS = {
+],
+  hs:{
   bancada:{v:"N",n:"Bancada",r:[28,186,124,38]},
   micro:{v:"N",n:"Micro-ondas",r:[154,140,108,74]},
   geladeira:{v:"N",n:"Geladeira",r:[268,48,92,286]},
@@ -568,11 +867,8 @@ const HS = {
   banheiro:{v:"O",n:"Banheiro",r:[244,40,112,294],nav:"B"},
   chuveiro:{v:"B",n:"Chuveiro",r:[14,20,166,322]},
   espelho:{v:"B",n:"Pia e espelho",r:[204,56,154,276]}
-};
-const OBJ = Object.keys(HS).filter(k=>!HS[k].nav);
-const HS_COUNT = OBJ.length;
-
-const DESC = {
+},
+  desc:{
   chuveiro:s=>s.showerOn?"Vapor tomando o banheiro. O espelho ao lado começa a embaçar.":"Box encardido. Cortina rosa rasgada. Rosa não era a cor original.",
   espelho:s=>s.showerOn?(s.mirrorRead?"No vapor do espelho, escrito com o dedo: HORA + APTO. NÃO ESQUECE, IDIOTA.":"O vapor revela letras escritas com o dedo no espelho…"):"Sua cara está péssima. Olho roxo. Tem marca de dedo no vidro, mas seco não dá pra ler. Do lado, um armarinho.",
   bancada:s=>s.knifeTaken?"Marca de faca no balcão. Ela não está mais aqui.":"Uma faca de cozinha largada. A lâmina está suja. Não é ketchup.",
@@ -585,9 +881,8 @@ const DESC = {
   celular:s=>"Tela rachada, 4% de bateria. "+(s.deleted?"A conversa com “R.” está vazia.":"Mensagem de “R.”: “Limpa tudo antes das 9. Ninguém pode saber. Pago o dobro.”"),
   cama:s=>s.pulse?"Um homem que você nunca viu. Respira, fraco. Corte fundo na testa. O travesseiro está encharcado.":"Um homem que você nunca viu, de bruços. O travesseiro está vermelho. Ele respira? Você não sabe.",
   porta:s=>`Porta blindada. Tranca de chave em cima${s.keyUsed?" (aberta)":""}. Teclado de 4 dígitos${s.codeOk?" (luz verde)":""}.`
-};
-
-const ACT = {
+},
+  act:{
   shower_on:{h:"chuveiro",l:"Ligar no quente",can:s=>!s.showerOn,run:s=>{s.showerOn=true},msg:"A água sai pelando. O banheiro enche de vapor.",key:"Ligou o chuveiro (revela o espelho)"},
   shower_off:{h:"chuveiro",l:"Desligar",can:s=>s.showerOn,run:s=>{s.showerOn=false},msg:"Silêncio. Só o pinga-pinga."},
   mirror_read:{h:"espelho",l:"Ler o que apareceu",can:s=>s.showerOn&&!s.mirrorRead,run:s=>{s.mirrorRead=true},msg:"HORA + APTO. NÃO ESQUECE, IDIOTA.",key:"Leu a regra da senha no espelho"},
@@ -615,11 +910,226 @@ const ACT = {
   key_use:{h:"porta",l:"Usar a chave pequena",can:s=>s.inv.has("chave")&&!s.keyUsed,run:s=>{s.inv.delete("chave");s.keyUsed=true},msg:"Clac. A tranca de cima cede.",key:"Destrancou a tranca de chave"},
   force:{h:"porta",l:"Meter o ombro",can:s=>!(s.keyUsed&&s.codeOk),run:s=>{s.forced++},msg:"Ombro em chamas. A porta nem tremeu."},
   exit:{h:"porta",l:"SAIR",can:s=>s.keyUsed&&s.codeOk&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Abriu a porta"}
-};
-const ITEMS = {
+},
+  items:{
   gelo:{n:"bloco de gelo",c:"#bfefff"}, chave:{n:"chave pequena",c:"#ffd23f"}, faca:{n:"faca suja",c:"#e0102f"},
   carteira:{n:"carteira do Renato",c:"#c58b4e"}, remedio:{n:"remédio sem nome",c:"#3dff8b"}
+},
+  paint(S){
+    $("steam").setAttribute("opacity",S.showerOn?"1":"0");
+    $("fog").setAttribute("opacity",S.showerOn?".55":"0");
+    $("mirrorText").setAttribute("opacity",S.showerOn?"1":"0");
+    $("knife").style.display=S.knifeTaken?"none":"";
+    $("ledKey").setAttribute("fill",S.keyUsed?"#3dff8b":"#e0102f");
+    $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
+  },
+  win:"A porta abre. Corredor vazio. Escada. Rua. Ar.",
+  lose:"A maçaneta gira por fora. “Bom dia”, diz uma voz que você reconhece do RH.",
+  ending(S){
+    const L=[];
+    if(S.samu) L.push("Sirenes subindo a rua. Alguém vai cuidar do cara da cama.");
+    else if(S.pulse) L.push("Você sabia que ele respirava. E saiu mesmo assim.");
+    else L.push("Ninguém checou se o homem da cama estava vivo.");
+    if(S.robbed) L.push("A carteira do Renato está no seu bolso. R$ 340 mais rico.");
+    if(S.washed) L.push("A faca ficou limpa. Limpa demais.");
+    if(S.thrown) L.push("A faca caiu ao lado da viatura.");
+    if(S.deleted) L.push("A conversa com R. sumiu. Do seu celular, pelo menos.");
+    if(S.replied) L.push("R. acha que o trabalho foi feito. Talvez tenha sido.");
+    if(S.tv) L.push("Halden Corp. A festa da firma. Você trabalha lá também, não trabalha?");
+    return L;
+  }
+},
+escritorio:{
+  id:"escritorio", name:"Andar 12", short:"O escritório da Halden às 5h40. O diretor caído na sala dele e o elevador bloqueado.",
+  pitch:"Você acorda embaixo da sua mesa no 12º andar da Halden Corp. A festa de fim de ano acabou faz horas. O elevador está bloqueado, a porta da diretoria está aberta e tem sangue no carpete. Saiam antes que o turno da segurança comece.",
+  views:{ N:"Mesas", L:"Corredor", S:"Elevador", O:"Copa", D:"Diretoria" }, ring:["N","L","S","O"], start:"N", backTo:"L", back:"‹ Voltar pro corredor",
+  code:"1986", codeCredit:"Acertou o código do elevador",
+  clues:[
+    "Na festa, o diretor brindou: “À Halden! Desde o ano da fundação, ninguém sai antes de mim.”",
+    "Seu crachá ficou na boate. O sistema imprime um provisório, se você lembrar a senha. Você sempre deixa a senha embaixo do teclado.",
+    "Fora do horário, o elevador pede crachá E código. Alguém escreveu o código no quadro da copa e escondeu."
+  ],
+  hs:{
+    gaveta_paulo:{v:"N",n:"Mesa do Paulo",r:[6,150,150,186]},
+    computador:{v:"N",n:"Seu computador",r:[186,136,118,116]},
+    telefone:{v:"N",n:"Telefone",r:[300,198,58,50]},
+    impressora:{v:"N",n:"Impressora",r:[262,330,94,112]},
+    alarme:{v:"L",n:"Alarme de incêndio",r:[16,110,90,176]},
+    diretoria:{v:"L",n:"Diretoria",r:[140,48,214,284],nav:"D"},
+    elevador:{v:"S",n:"Elevador",r:[96,36,210,300]},
+    janela2:{v:"O",n:"Janela",r:[8,34,106,128]},
+    cafe:{v:"O",n:"Cafeteira e armário",r:[10,166,116,166]},
+    quadro:{v:"O",n:"Quadro branco",r:[120,44,148,120]},
+    geladeira2:{v:"O",n:"Geladeira",r:[270,44,90,290]},
+    laptop:{v:"D",n:"Laptop do diretor",r:[150,176,110,70]},
+    diretor:{v:"D",n:"Diretor",r:[50,140,100,140]},
+    placa:{v:"D",n:"Placa na parede",r:[220,52,134,80]},
+    trofeu:{v:"D",n:"Troféu",r:[40,356,100,104]}
+  },
+  desc:{
+    gaveta_paulo:s=>s.framed?"A mesa do Paulo. A gaveta está fechada, com o troféu dentro.":"Mesa do Paulo, do financeiro. Foto da família, caneca “Melhor pai do mundo”. A gaveta não tem chave.",
+    computador:s=>!s.senha?"Seu computador, na tela de login. Você não lembra a senha. Nunca lembra.":(!s.logged?"Tela de login. O post-it diz: halden@1986.":(s.printReq?"Pedido de crachá provisório enviado pra impressora.":"Logado. Caixa de entrada aberta. O sistema de crachás está no menu.")),
+    telefone:s=>s.security?"Linha ocupada. A segurança está subindo.":"Telefone fixo. Ramal 0 é a segurança do prédio.",
+    impressora:s=>s.printReq?(s.printTaken?"Bandeja vazia.":"Um crachá provisório saindo quentinho."):"Impressora piscando. Bandeja vazia.",
+    alarme:()=>"Alarme de incêndio e mapa da rota de fuga. A escada de emergência está trancada com corrente. Alguém fez questão.",
+    elevador:s=>`Elevador bloqueado fora do horário. Leitor de crachá${s.badged?" (verde)":""}. Teclado de código${s.codeOk?" (verde)":""}. Uma mão de sangue na porta.`,
+    janela2:()=>"12º andar. Uma viatura acabou de parar na frente do prédio.",
+    cafe:s=>"Cafeteira industrial ainda quente. Embaixo, o armário da copa"+(s.kit?" (aberto).":"."),
+    quadro:s=>s.calendar?"Atrás do calendário, em caneta vermelha: CÓDIGO DO ELEVADOR FORA DO HORÁRIO = ANO DE FUNDAÇÃO.":"Quadro branco com as metas do trimestre. Um calendário da firma cobre metade dele.",
+    geladeira2:()=>"Marmitas com nome, um espumante pela metade e muito gelo.",
+    laptop:s=>s.transfer?"Transferência concluída. R$ 80.000 a caminho de uma conta no seu nome.":"Laptop aberto. Uma transferência de R$ 80.000 esperando confirmação, pra uma conta no SEU nome. Do lado, o app das câmeras do andar.",
+    diretor:s=>s.bandage?"Ricardo Romero, o diretor. Curativo na cabeça. Respira.":(s.pulse?"Ricardo Romero, o diretor. Respira. Galo enorme e um corte na cabeça.":"Ricardo Romero, o diretor, caído sobre a mesa. Sangue no tampo. Não se mexe."),
+    placa:s=>s.plaque?"HALDEN CORP · DESDE 1986. Embaixo, em letra menor: “Aqui ninguém sai antes do chefe.”":"Uma placa dourada na parede.",
+    trofeu:s=>s.trophyTaken?"Uma marca no carpete onde estava o troféu.":"Troféu “Melhor Equipe 2025”. A base está amassada e vermelha."
+  },
+  act:{
+    postit:{h:"computador",l:"Olhar embaixo do teclado",can:s=>!s.senha,run:s=>{s.senha=true},msg:"Post-it amarelo: halden@1986. Claro."},
+    login:{h:"computador",l:"Entrar no sistema",can:s=>s.senha&&!s.logged,run:s=>{s.logged=true},msg:"Bem-vindo. Você tem 47 e-mails não lidos.",key:"Entrou no computador"},
+    mail:{h:"computador",l:"Ler o último e-mail",can:s=>s.logged&&!s.mail,run:s=>{s.mail=true},msg:"De: R. Romero. “Se perguntarem, você saiu cedo da festa. Eu cuido do resto. Como sempre.”"},
+    print_req:{h:"computador",l:"Pedir crachá provisório",can:s=>s.logged&&!s.printReq,run:s=>{s.printReq=true},msg:"“Solicitação enviada para IMPRESSORA-12.”",key:"Pediu crachá provisório"},
+    print_take:{h:"impressora",l:"Pegar o crachá provisório",can:s=>s.printReq&&!s.printTaken,run:s=>{s.printTaken=true;s.inv.add("cracha")},msg:"Sua foto de crachá de 2019. Você parecia feliz.",key:"Pegou o crachá provisório"},
+    print_jam:{h:"impressora",l:"Abrir a tampa",can:s=>!s.jam,run:s=>{s.jam=true},msg:"Uma folha amassada: planilha “Bônus diretoria — não compartilhar”."},
+    security:{h:"telefone",l:"Ligar pra segurança (ramal 0)",can:s=>!s.security,run:s=>{s.security=true},msg:"“Tem um homem ferido na diretoria.” — “Subindo agora.”",good:"Chamou a segurança para socorrer o diretor"},
+    drawer:{h:"gaveta_paulo",l:"Abrir a gaveta",can:s=>!s.drawer,run:s=>{s.drawer=true},msg:"Vale-refeição, remédio de pressão e um bilhete: “Paulo, a culpa vai cair em alguém. Não seja você. — R.”"},
+    frame:{h:"gaveta_paulo",l:"Esconder o troféu na gaveta",can:s=>s.inv.has("trofeu"),run:s=>{s.inv.delete("trofeu");s.framed=true},msg:"Cabe direitinho. O Paulo chega às 8h.",grey:"Escondeu o troféu na gaveta do Paulo"},
+    alarm_pull:{h:"alarme",l:"Puxar o alarme",can:s=>!s.alarm,run:s=>{s.alarm=true},msg:"Nada. O sistema foi desligado “pra festa”."},
+    badge:{h:"elevador",l:"Passar o crachá",can:s=>s.inv.has("cracha")&&!s.badged,run:s=>{s.badged=true},msg:"Bip. Luz verde no leitor.",key:"Liberou o crachá no elevador"},
+    code_ui:{h:"elevador",l:"Digitar o código",can:s=>!s.codeOk,ui:"keypad"},
+    force:{h:"elevador",l:"Esmurrar a porta",can:s=>!(s.badged&&s.codeOk),run:s=>{s.forced++},msg:"O eco vai longe. Ninguém responde."},
+    exit:{h:"elevador",l:"CHAMAR O ELEVADOR",can:s=>s.badged&&s.codeOk&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Chamou o elevador"},
+    coffee:{h:"cafe",l:"Tomar um café",can:s=>s.water<2&&s.hang>0,run:s=>{s.water++;s.hang=Math.max(0,s.hang-1)},msg:"Queimado e maravilhoso. A cabeça desembaça um pouco."},
+    kit:{h:"cafe",l:"Abrir o armário",can:s=>!s.kit,run:s=>{s.kit=true;s.inv.add("kit")},msg:"Kit de primeiros socorros. Você guarda."},
+    bubbly:{h:"geladeira2",l:"Tomar o resto do espumante",can:s=>!s.beer,run:s=>{s.beer=true;s.hang=Math.min(4,s.hang+1)},msg:"Quente e sem gás. Tudo gira."},
+    calendar:{h:"quadro",l:"Tirar o calendário",can:s=>!s.calendar,run:s=>{s.calendar=true},msg:"CÓDIGO DO ELEVADOR FORA DO HORÁRIO = ANO DE FUNDAÇÃO.",key:"Achou a regra do código"},
+    throw_trophy:{h:"janela2",l:"Jogar o troféu lá embaixo",can:s=>s.inv.has("trofeu"),run:s=>{s.inv.delete("trofeu");s.thrown=true},msg:"A janela só abre um palmo. Passa. Cai num canteiro.",grey:"Jogou o troféu pela janela"},
+    transfer:{h:"laptop",l:"Confirmar a transferência",can:s=>!s.transfer,run:s=>{s.transfer=true},msg:"“Transferência agendada com sucesso.” R$ 80.000.",grey:"Confirmou a transferência de R$ 80 mil para si"},
+    cctv:{h:"laptop",l:"Apagar as gravações das câmeras",can:s=>!s.cctv,run:s=>{s.cctv=true},msg:"“Excluir 6 h de gravação?” Sim. Pronto.",grey:"Apagou as gravações das câmeras"},
+    pulse:{h:"diretor",l:"Checar o pulso",can:s=>!s.pulse,run:s=>{s.pulse=true},msg:"Vivo. Respiração curta.",good:"Checou se o diretor estava vivo"},
+    bandage:{h:"diretor",l:"Fazer um curativo",can:s=>s.inv.has("kit")&&!s.bandage,run:s=>{s.inv.delete("kit");s.bandage=true},msg:"Gaze, esparadrapo, pressão. O sangramento para.",good:"Fez curativo no diretor"},
+    take_badge:{h:"diretor",l:"Pegar o crachá do pescoço dele",can:s=>!s.robbed,run:s=>{s.robbed=true;s.inv.add("cracha")},msg:"Crachá MASTER. Abre tudo no prédio.",grey:"Pegou o crachá do diretor desacordado",key:"Pegou o crachá do diretor"},
+    plaque:{h:"placa",l:"Ler a placa",can:s=>!s.plaque,run:s=>{s.plaque=true},msg:"HALDEN CORP · DESDE 1986.",key:"Achou o ano de fundação"},
+    trophy:{h:"trofeu",l:"Pegar o troféu",can:s=>!s.trophyTaken,run:s=>{s.trophyTaken=true;s.inv.add("trofeu")},msg:"Pesado. A base está grudenta."}
+  },
+  items:{ cracha:{n:"crachá",c:"#2de2e6"}, kit:{n:"kit de primeiros socorros",c:"#f7ecff"}, trofeu:{n:"troféu sujo",c:"#ffd23f"} },
+  paint(S){
+    $("ledKey").setAttribute("fill",S.badged?"#3dff8b":"#e0102f");
+    $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
+    $("calendario").style.display=S.calendar?"none":"";
+    $("regra").style.display=S.calendar?"":"none";
+    $("trofeuArt").style.display=S.trophyTaken?"none":"";
+    $("printPaper").style.display=(S.printReq&&!S.printTaken)?"":"none";
+    $("dirBadge").style.display=S.robbed?"none":"";
+    $("bandageArt").style.display=S.bandage?"":"none";
+  },
+  win:"As portas se fecham. 12, 11, 10… O saguão está vazio. A rua, não.",
+  lose:"As portas do elevador se abrem sozinhas. Dois seguranças e alguém do RH: “Precisamos conversar.”",
+  ending(S){
+    const L=[];
+    if(S.security) L.push("A segurança subiu. O diretor vai acordar no hospital.");
+    else if(S.pulse) L.push("Você viu que ele respirava. E desceu mesmo assim.");
+    else L.push("Ninguém conferiu se o diretor estava vivo.");
+    if(S.bandage) L.push("O curativo segurou o sangramento.");
+    if(S.transfer) L.push("R$ 80.000 caem na sua conta às 9h. Junto com uma auditoria.");
+    if(S.cctv) L.push("Seis horas de gravação sumiram. Inclusive as que provariam que você não fez nada.");
+    if(S.framed) L.push("O Paulo abre a gaveta às 8h02.");
+    if(S.thrown) L.push("O troféu foi parar num canteiro, na frente da viatura.");
+    if(S.robbed) L.push("O crachá MASTER do diretor ficou com você.");
+    if(S.mail) L.push("“Eu cuido do resto. Como sempre.” Quantas vezes já cuidaram por você?");
+    return L;
+  }
+},
+motel:{
+  id:"motel", name:"Motel Flamingo", short:"Uma suíte cor-de-rosa, R$ 50 mil numa bolsa e o Paulo do financeiro numa banheira de gelo.",
+  pitch:"Você acorda na suíte 7 do Motel Flamingo. Em cima da cama, uma bolsa pesada. No banheiro, o Paulo do financeiro, desacordado numa banheira de gelo. O portão da garagem só abre com a conta paga. Saiam antes da troca de turno.",
+  views:{ N:"Cama", L:"Frigobar e TV", S:"Garagem", O:"Closet", B:"Banheiro" }, ring:["N","L","S","O"], start:"N", backTo:"O", back:"‹ Voltar pro quarto",
+  code:"0703", codeCredit:"Abriu o cofre",
+  clues:[
+    "Seu cofre sempre usa a mesma senha: o dia e o mês em que você entrou na empresa. Isso está escrito em alguma coisa sua.",
+    "O motel só abre o portão com a conta paga. E com o controle, que ficou na sua jaqueta.",
+    "O Paulo veio com você da festa. Ele estava gelado quando você apagou."
+  ],
+  hs:{
+    bolsa:{v:"N",n:"Bolsa",r:[104,224,150,74]},
+    interfone:{v:"N",n:"Interfone",r:[284,200,74,70]},
+    tv:{v:"L",n:"TV",r:[20,68,192,166]},
+    frigobar:{v:"L",n:"Frigobar",r:[222,160,130,174]},
+    portao:{v:"S",n:"Portão da garagem",r:[40,40,252,295]},
+    portinhola:{v:"S",n:"Portinhola",r:[294,124,64,124]},
+    cofre:{v:"O",n:"Cofre",r:[30,210,122,110]},
+    roupas:{v:"O",n:"Roupas do Paulo",r:[110,350,170,104]},
+    banheiro:{v:"O",n:"Banheiro",r:[256,24,100,308],nav:"B"},
+    banheira:{v:"B",n:"Banheira",r:[10,180,252,156]},
+    jaqueta:{v:"B",n:"Sua jaqueta",r:[266,68,90,146]}
+  },
+  desc:{
+    bolsa:s=>s.bagTaken?"Só a marca da bolsa no lençol.":(s.bagOpen?"Uns R$ 50 mil em notas de 100. Um recibo: “Halden Corp — consultoria”.":"Bolsa preta de academia em cima da cama. Pesada. Fechada."),
+    interfone:s=>"Interfone da recepção."+(s.ambulance?" Você já pediu a ambulância.":" Botão 9."),
+    tv:s=>s.tv?"Jornal: “Executivo da Halden encontrado ferido em kitnet no centro. Polícia procura colegas que estavam na festa.”":"TV no canal do motel. O controle sumiu, mas os botões funcionam.",
+    frigobar:()=>"Frigobar: água, energético e uma dose de whisky. Tabela de preços colada na porta.",
+    portao:s=>`Portão de enrolar. Receptor do controle${s.remote?" (você tem o controle)":""}. Só abre com a conta paga${s.paid?" — paga":""}.`,
+    portinhola:s=>s.paid?"Portinhola fechada. Conta paga.":"Portinhola de pagamento. Uma voz do outro lado: “Total: R$ 380,00.”",
+    cofre:s=>s.codeOk?(s.wallet?"Cofre aberto e vazio.":"Cofre aberto. Sua carteira está lá dentro."):"Cofre com teclado de 4 dígitos. Você trancou? Deve ter sido.",
+    roupas:s=>s.searched?"Roupas do Paulo. Bolsos vazios.":"Camisa social, calça, gravata da Halden. É do Paulo do financeiro.",
+    banheira:s=>s.pulled?"O Paulo está no chão, enrolado em toalhas. Tremendo. Vivo.":(s.pulse?"Paulo, do financeiro. Vivo, mas gelado. Lábios roxos.":"Banheira cheia de gelo. O Paulo do financeiro está lá dentro, desacordado."),
+    jaqueta:s=>s.jacket?"Sua jaqueta. Bolsos vazios.":"Sua jaqueta pendurada no gancho."
+  },
+  act:{
+    bag_open:{h:"bolsa",l:"Abrir a bolsa",can:s=>!s.bagOpen,run:s=>{s.bagOpen=true},msg:"Notas de 100. Muitas. E um recibo da Halden Corp."},
+    take_cash:{h:"bolsa",l:"Pegar R$ 380",can:s=>s.bagOpen&&!s.cash&&!s.bagTaken,run:s=>{s.cash=true;s.inv.add("dinheiro")},msg:"Ninguém vai sentir falta. Você acha.",grey:"Pegou dinheiro da bolsa"},
+    take_bag:{h:"bolsa",l:"Levar a bolsa inteira",can:s=>s.bagOpen&&!s.bagTaken,run:s=>{s.bagTaken=true;s.cash=true;s.inv.add("dinheiro");s.inv.add("bolsa")},msg:"R$ 50 mil no ombro.",grey:"Levou a bolsa com R$ 50 mil"},
+    ambulance:{h:"interfone",l:"Pedir uma ambulância",can:s=>!s.ambulance,run:s=>{s.ambulance=true},msg:"“Ambulância? Na suíte 7? … Tá. Vou ligar.”",good:"Pediu ambulância para o Paulo"},
+    bill:{h:"interfone",l:"Perguntar da conta",can:s=>!s.bill,run:s=>{s.bill=true},msg:"“R$ 380. Paga na portinhola que o portão libera.”"},
+    tv:{h:"tv",l:"Mudar pro jornal",can:s=>!s.tv,run:s=>{s.tv=true},msg:"“…executivo da Halden encontrado ferido em kitnet… polícia procura colegas que estavam na festa…”"},
+    water:{h:"frigobar",l:"Beber água",can:s=>s.water<2&&s.hang>0,run:s=>{s.water++;s.hang=Math.max(0,s.hang-1)},msg:"Gelada. Salvação."},
+    whisky:{h:"frigobar",l:"Tomar a dose de whisky",can:s=>!s.beer,run:s=>{s.beer=true;s.hang=Math.min(4,s.hang+1)},msg:"Desce queimando. O quarto gira."},
+    pay_cash:{h:"portinhola",l:"Pagar com o dinheiro",can:s=>!s.paid&&s.inv.has("dinheiro"),run:s=>{s.paid=true;s.inv.delete("dinheiro")},msg:"Uma mão pega as notas. “Obrigado, volte sempre.”",key:"Pagou a conta"},
+    pay_card:{h:"portinhola",l:"Pagar com o cartão corporativo do Paulo",can:s=>!s.paid&&s.inv.has("cartao"),run:s=>{s.paid=true;s.corpCard=true},msg:"Aprovado. “HALDEN CORP — despesa com cliente.”",grey:"Pagou o motel com o cartão corporativo do Paulo",key:"Pagou a conta"},
+    pay_wallet:{h:"portinhola",l:"Pagar com a sua carteira",can:s=>!s.paid&&s.inv.has("carteira"),run:s=>{s.paid=true},msg:"Seu cartão. Sua conta. Seu nome no extrato.",key:"Pagou a conta"},
+    code_ui:{h:"cofre",l:"Digitar a senha do cofre",can:s=>!s.codeOk,ui:"keypad"},
+    wallet:{h:"cofre",l:"Pegar sua carteira",can:s=>s.codeOk&&!s.wallet,run:s=>{s.wallet=true;s.inv.add("carteira")},msg:"Sua carteira. Tudo no lugar."},
+    search:{h:"roupas",l:"Revistar os bolsos",can:s=>!s.searched,run:s=>{s.searched=true;s.inv.add("cartao");s.inv.add("celular")},msg:"O cartão corporativo da Halden e o celular do Paulo."},
+    photos:{h:"roupas",l:"Apagar as fotos do celular dele",can:s=>s.inv.has("celular")&&!s.photos,run:s=>{s.photos=true},msg:"Fotos da festa. Você aparece em várias. Agora não aparece em nenhuma.",grey:"Apagou as fotos do celular do Paulo"},
+    pulse:{h:"banheira",l:"Checar o pulso",can:s=>!s.pulse,run:s=>{s.pulse=true},msg:"Fraco, mas tem.",good:"Checou se o Paulo estava vivo"},
+    pull:{h:"banheira",l:"Tirar ele do gelo",can:s=>!s.pulled,run:s=>{s.pulled=true},msg:"Pesado. Escorregadio. Você enrola ele em toalhas.",good:"Tirou o Paulo do gelo"},
+    jacket:{h:"jaqueta",l:"Revistar a jaqueta",can:s=>!s.jacket,run:s=>{s.jacket=true;s.remote=true;s.inv.add("controle")},msg:"O controle do portão. E um broche: “5 anos de Halden — 07/03”.",key:"Achou o controle e a data 07/03"},
+    kick:{h:"portao",l:"Chutar o portão",can:s=>!(s.paid&&s.remote),run:s=>{s.forced++},msg:"O barulho ecoa na garagem toda."},
+    exit:{h:"portao",l:"ABRIR O PORTÃO",can:s=>s.paid&&s.remote&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Abriu o portão"}
+  },
+  items:{
+    dinheiro:{n:"R$ 380",c:"#3dff8b"}, bolsa:{n:"bolsa com R$ 50 mil",c:"#8a8a99"}, cartao:{n:"cartão do Paulo",c:"#2de2e6"},
+    celular:{n:"celular do Paulo",c:"#b18cff"}, carteira:{n:"sua carteira",c:"#c58b4e"}, controle:{n:"controle do portão",c:"#ffd23f"}
+  },
+  paint(S){
+    $("ledPaid").setAttribute("fill",S.paid?"#3dff8b":"#e0102f");
+    $("ledRemote").setAttribute("fill",S.remote?"#3dff8b":"#e0102f");
+    $("ledSafe").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
+    $("bagArt").style.display=S.bagTaken?"none":"";
+    $("cashPeek").style.display=S.bagOpen?"":"none";
+    $("cofreOpen").style.display=S.codeOk?"":"none";
+    $("walletArt").style.display=S.wallet?"none":"";
+    $("pauloTub").style.display=S.pulled?"none":"";
+    $("pauloFloor").style.display=S.pulled?"":"none";
+    $("tvNews").style.display=S.tv?"":"none";
+  },
+  win:"O portão sobe. Sol na cara. A marginal já está parada.",
+  lose:"Batem na porta. “Serviço de quarto”, diz a voz. Não é serviço de quarto.",
+  ending(S){
+    const L=[];
+    if(S.ambulance) L.push("A ambulância chega pro Paulo.");
+    else if(S.pulled) L.push("Você tirou o Paulo do gelo. E foi embora.");
+    else if(S.pulse) L.push("Você sentiu o pulso do Paulo e deixou ele lá.");
+    else L.push("Ninguém olhou o Paulo direito.");
+    if(S.bagTaken) L.push("R$ 50 mil no porta-malas. Dinheiro da Halden. Alguém vai vir buscar.");
+    else if(S.cash) L.push("R$ 380 da bolsa pagaram a suíte.");
+    if(S.corpCard) L.push("A suíte 7 entrou na fatura corporativa do Paulo.");
+    if(S.photos) L.push("Nas fotos do Paulo, a festa terminou sem você.");
+    if(S.tv) L.push("A kitnet do jornal. Você já esteve lá, não esteve?");
+    return L;
+  }
+},
+
 };
+let STORY=null, VIEWS, RING, HS, DESC, ACT, ITEMS, CLUES, CODE, OBJ, HS_COUNT;
 
 // ---------------- identity ----------------
 const store = {
@@ -634,7 +1144,7 @@ const me = {pk, nick:"", color:PALETTE[0], uid:null};
 // ---------------- state ----------------
 const evMap = new Map();
 let myEvents = [], seq = 0, S = null, joined = false, code = null;
-let view = START_VIEW, sheetH = null, lastRes = null;
+let view = "O", sheetH = null, lastRes = null;
 let peerMap = new Map();   // pk -> {nick,color,view,at,online}
 let screen = "lobby", shownMemory = false, endShownFor = null, seenTaps = 0;
 let chatOpen = false, seenChats = 0, unread = 0, toastT = null, repTab = "team";
@@ -754,7 +1264,7 @@ async function connectClaude(){
 }
 
 // ---------------- events ----------------
-const KINDS = new Set(["join","start","ready","tap","act","chat"]);
+const KINDS = new Set(["join","story","start","ready","tap","act","chat"]);
 function valid(e){
   return e && typeof e==="object" && typeof e.id==="string" && e.id.length<48 && typeof e.p==="string" && e.p.length<64
     && typeof e.ts==="number" && isFinite(e.ts) && KINDS.has(e.k);
@@ -762,7 +1272,8 @@ function valid(e){
 function clean(e){
   const o={id:e.id,p:e.p,ts:e.ts,k:e.k};
   if(e.k==="join"){ o.nick=String(e.nick||"").slice(0,14)||"Jogador"; o.color=/^#[0-9a-f]{6}$/i.test(e.color)?e.color:PALETTE[0]; if(typeof e.uid==="string") o.uid=e.uid.slice(0,80); }
-  if(e.k==="tap"){ o.x=+e.x||0; o.y=+e.y||0; o.h=HS[e.h]?e.h:null; o.vw=VIEWS[e.vw]?e.vw:null; }
+  if(e.k==="tap"){ o.x=+e.x||0; o.y=+e.y||0; o.h=typeof e.h==="string"&&/^[a-z0-9_]{1,24}$/.test(e.h)?e.h:null; o.vw=typeof e.vw==="string"&&/^[A-Z]$/.test(e.vw)?e.vw:null; }
+  if(e.k==="story"){ o.s=STORIES[e.s]?e.s:"kitnet"; }
   if(e.k==="act"){ o.a=String(e.a||"").slice(0,20); if(e.v!=null) o.v=String(e.v).slice(0,6); }
   if(e.k==="chat"){ o.m=String(e.m||"").slice(0,160); }
   return o;
@@ -781,13 +1292,18 @@ function fold(){
   const evs=[...evMap.values()].sort((a,b)=>a.ts-b.ts||(a.id<b.id?-1:a.id>b.id?1:0));
   const s={inv:new Set(),hang:3,water:0,forced:0,wrong:0,wrongBy:{},brief:null,start:null,end:null,outcome:null,
     players:new Map(),readyAt:{},waiting:[],taps:[],chats:[],acts:[],credit:[],choices:[]};
+  const storyEvs=[];
   // pass 1: who is in, when the host pressed start, who has read the card
   for(const e of evs){
     if(e.k==="join"){ const p=s.players.get(e.p); if(!p) s.players.set(e.p,{nick:e.nick,color:e.color,ts:e.ts,uid:e.uid||null}); else {p.nick=e.nick;p.color=e.color;} }
     else if(e.k==="chat") s.chats.push(e);
+    else if(e.k==="story"&&s.brief==null) storyEvs.push(e);
     else if(e.k==="start"&&s.brief==null) s.brief=e.ts;
     else if(e.k==="ready"&&s.brief!=null&&e.ts>=s.brief-3000&&s.readyAt[e.p]==null) s.readyAt[e.p]=e.ts;
   }
+  s.host = [...s.players.entries()].sort((a,b)=>a[1].ts-b[1].ts)[0]?.[0] || null;
+  s.story = storyEvs.filter(e=>e.p===s.host).pop()?.s || "kitnet";
+  applyStory(s.story);
   if(s.brief!=null){
     const required=[...s.players].filter(([,p])=>p.ts<=s.brief).map(([id])=>id);
     s.waiting=required.filter(id=>s.readyAt[id]==null);
@@ -796,14 +1312,14 @@ function fold(){
   }
   // pass 2: the game itself, from the moment the clock started
   for(const e of evs){
-    if(e.k==="join"||e.k==="chat"||e.k==="start"||e.k==="ready") continue;
+    if(e.k==="join"||e.k==="chat"||e.k==="story"||e.k==="start"||e.k==="ready") continue;
     if(s.start==null||s.end!=null||e.ts<s.start-3000||e.ts>s.start+DUR) continue;
     if(e.k==="tap"){ s.taps.push(e); continue; }
     if(e.k==="act"){
       let ok=false;
       if(e.a==="code"){
         if(!s.codeOk){ ok=true;
-          if(e.v===CODE){ s.codeOk=true; s.credit.push({p:e.p,ts:e.ts,t:"Acertou a senha da porta"}); }
+          if(e.v===CODE){ s.codeOk=true; s.credit.push({p:e.p,ts:e.ts,t:STORY.codeCredit}); }
           else { s.wrong++; s.wrongBy[e.p]=(s.wrongBy[e.p]||0)+1; }
         }
       } else {
@@ -819,7 +1335,6 @@ function fold(){
     }
   }
   if(s.start!=null&&s.end==null&&now()>s.start+DUR){ s.end=s.start+DUR; s.outcome="lose"; }
-  s.host = [...s.players.entries()].sort((a,b)=>a[1].ts-b[1].ts)[0]?.[0] || null;
   return s;
 }
 
@@ -844,7 +1359,7 @@ async function join(){
   joining=true; $("joinBtn").disabled=true; $("newBtn").disabled=true; $("joinBtn").textContent="Entrando…";
   await capsReady;
   me.nick=nick; code=c; store.set("k47.nick",nick); store.set("k47.code",c);
-  evMap.clear(); myEvents=[]; seq=0; view=START_VIEW;
+  evMap.clear(); myEvents=[]; seq=0; view=STORY.start;
   try{ if(net.kind==="local") history.replaceState(null,"","#"+c); }catch(e){}
   if(net.kind==="local") await connectLocal();
   else if(net.kind==="claude") await connectClaude();
@@ -880,6 +1395,18 @@ function copyText(t,btn){
 const isOnline = id => id===pk || !!peerMap.get(id)?.online;
 function canStart(){ return net.kind==="solo" || S.host===pk || !isOnline(S.host); }
 
+function renderStoryPick(){
+  const box=$("storyPick"); box.textContent="";
+  const mine = net.kind==="solo" || S.host===pk;
+  for(const st of Object.values(STORIES)){
+    const b=document.createElement("button"); b.type="button"; b.className="story"; b.setAttribute("aria-pressed",String(st.id===S.story)); b.disabled=!mine;
+    const t=document.createElement("b"); t.textContent=st.name; const d=document.createElement("span"); d.textContent=st.short;
+    b.append(t,d); b.onclick=()=>{ if(mine&&S.story!==st.id) addEvent("story",{s:st.id}); };
+    box.append(b);
+  }
+  $("storyHint").textContent = mine ? "Você escolhe a história. Todo mundo vê a escolha." : `${S.players.get(S.host)?.nick||"Quem criou a sala"} escolhe a história.`;
+}
+
 // ---------------- screens ----------------
 function showScreen(n){
   if(screen!==n){ screen=n; ["lobby","game","end"].forEach(id=>$(id).hidden=(id!==n)); }
@@ -895,12 +1422,13 @@ function recompute(){
     $("shareHint").textContent = net.kind==="local"
       ? "Mande o link pros colegas (mesma rede ou Tailscale). Quem abrir cai direto nesta sala."
       : net.kind==="claude" ? "Mande o código pros colegas. Eles entram com o mesmo código." : "Sem servidor: só você joga nesta tela.";
+    renderStoryPick();
     const hostNick=S.players.get(S.host)?.nick||"anfitrião";
     const ok=canStart(), sb=$("startBtn"); sb.disabled=!ok;
     sb.textContent = ok ? "Começar · "+fmt(DUR) : `Esperando ${hostNick} começar`;
   } else if(S.end==null){
     showScreen("game");
-    if(!shownMemory){ shownMemory=true; setView(START_VIEW,0); openMemory(true); }
+    if(!shownMemory){ shownMemory=true; setView(STORY.start,0); openMemory(true); }
     if(briefing&&S.start!=null){ briefing=false; $("memory").hidden=true; }
     renderBrief();
     renderGame();
@@ -953,14 +1481,14 @@ function renderPeople(){
 }
 function othersIn(v){ return personRows().filter(r=>!r.me&&r.online&&r.view===v); }
 function renderArrows(){
-  const inB = view==="B";
+  const inB = !RING.includes(view);
   $("turnL").hidden=inB; $("turnR").hidden=inB; $("viewName").hidden=inB; $("backBtn").hidden=!inB;
   if(inB) return;
   const i=RING.indexOf(view), lv=RING[(i+3)%4], rv=RING[(i+1)%4];
   $("nxL").textContent=VIEWS[lv]; $("nxR").textContent=VIEWS[rv];
   for(const [id,v] of [["pdL",lv],["pdR",rv]]){
     const box=$(id); box.textContent="";
-    const ps=othersIn(v); if(v==="O") ps.push(...othersIn("B"));
+    const ps=othersIn(v); if(v===STORY.backTo) Object.keys(VIEWS).filter(k=>!RING.includes(k)).forEach(k=>ps.push(...othersIn(k)));
     ps.slice(0,4).forEach(p=>{ const d=document.createElement("i"); d.style.background=p.color; d.title=p.nick; box.append(d); });
   }
 }
@@ -970,12 +1498,14 @@ function renderHere(){
 }
 
 // ---------------- camera ----------------
+function showView(){
+  document.querySelectorAll("#views .view").forEach(g=>g.style.display=(g.id==="v-"+view)?"":"none");
+  document.querySelectorAll("#hsLayer .hs-g").forEach(g=>g.style.display=(HS[g.dataset.h].v===view)?"":"none");
+  $("viewName").textContent=VIEWS[view].toUpperCase();
+}
 function setView(v,dir){
   if(!VIEWS[v]) return;
-  view=v;
-  document.querySelectorAll("#scene .view").forEach(g=>g.style.display=(g.id==="v-"+v)?"":"none");
-  document.querySelectorAll("#hsLayer .hs-g").forEach(g=>g.style.display=(HS[g.dataset.h].v===v)?"":"none");
-  $("viewName").textContent=VIEWS[v].toUpperCase();
+  view=v; showView();
   const w=$("scene"); w.classList.remove("turnL","turnR"); void w.getBoundingClientRect();
   if(dir) w.classList.add(dir<0?"turnL":"turnR");
   closeSheet();
@@ -983,29 +1513,44 @@ function setView(v,dir){
   net.presence();
   renderPeople();
 }
-function turn(d){ if(view==="B") return; const i=RING.indexOf(view); setView(RING[(i+d+4)%4], d); }
+function turn(d){ if(!RING.includes(view)) return; const i=RING.indexOf(view); setView(RING[(i+d+4)%4], d); }
 $("turnL").onclick=()=>turn(-1);
 $("turnR").onclick=()=>turn(1);
-$("backBtn").onclick=()=>setView("O",-1);
+$("backBtn").onclick=()=>setView(STORY.backTo,-1);
 $("stage").addEventListener("pointerdown",e=>{ swipe={x:e.clientX,y:e.clientY,t:now()}; });
 $("stage").addEventListener("pointerup",e=>{
   if(!swipe) return; const dx=e.clientX-swipe.x, dy=e.clientY-swipe.y, quick=now()-swipe.t<600; swipe=null;
   if(quick&&Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){
     suppressClick=true; setTimeout(()=>suppressClick=false,60);
-    if(view==="B"){ if(dx>0) setView("O",-1); } else turn(dx>0?-1:1);
+    if(!RING.includes(view)){ if(dx>0) setView(STORY.backTo,-1); } else turn(dx>0?-1:1);
   }
 });
 
-// floor perspective lines, generated once per view
-document.querySelectorAll("#scene .floorlines").forEach(g=>{
+function applyStory(id){
+  if(STORY&&STORY.id===id) return;
+  STORY=STORIES[id]||STORIES.kitnet;
+  ({views:VIEWS, ring:RING, hs:HS, desc:DESC, act:ACT, items:ITEMS, clues:CLUES, code:CODE}=STORY);
+  OBJ=Object.keys(HS).filter(k=>!HS[k].nav); HS_COUNT=OBJ.length;
+  const box=$("views"); box.textContent="";
+  const art=$("art-"+STORY.id).content.querySelector("svg");
+  [...art.children].forEach(c=>box.append(c.cloneNode(true)));
+  drawFloorlines(box);
+  buildHotspots();
+  $("backBtn").textContent=STORY.back;
+  $("pitch").textContent=STORY.pitch;
+  view=STORY.start; showView();
+}
+// floor perspective lines
+function drawFloorlines(root){ root.querySelectorAll(".floorlines").forEach(g=>{
   let d="";
   for(let i=-9;i<=9;i++) d+=`M${180+i*26} 330 L${180+i*90} 480 `;
   [342,358,380,410,450].forEach(y=>d+=`M0 ${y} H360 `);
   const p=document.createElementNS(NS,"path"); p.setAttribute("d",d); p.setAttribute("stroke","#0c0414"); p.setAttribute("stroke-width","1.5"); p.setAttribute("opacity",".35"); p.setAttribute("fill","none");
   g.append(p);
-});
+}); }
 
-// hotspots
+function buildHotspots(){
+$("hsLayer").textContent="";
 for(const [id,h] of Object.entries(HS)){
   const [x,y,w,hh]=h.r;
   const gg=document.createElementNS(NS,"g"); gg.setAttribute("class","hs-g"); gg.dataset.h=id;
@@ -1013,6 +1558,7 @@ for(const [id,h] of Object.entries(HS)){
   const r=document.createElementNS(NS,"rect"); Object.entries({x,y,width:w,height:hh,class:"hs"}).forEach(([k,v])=>r.setAttribute(k,v)); r.dataset.h=id;
   const t=document.createElementNS(NS,"text"); t.setAttribute("x",x+w/2); t.setAttribute("y",y+hh/2+5); t.setAttribute("text-anchor","middle"); t.setAttribute("class","hs-lbl"); t.textContent=h.n;
   gg.append(m,r,t); $("hsLayer").append(gg);
+}
 }
 
 function svgPoint(ev){
@@ -1036,12 +1582,7 @@ function renderGame(){
   const hb=$("hangBar"); hb.textContent=""; for(let i=0;i<4;i++){ const b=document.createElement("i"); if(i<S.hang) b.className="f"; hb.append(b); }
   const w=$("sceneWrap"); w.style.setProperty("--h",S.hang); w.classList.toggle("sway",S.hang>0);
   $("scene").style.filter=`blur(${(S.hang*0.18).toFixed(2)}px) saturate(${1+S.hang*.1})`;
-  $("steam").setAttribute("opacity",S.showerOn?"1":"0");
-  $("fog").setAttribute("opacity",S.showerOn?".55":"0");
-  $("mirrorText").setAttribute("opacity",S.showerOn?"1":"0");
-  $("knife").style.display=S.knifeTaken?"none":"";
-  $("ledKey").setAttribute("fill",S.keyUsed?"#3dff8b":"#e0102f");
-  $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
+  STORY.paint(S);
   const inv=$("inv"); inv.textContent="";
   const l=document.createElement("span"); l.className="lbl"; l.textContent="Bolso"; inv.append(l);
   if(!S.inv.size){ const e=document.createElement("span"); e.className="empty"; e.textContent="vazio"; inv.append(e); }
@@ -1232,7 +1773,7 @@ function signals(st){
   const out=[];
   if(st.first!=null&&st.first<6) out.push(["g","Agiu nos primeiros segundos ("+st.first.toFixed(1)+" s)."]);
   else if(st.first!=null&&st.first>20) out.push(["r","Demorou "+st.first.toFixed(0)+" s para a primeira ação."]);
-  else if(st.first==null) out.push(["r","Não interagiu com a kitnet."]);
+  else if(st.first==null) out.push(["r","Não interagiu com o ambiente."]);
   if(st.visited.size>=9) out.push(["g","Explorou quase todo o ambiente ("+st.visited.size+"/"+HS_COUNT+")."]);
   else if(st.visited.size<=3) out.push(["r","Explorou pouco ("+st.visited.size+"/"+HS_COUNT+" objetos)."]);
   if(!st.solo){ if(st.chats>=4) out.push(["g","Comunicou ativamente ("+st.chats+" mensagens no jogo)."]); else if(st.chats===0) out.push(["r","Não falou com o time durante o desafio."]); }
@@ -1243,20 +1784,7 @@ function signals(st){
   st.choices.forEach(c=>out.push([c.g?"g":"r",c.t+"."]));
   return out;
 }
-function storyLines(){
-  const L=[];
-  L.push(S.outcome==="win"?"A porta abre. Corredor vazio. Escada. Rua. Ar.":"A maçaneta gira por fora. “Bom dia”, diz uma voz que você reconhece do RH.");
-  if(S.samu) L.push("Sirenes subindo a rua. Alguém vai cuidar do cara da cama.");
-  else if(S.pulse) L.push("Você sabia que ele respirava. E saiu mesmo assim.");
-  else L.push("Ninguém checou se o homem da cama estava vivo.");
-  if(S.robbed) L.push("A carteira do Renato está no seu bolso. R$ 340 mais rico.");
-  if(S.washed) L.push("A faca ficou limpa. Limpa demais.");
-  if(S.thrown) L.push("A faca caiu ao lado da viatura.");
-  if(S.deleted) L.push("A conversa com R. sumiu. Do seu celular, pelo menos.");
-  if(S.replied) L.push("R. acha que o trabalho foi feito. Talvez tenha sido.");
-  if(S.tv) L.push("Halden Corp. A festa da firma. Você trabalha lá também, não trabalha?");
-  return L;
-}
+function storyLines(){ return [S.outcome==="win"?STORY.win:STORY.lose, ...STORY.ending(S)]; }
 function renderEnd(){
   const v=$("verdict"); v.className="verdict "+(S.outcome==="win"?"win":"lose");
   v.textContent=S.outcome==="win"?"VOCÊS SAÍRAM.":"TARDE DEMAIS.";
@@ -1267,7 +1795,7 @@ function el(tag,cls,txt){ const e=document.createElement(tag); if(cls) e.classNa
 function heatGrid(filter){
   const grid=el("div","heatgrid");
   const defs=document.querySelector("#scene defs");
-  for(const v of ["N","L","S","O","B"]){
+  for(const v of Object.keys(VIEWS)){
     const fig=el("figure");
     const svg=document.createElementNS(NS,"svg"); svg.setAttribute("viewBox","0 0 360 480"); svg.setAttribute("class","heat"); svg.setAttribute("role","img"); svg.setAttribute("aria-label","Cliques em "+VIEWS[v]);
     svg.append(defs.cloneNode(true));
@@ -1283,7 +1811,7 @@ function heatGrid(filter){
 function renderReport(){
   const r=$("report"); r.textContent="";
   r.append(el("div","conf","Confidencial · Núcleo RH · Avaliação situacional ESC-60"));
-  r.append(el("h2",null,"Relatório de desempenho · Sala "+code));
+  r.append(el("h2",null,"Relatório de desempenho · "+STORY.name+" · Sala "+code));
   const meta=el("div","meta");
   [["Resultado",S.outcome==="win"?"Escaparam":"Não escaparam"],["Tempo",fmt(S.end-S.start)+" de "+fmt(DUR)],["Jogadores",String(S.players.size)],["Anfitrião",S.players.get(S.host)?.nick||"—"],["Cliques",String(S.taps.length)],["Mensagens",String(S.chats.filter(c=>c.ts>=S.start&&c.ts<=S.end).length)],["Erros de senha",String(S.wrong)]]
     .forEach(([k,v])=>{ const s=el("span",null,k+": "); s.append(el("b",null,v)); meta.append(s); });
@@ -1307,7 +1835,7 @@ function renderReport(){
       li.append(el("span",it.kind==="g"?"sig-g":it.kind==="r"?"sig-r":"",(p?.nick||"?")+" — "+it.t)); tl.append(li); });
     left.append(tl, el("h3",null,"Comparativo"));
     const cmp=el("ul");
-    for(const [id,p] of S.players){ const st=stats(id); cmp.append(el("li",null,`${p.nick}${id===S.host?" (anfitrião)":""}: ${st.taps.length} cliques · ${st.visited.size}/${HS_COUNT} objetos · ${st.walls.size}/5 paredes · ${st.credits.length} etapas · ${st.chats} msgs · ${st.choices.filter(c=>!c.g).length} escolhas questionáveis`)); }
+    for(const [id,p] of S.players){ const st=stats(id); cmp.append(el("li",null,`${p.nick}${id===S.host?" (anfitrião)":""}: ${st.taps.length} cliques · ${st.visited.size}/${HS_COUNT} objetos · ${st.walls.size}/${Object.keys(VIEWS).length} ambientes · ${st.credits.length} etapas · ${st.chats} msgs · ${st.choices.filter(c=>!c.g).length} escolhas questionáveis`)); }
     left.append(cmp);
     right.append(el("h3",null,"Onde o time clicou"), heatGrid(null));
   } else {
@@ -1341,10 +1869,10 @@ function exportData(){
     cliques:st.taps.map(t=>({t:+((t.ts-S.start)/1000).toFixed(2),parede:t.vw,x:t.x,y:t.y,objeto:t.h})),
     acoes:st.acts.map(a=>({t:+((a.ts-S.start)/1000).toFixed(2),acao:a.a,valor:a.v,efeito:a.ok})),
     mensagens:st.chats,etapas:st.credits.map(c=>c.t),escolhas:st.choices.map(c=>c.t),sinais:signals(st).map(x=>x[1])}; });
-  return {sala:code,resultado:S.outcome,duracao_s:(S.end-S.start)/1000,erros_senha:S.wrong,jogadores:players,chat:S.chats.map(c=>({t:+((c.ts-S.start)/1000).toFixed(1),jogador:c.p,msg:c.m}))};
+  return {sala:code,historia:STORY.id,resultado:S.outcome,duracao_s:(S.end-S.start)/1000,erros_senha:S.wrong,jogadores:players,chat:S.chats.map(c=>({t:+((c.ts-S.start)/1000).toFixed(1),jogador:c.p,msg:c.m}))};
 }
 function summaryText(){
-  const lines=[`KITNET 47 · Sala ${code} · ${S.outcome==="win"?"Escaparam":"Não escaparam"} em ${fmt(S.end-S.start)}`];
+  const lines=[`${STORY.name.toUpperCase()} · Sala ${code} · ${S.outcome==="win"?"Escaparam":"Não escaparam"} em ${fmt(S.end-S.start)}`];
   for(const [id,p] of S.players){ const st=stats(id); lines.push(`\n${p.nick}${id===S.host?" (anfitrião)":""}: `+Object.entries(st.sc).map(([k,v])=>`${k} ${v==null?"—":v}`).join(" · ")); signals(st).forEach(s=>lines.push("  - "+s[1])); }
   return lines.join("\n");
 }
@@ -1353,7 +1881,7 @@ window.addEventListener("keydown",e=>{
   if(e.key==="Escape"){ closeSheet(); closeChat(); $("keypad").hidden=true; $("memory").hidden=true; }
   if(screen==="game"&&!chatOpen&&document.activeElement?.tagName!=="INPUT"){ if(e.key==="ArrowLeft") turn(-1); if(e.key==="ArrowRight") turn(1); }
 });
-setView(START_VIEW,0);
+applyStory("kitnet");
 // arriving through a shared link (#CODE) with a saved nickname: drop straight into the room
 capsReady.then(()=>{ if(location.hash.length>1&&nickIn.value.trim()&&!joined) join(); });
 })();
