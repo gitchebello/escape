@@ -56,15 +56,19 @@ input[type=text]:focus{border-color:var(--cyan)}
 .tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .codebig{font-family:var(--f-hud);font-size:46px;color:var(--sun);letter-spacing:.2em;line-height:1}
 
-/* story picker */
-.stories{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
-.story{display:flex;flex-direction:column;gap:2px;text-align:left;border:2px solid var(--panel-2);background:rgba(12,4,20,.6);padding:10px 12px;min-height:56px}
-.story b{font-family:var(--f-hud);font-weight:400;font-size:24px;line-height:1;color:var(--paper)}
-.story span{font-size:12px;color:var(--muted);line-height:1.35}
-.story[aria-pressed=true]{border-color:var(--sun);box-shadow:4px 4px 0 var(--pink)}
-.story[aria-pressed=true] b{color:var(--sun)}
-.story:disabled{cursor:default}
-.story:disabled:not([aria-pressed=true]){opacity:.5}
+/* story picker: illustrated cards */
+.stories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.scard{display:flex;flex-direction:column;gap:4px;text-align:left;border:2px solid var(--panel-2);background:rgba(12,4,20,.6);padding:0 0 10px;min-width:0;overflow:hidden;transition:transform .15s,border-color .15s}
+.scard .thumb{display:block;width:100%;aspect-ratio:360/230;background:#0c0414;border-bottom:2px solid var(--panel-2)}
+.scard b{font-family:var(--f-hud);font-weight:400;font-size:22px;line-height:1;color:var(--paper);padding:4px 10px 0}
+.scard span{font-size:11.5px;color:var(--muted);line-height:1.35;padding:0 10px}
+.scard[aria-pressed=true]{border-color:var(--sun);box-shadow:4px 4px 0 var(--pink);transform:translateY(-2px)}
+.scard[aria-pressed=true] .thumb{border-color:var(--sun)}
+.scard[aria-pressed=true] b{color:var(--sun)}
+.scard:disabled{cursor:default}
+.scard:disabled:not([aria-pressed=true]){opacity:.5}
+.scard .new{position:relative}
+.scard .tagnew{align-self:flex-start;margin:0 10px;font-size:10px;font-weight:700;letter-spacing:.12em;background:var(--ok);color:var(--ink);padding:1px 5px}
 /* roster (lobby + game) */
 .roster{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .roster li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:6px 8px;background:rgba(12,4,20,.55);border-left:4px solid var(--c,#fff)}
@@ -129,11 +133,89 @@ input[type=text]:focus{border-color:var(--cyan)}
 .viewname{font-family:var(--f-hud);font-size:20px;letter-spacing:.12em;color:var(--sun);display:grid;place-items:center;padding:0 6px;white-space:nowrap}
 .here{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;display:flex;gap:6px;pointer-events:none;flex-wrap:wrap;justify-content:center;width:80%}
 .here span{font-family:var(--f-hud);font-size:16px;padding:0 6px;background:rgba(12,4,20,.8);border:1px solid currentColor}
-.inv{display:flex;gap:6px;align-items:center;min-height:44px;overflow-x:auto;padding-bottom:8px}
-.inv .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);flex:none}
-.item{flex:none;display:flex;align-items:center;gap:6px;border:1px solid var(--cyan);padding:4px 8px;font-family:var(--f-hud);font-size:19px;color:var(--cyan);background:rgba(45,226,230,.07)}
-.item i{width:12px;height:12px;display:block;border:2px solid var(--ink)}
-.inv .empty{font-family:var(--f-hud);font-size:18px;color:#5a4a70}
+/* bag bar (bottom) */
+.bagbar{display:flex;align-items:center;gap:10px;min-height:54px;margin-bottom:8px;border:2px solid var(--cyan);background:linear-gradient(90deg,rgba(45,226,230,.16),rgba(12,4,20,.7) 60%);padding:4px 10px 4px 6px;text-align:left;min-width:0;width:100%}
+.bagbar:active{background:rgba(45,226,230,.3)}
+.bagbar .bagic{flex:none;width:44px;height:44px;display:block}
+.bagbar .bagtx{display:flex;flex-direction:column;line-height:1;flex:none}
+.bagbar .bagtx b{font-weight:700;letter-spacing:.16em;font-size:13px;color:var(--cyan)}
+.bagbar .bagtx small{font-family:var(--f-hud);font-size:17px;color:var(--muted)}
+.bagitems{display:flex;gap:5px;overflow:hidden;min-width:0;flex:1;justify-content:flex-end}
+.mini{flex:none;width:36px;height:36px;display:grid;place-items:center;background:rgba(12,4,20,.7);border:1px solid var(--panel-2);position:relative}
+.mini svg{width:30px;height:30px}
+.mini.usable{border-color:var(--sun);box-shadow:0 0 0 2px rgba(255,210,63,.35),0 0 12px rgba(255,210,63,.6);animation:glow 1.2s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 0 2px rgba(255,210,63,.1),0 0 4px rgba(255,210,63,.2)}}
+.bagbar.bump{animation:bump .45s ease-out}
+@keyframes bump{30%{transform:scale(1.06) rotate(-1deg);background:rgba(45,226,230,.45)}}
+/* bag sheet */
+.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.slot{aspect-ratio:1;border:2px solid var(--panel-2);background:radial-gradient(circle at 50% 40%,#3a1f5e,#160a26);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px;min-width:0}
+.slot svg{width:62%;height:auto}
+.slot span{font-family:var(--f-hud);font-size:14px;line-height:1;color:var(--paper);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot.empty{border-style:dashed;background:transparent;opacity:.5}
+.slot[aria-pressed=true]{border-color:var(--sun);box-shadow:3px 3px 0 var(--pink)}
+.slot.usable{border-color:var(--sun)}
+.idet{display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;align-items:start;border-top:1px dashed var(--line);padding-top:10px}
+.idet .big{width:72px;height:72px;background:radial-gradient(circle,#4a2a74,#160a26);border:2px solid var(--cyan);display:grid;place-items:center}
+.idet .big svg{width:58px;height:58px}
+.idet h3{margin:0;font-family:var(--f-hud);font-weight:400;font-size:26px;line-height:1;color:var(--sun)}
+.idet p{margin:4px 0 0;font-size:14px;line-height:1.45}
+.idet .by{font-size:12px;color:var(--muted)}
+.uses{grid-column:1 / -1;display:flex;flex-direction:column;gap:6px}
+.act .need{display:flex;gap:2px;flex:none}
+.act .need svg{width:24px;height:24px}
+/* pickup + fx */
+.fly{position:absolute;left:50%;top:50%;z-index:20;transform:translate(-50%,-50%);pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:4px}
+.fly svg{width:96px;height:96px;filter:drop-shadow(0 0 14px rgba(255,210,63,.9))}
+.fly span{font-family:var(--f-hud);font-size:22px;color:var(--sun);background:var(--ink);border:2px solid var(--sun);padding:0 8px;white-space:nowrap}
+.flash{position:absolute;inset:0;pointer-events:none;z-index:6;opacity:0}
+.flash.good{box-shadow:inset 0 0 70px rgba(61,255,139,.85)}
+.flash.grey{box-shadow:inset 0 0 70px rgba(224,16,47,.9)}
+.flash.go{animation:flash .9s ease-out}
+@keyframes flash{15%{opacity:1}100%{opacity:0}}
+.shake{animation:shake .4s linear}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+.fxq{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);z-index:14;display:flex;flex-direction:column;gap:6px;align-items:center;width:min(92%,420px);pointer-events:none}
+.banner{display:flex;align-items:center;gap:8px;background:var(--ink);border:2px solid var(--sun);border-left:8px solid var(--c,var(--sun));padding:6px 10px;font-size:13px;line-height:1.3;box-shadow:4px 4px 0 var(--pink);animation:bannerIn .35s ease-out,bannerOut .4s ease-in 2.9s forwards}
+.banner svg{width:26px;height:26px;flex:none}
+.banner b{color:var(--sun);font-family:var(--f-hud);font-weight:400;font-size:18px;letter-spacing:.06em}
+@keyframes bannerIn{from{transform:translateY(20px) scale(.9);opacity:0}}
+@keyframes bannerOut{to{transform:translateY(-10px);opacity:0}}
+.stage.alarm::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;box-shadow:inset 0 0 70px rgba(224,16,47,.75);animation:blink 1s ease-in-out infinite}
+/* locks */
+.locks{position:absolute;top:2px;left:2px;z-index:5;display:flex;gap:4px;pointer-events:none}
+.lk{display:flex;align-items:center;gap:3px;font-family:var(--f-hud);font-size:15px;line-height:1;padding:2px 6px 2px 3px;background:rgba(12,4,20,.85);border:1px solid #5a2140;color:#ff7aa8}
+.lk svg{width:16px;height:16px}
+.lk.ok{border-color:var(--ok);color:var(--ok)}
+.lk.pop{animation:bump .6s ease-out}
+/* end art */
+.endart{display:flex;justify-content:center;position:relative}
+.polaroid{margin:0;background:#f7ecff;padding:10px 10px 4px;box-shadow:8px 8px 0 var(--pink);transform:rotate(2.5deg);width:min(78vw,300px);position:relative}
+.polaroid svg{display:block;width:100%;aspect-ratio:360/300;background:#0c0414}
+.polaroid figcaption{font-family:var(--f-hud);font-size:20px;color:var(--ink);text-align:center;padding:4px 0}
+.stamp{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%) rotate(-14deg);font-family:var(--f-display);font-size:52px;line-height:1;padding:2px 12px;border:5px solid currentColor;background:rgba(247,236,255,.15);animation:stamp .5s cubic-bezier(.2,1.6,.4,1) .3s both}
+.stamp.win{color:var(--ok);text-shadow:2px 2px 0 var(--ink)}
+.stamp.lose{color:var(--blood);text-shadow:2px 2px 0 var(--ink)}
+@keyframes stamp{from{transform:translate(-50%,-50%) rotate(-14deg) scale(3);opacity:0}}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:9px;height:14px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+/* scene animations used by the art */
+.disco{animation:spin 7s linear infinite;transform-box:view-box;transform-origin:180px 240px}
+.bob{animation:bob 5s ease-in-out infinite;transform-box:view-box;transform-origin:180px 330px}
+@keyframes bob{50%{transform:rotate(1.2deg) translateY(3px)}}
+.wave{animation:wave 3.5s linear infinite}
+@keyframes wave{to{transform:translateX(-60px)}}
+.twinkle{animation:blink 1.3s steps(2) infinite}
+.twinkle.b{animation-delay:.65s}
+.flicker{animation:flicker 3s steps(1) infinite}
+@keyframes flicker{0%,100%{opacity:1}8%{opacity:.3}10%{opacity:1}62%{opacity:.5}64%{opacity:1}}
+.drip{animation:drip 1.6s ease-in infinite}
+@keyframes drip{0%{transform:translateY(0);opacity:1}80%{transform:translateY(18px);opacity:1}100%{transform:translateY(22px);opacity:0}}
+.paw{animation:paw 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes paw{50%{transform:rotate(-24deg)}}
+.dust{animation:dust 9s ease-in-out infinite}
+@keyframes dust{50%{transform:translate(8px,-14px);opacity:.15}}
 .toast{position:absolute;left:50%;top:34px;transform:translateX(-50%);max-width:min(88%,420px);background:var(--ink);border:2px solid var(--sun);color:var(--paper);padding:8px 12px;font-size:14px;line-height:1.35;z-index:15;box-shadow:4px 4px 0 var(--pink)}
 .toast b{color:var(--sun)}
 
@@ -186,6 +268,7 @@ input[type=text]:focus{border-color:var(--cyan)}
 .verdict.win{color:var(--ok);text-shadow:4px 0 var(--pink)}
 .verdict.lose{color:var(--blood);text-shadow:4px 0 var(--cyan)}
 .story{display:flex;flex-direction:column;gap:6px;font-family:var(--f-hud);font-size:21px;line-height:1.15;margin:0;padding:0;list-style:none}
+.story li{animation:bannerIn .4s ease-out both}
 .story li::before{content:"› ";color:var(--pink)}
 .rep{background:#f2eef6;color:#1a1424;padding:20px 16px;display:flex;flex-direction:column;gap:18px;border-top:8px solid var(--pink)}
 .rep h2{margin:0;font-size:22px}
@@ -286,6 +369,9 @@ input[type=text]:focus{border-color:var(--cyan)}
   </div>
   <div class="stage" id="stage">
     <div id="toast" class="toast" hidden></div>
+    <div class="locks" id="locks" aria-label="Travas da saída"></div>
+    <div class="flash" id="flash"></div>
+    <div class="fxq" id="fxq" aria-live="polite"></div>
     <div class="here" id="here"></div>
     <div id="sceneWrap">
       <svg id="scene" viewBox="0 0 360 480" role="img" aria-label="Visão em primeira pessoa da kitnet" preserveAspectRatio="xMidYMid meet">
@@ -299,9 +385,31 @@ input[type=text]:focus{border-color:var(--cyan)}
           <linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a0b45"/><stop offset=".55" stop-color="#ff2e88"/><stop offset="1" stop-color="#ffd23f"/></linearGradient>
           <linearGradient id="gFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a0f68"/><stop offset="1" stop-color="#7b1fa2"/></linearGradient>
           <radialGradient id="gVig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".75"/></radialGradient>
+          <pattern id="pFoam" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#24123d"/><path d="M0 24 L12 2 L24 24z" fill="#2e1650"/><path d="M12 2 L24 24" stroke="#3a1d5e" stroke-width="1.5"/></pattern>
+          <pattern id="pBrick" width="40" height="20" patternUnits="userSpaceOnUse"><rect width="40" height="20" fill="#6b2230"/><rect x="2" y="2" width="16" height="6" fill="#7a2a3a" opacity=".6"/><path d="M0 1 H40 M0 11 H40 M20 1 V11 M0 11 V21 M40 11 V21" stroke="#3a1020" stroke-width="2"/></pattern>
+          <pattern id="pBoxes" width="36" height="30" patternUnits="userSpaceOnUse"><rect width="36" height="30" fill="#c8a46a"/><rect x="0" y="0" width="36" height="5" fill="#a8844a"/><rect x="1" y="1" width="34" height="28" fill="none" stroke="#6a4a1a" stroke-width="2"/><rect x="10" y="11" width="16" height="7" fill="#f7ecff"/><path d="M12 14 h12" stroke="#5a4a70" stroke-width="1"/></pattern>
+          <pattern id="pMesh" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 0 L12 12 M12 0 L0 12" stroke="#9aa0ad" stroke-width="1.4"/></pattern>
+          <pattern id="pConcrete" width="60" height="40" patternUnits="userSpaceOnUse"><rect width="60" height="40" fill="#3d4a5c"/><path d="M0 39 H60 M30 0 V40" stroke="#2c3646" stroke-width="2"/><circle cx="12" cy="14" r="1.5" fill="#2c3646"/><circle cx="44" cy="28" r="1" fill="#2c3646"/><circle cx="50" cy="8" r="1.2" fill="#4c5a6e"/></pattern>
+          <pattern id="pTeak" width="60" height="14" patternUnits="userSpaceOnUse"><rect width="60" height="14" fill="#b0763a"/><rect y="11" width="60" height="3" fill="#4a2a10"/><path d="M8 5 h20 M36 7 h16" stroke="#9a6430" stroke-width="1.5"/></pattern>
+          <pattern id="pWood" width="30" height="60" patternUnits="userSpaceOnUse"><rect width="30" height="60" fill="#6b3a1c"/><rect width="2" height="60" fill="#3a1f0c"/><path d="M10 6 q4 20 0 40 M20 10 q-3 20 2 44" stroke="#7d4826" stroke-width="2" fill="none"/></pattern>
+          <linearGradient id="gDawn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a0b45"/><stop offset=".55" stop-color="#ff5f6d"/><stop offset="1" stop-color="#ffc371"/></linearGradient>
+          <linearGradient id="gSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1aa7ad"/><stop offset="1" stop-color="#0b2a5a"/></linearGradient>
+          <linearGradient id="gShadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c0414" stop-opacity=".55"/><stop offset=".35" stop-color="#0c0414" stop-opacity="0"/><stop offset=".9" stop-color="#0c0414" stop-opacity="0"/><stop offset="1" stop-color="#0c0414" stop-opacity=".35"/></linearGradient>
+          <linearGradient id="gFloorShade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c0414" stop-opacity=".6"/><stop offset=".25" stop-color="#0c0414" stop-opacity=".1"/><stop offset="1" stop-color="#ff2e88" stop-opacity=".08"/></linearGradient>
+          <radialGradient id="gLight" cx=".5" cy=".12" r=".7"><stop offset="0" stop-color="#fff6d8" stop-opacity=".22"/><stop offset=".6" stop-color="#fff6d8" stop-opacity="0"/></radialGradient>
+          <filter id="fGrain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0"/></filter>
+          <filter id="fGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
 
         <g id="views"></g>
+        <!-- global lighting: wall shading, floor contact shadow, overhead light, film grain -->
+        <g id="lighting" pointer-events="none">
+          <rect x="0" y="22" width="360" height="308" fill="url(#gShadeTop)"/>
+          <rect x="0" y="330" width="360" height="150" fill="url(#gFloorShade)"/>
+          <rect x="0" y="22" width="360" height="458" fill="url(#gLight)" style="mix-blend-mode:screen"/>
+          <rect x="0" y="22" width="360" height="458" filter="url(#fGrain)" opacity=".18"/>
+          <g fill="#fff" opacity=".35"><circle class="dust" cx="60" cy="140" r="1.4"/><circle class="dust" cx="250" cy="90" r="1.2" style="animation-delay:-3s"/><circle class="dust" cx="300" cy="260" r="1.6" style="animation-delay:-6s"/><circle class="dust" cx="140" cy="300" r="1.1" style="animation-delay:-1.5s"/><circle class="dust" cx="200" cy="190" r="1.3" style="animation-delay:-4.5s"/></g>
+        </g>
 
         <rect x="0" y="0" width="360" height="22" fill="#0c0414"/>
         <rect x="100" y="8" width="160" height="5" rx="2" fill="#ff2e88"/>
@@ -319,13 +427,18 @@ input[type=text]:focus{border-color:var(--cyan)}
     <button class="arrow r" id="turnR" aria-label="Virar para a direita"><span class="pd" id="pdR"></span><span class="nx" id="nxR"></span><span class="ch">›</span></button>
     <button class="back" id="backBtn" hidden>‹ Voltar pro quarto</button>
   </div>
-  <div class="inv" id="inv"></div>
+  <button class="bagbar" id="bagBtn" aria-label="Abrir a bolsa do time">
+    <svg class="bagic" viewBox="0 0 40 40" aria-hidden="true"><path d="M13 14 q0 -9 7 -9 q7 0 7 9" fill="none" stroke="#0c0414" stroke-width="5"/><path d="M13 14 q0 -9 7 -9 q7 0 7 9" fill="none" stroke="#ff8a3d" stroke-width="2.5"/><path d="M6 14 h28 l-2 21 h-24z" fill="#c2185b" stroke="#0c0414" stroke-width="2.5"/><path d="M6 14 h28 l-1 8 q-13 5 -26 0z" fill="#ff2e88" stroke="#0c0414" stroke-width="2.5"/><rect x="17" y="19" width="6" height="6" rx="1" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/><path d="M10 30 h20" stroke="#0c0414" stroke-width="1.5" stroke-dasharray="2 2"/></svg>
+    <span class="bagtx"><b>BOLSA</b><small id="bagCount">vazia</small></span>
+    <span class="bagitems" id="bagItems"></span>
+  </button>
 </section>
 
 <!-- ================= END ================= -->
 <section id="end" class="screen" hidden>
   <div class="endwrap">
     <h2 class="verdict" id="verdict">VOCÊS SAÍRAM.</h2>
+    <div class="endart" id="endArt"></div>
     <ul class="story" id="story"></ul>
     <div class="rep" id="report"></div>
   </div>
@@ -338,6 +451,15 @@ input[type=text]:focus{border-color:var(--cyan)}
     <p class="sh-res" id="shRes" hidden></p>
     <div class="acts" id="shActs"></div>
     <div class="sh-who" id="shWho"></div>
+  </div>
+</div>
+
+<div class="sheet" id="bag" aria-hidden="true">
+  <div class="sheet-in">
+    <div class="sh-top"><h2 class="sh-title">Bolsa do time</h2><button class="x" id="bagClose" aria-label="Fechar bolsa">×</button></div>
+    <p class="hint">Tudo que alguém pega vai pra bolsa de todo mundo. Toque num item pra ver e usar.</p>
+    <div class="slots" id="slots"></div>
+    <div id="itemDet"></div>
   </div>
 </div>
 
@@ -440,7 +562,7 @@ input[type=text]:focus{border-color:var(--cyan)}
             <rect x="40" y="224" width="120" height="16" fill="#e0102f"/>
             <text x="46" y="236" font-family="VT323,K47 VT,monospace" font-size="13" fill="#fff">URGENTE · EXECUTIVO SUMIDO</text>
           </g>
-          <rect class="tvglow" x="40" y="156" width="120" height="84" fill="#2de2e6" opacity=".12"/>
+          <g opacity=".12"><rect class="tvglow" x="40" y="156" width="120" height="84" fill="#2de2e6"/></g>
           <rect x="94" y="258" width="14" height="6" fill="#0c0414"/>
           <path d="M0 330 H360 V480 H0z" fill="url(#gFloor)"/>
           <g class="floorlines"></g>
@@ -743,7 +865,7 @@ input[type=text]:focus{border-color:var(--cyan)}
             <rect x="34" y="168" width="164" height="18" fill="#e0102f"/>
             <text x="40" y="181" font-family="VT323,K47 VT,monospace" font-size="13" fill="#fff">KITNET · HALDEN · POLÍCIA</text>
           </g>
-          <rect class="tvglow" x="34" y="84" width="164" height="102" fill="#2de2e6" opacity=".12"/>
+          <g opacity=".12"><rect class="tvglow" x="34" y="84" width="164" height="102" fill="#2de2e6"/></g>
           <path d="M116 206 v20 M96 226 h40" stroke="#3a2a4f" stroke-width="4"/>
           <rect x="226" y="200" width="122" height="130" fill="#eaeaf2" stroke="#0c0414" stroke-width="3"/>
           <rect x="236" y="214" width="8" height="40" fill="#7a7a8a"/>
@@ -832,12 +954,700 @@ input[type=text]:focus{border-color:var(--cyan)}
         </g>
 </svg></template>
 
+<template id="art-karaoke"><svg xmlns="http://www.w3.org/2000/svg">
+        <!-- ===== N: PALCO ===== -->
+        <g id="v-N" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pFoam)"/>
+          <path d="M0 28 H360" stroke="#ff2e88" stroke-width="3"/><path d="M0 33 H360" stroke="#2de2e6" stroke-width="1.5" opacity=".7"/>
+          <rect x="62" y="34" width="236" height="146" rx="6" fill="#0c0414" stroke="#3a2a4f" stroke-width="3"/>
+          <rect x="72" y="44" width="216" height="118" fill="#120a40"/>
+          <g id="telaoOff">
+            <text x="180" y="100" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="20" fill="#2de2e6" class="twinkle">INSIRA O CÓDIGO ♪</text>
+            <text x="180" y="122" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="13" fill="#5a4a70">TÓQUIO KARAOKÊ SYSTEM</text>
+          </g>
+          <g id="telaoOn" style="display:none">
+            <rect x="72" y="44" width="216" height="118" fill="url(#gSky)" opacity=".8"/>
+            <circle cx="240" cy="122" r="24" fill="#ffd23f" opacity=".9"/>
+            <path d="M72 162 l42 -44 l30 24 l44 -40 l58 60z" fill="#1b0a2e"/>
+            <text x="180" y="76" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="18" fill="#fff" stroke="#0c0414" stroke-width="3" paint-order="stroke">E NESSA LOUCURA…</text>
+            <text x="180" y="96" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="16" fill="#ffd23f" stroke="#0c0414" stroke-width="3" paint-order="stroke">DE DIZER QUE NÃO TE QUERO</text>
+            <text x="276" y="56" text-anchor="end" font-family="VT323,K47 VT,monospace" font-size="12" fill="#fff">MENU ▸ HISTÓRICO</text>
+          </g>
+          <g id="telaoHist" style="display:none">
+            <rect x="72" y="44" width="216" height="118" fill="#0c0414"/>
+            <g font-family="VT323,K47 VT,monospace">
+              <text x="84" y="64" font-size="15" fill="#2de2e6">HISTÓRICO · SALA VIP</text>
+              <text x="84" y="88" font-size="19" fill="#ffd23f">1520 EVIDÊNCIAS ×3</text>
+              <text x="84" y="106" font-size="15" fill="#f7ecff">0712 MALANDRAGEM</text>
+              <text x="84" y="122" font-size="15" fill="#f7ecff">2290 BOATE AZUL</text>
+              <text x="84" y="148" font-size="15" fill="#e0102f">NOTA MÉDIA: 41</text>
+            </g>
+          </g>
+          <g opacity=".08"><rect x="72" y="44" width="216" height="118" fill="#2de2e6" class="tvglow"/></g>
+          <rect x="140" y="180" width="80" height="8" fill="#3a2a4f"/>
+          <path d="M40 34 V46" stroke="#c9ccd6" stroke-width="2"/>
+          <circle cx="40" cy="64" r="18" fill="#c9ccd6" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M22 64 H58 M40 46 V82 M26 54 Q40 60 54 54 M26 74 Q40 68 54 74 M30 50 V78 M50 50 V78" stroke="#7a7a8a" stroke-width="1.2" fill="none"/>
+          <g fill="#fff"><rect x="32" y="55" width="5" height="5" class="twinkle"/><rect x="44" y="66" width="5" height="5" class="twinkle b"/><rect x="34" y="70" width="4" height="4" class="twinkle b"/></g>
+          <g>
+            <rect x="8" y="182" width="54" height="98" rx="3" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+            <circle cx="35" cy="208" r="13" fill="#0c0414" stroke="#3a2a4f" stroke-width="3"/><circle cx="35" cy="208" r="4" fill="#3a2a4f"/>
+            <circle cx="35" cy="250" r="19" fill="#0c0414" stroke="#3a2a4f" stroke-width="3"/><circle cx="35" cy="250" r="6" fill="#3a2a4f"/>
+          </g>
+          <rect x="0" y="286" width="360" height="44" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
+          <path d="M0 296 H360" stroke="#5a2a16" stroke-width="3"/>
+          <g fill="#ffd23f"><circle cx="20" cy="312" r="4" class="twinkle"/><circle cx="60" cy="312" r="4" class="twinkle b"/><circle cx="100" cy="312" r="4" class="twinkle"/><circle cx="140" cy="312" r="4" class="twinkle b"/><circle cx="180" cy="312" r="4" class="twinkle"/><circle cx="220" cy="312" r="4" class="twinkle b"/><circle cx="260" cy="312" r="4" class="twinkle"/><circle cx="300" cy="312" r="4" class="twinkle b"/><circle cx="340" cy="312" r="4" class="twinkle"/></g>
+          <path d="M180 286 V218" stroke="#9aa0ad" stroke-width="4"/>
+          <path d="M162 286 l18 -10 l18 10" stroke="#9aa0ad" stroke-width="4" fill="none"/>
+          <g id="micArt">
+            <rect x="174" y="196" width="12" height="28" rx="4" fill="#1b1622" stroke="#0c0414" stroke-width="2"/>
+            <circle cx="180" cy="192" r="10" fill="#c9ccd6" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M172 190 h16 M172 195 h16" stroke="#7a7a8a" stroke-width="1.5"/>
+            <path d="M184 186 q6 -2 8 4" stroke="#5a2a16" stroke-width="1.5" fill="none"/>
+          </g>
+          <rect x="270" y="208" width="80" height="60" rx="5" fill="#2e1650" stroke="#0c0414" stroke-width="3"/>
+          <rect x="278" y="216" width="48" height="18" fill="#06210f" stroke="#0c0414" stroke-width="1.5"/>
+          <text id="machineDisp" x="302" y="230" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="15" fill="#3dff8b">----</text>
+          <circle id="ledMachine" cx="338" cy="225" r="5" fill="#e0102f" filter="url(#fGlow)"/>
+          <g><rect x="280" y="242" width="12" height="9" rx="2" fill="#ff2e88"/><rect x="296" y="242" width="12" height="9" rx="2" fill="#2de2e6"/><rect x="312" y="242" width="12" height="9" rx="2" fill="#ffd23f"/><rect x="328" y="242" width="14" height="9" rx="2" fill="#e0102f"/></g>
+          <rect x="282" y="268" width="56" height="18" fill="#1b1622" stroke="#0c0414" stroke-width="2"/>
+          <path d="M0 330 H360 V480 H0z" fill="#2a0b45"/>
+          <g class="floorlines"></g>
+          <path d="M184 330 q-40 40 18 70 q60 30 -12 80" stroke="#0c0414" stroke-width="5" fill="none" opacity=".7"/>
+          <g><rect x="60" y="370" width="6" height="10" fill="#ff2e88" transform="rotate(30 63 375)"/><rect x="120" y="420" width="6" height="10" fill="#ffd23f" transform="rotate(-20 123 425)"/><rect x="260" y="380" width="6" height="10" fill="#2de2e6" transform="rotate(50 263 385)"/><rect x="300" y="440" width="6" height="10" fill="#3dff8b" transform="rotate(10 303 445)"/><rect x="40" y="450" width="6" height="10" fill="#b18cff"/></g>
+          <path d="M240 420 l26 -10 l6 10 l-22 14z" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <g class="discoLayer" style="display:none"><g class="disco"><circle cx="40" cy="80" r="9" fill="#ff2e88" opacity=".5"/><circle cx="120" cy="140" r="7" fill="#2de2e6" opacity=".5"/><circle cx="220" cy="60" r="10" fill="#ffd23f" opacity=".5"/><circle cx="300" cy="180" r="8" fill="#3dff8b" opacity=".5"/><circle cx="80" cy="260" r="10" fill="#b18cff" opacity=".5"/><circle cx="260" cy="300" r="9" fill="#ff2e88" opacity=".5"/><circle cx="180" cy="380" r="12" fill="#2de2e6" opacity=".45"/><circle cx="330" cy="420" r="9" fill="#ffd23f" opacity=".45"/><circle cx="30" cy="420" r="10" fill="#3dff8b" opacity=".45"/><circle cx="150" cy="220" r="6" fill="#fff" opacity=".6"/><circle cx="340" cy="60" r="7" fill="#fff" opacity=".6"/><circle cx="110" cy="460" r="8" fill="#ff2e88" opacity=".45"/></g></g>
+        </g>
+
+        <!-- ===== L: BAR ===== -->
+        <g id="v-L" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#8a0f2a"/>
+          <rect x="0" y="0" width="360" height="330" fill="url(#pFoam)" opacity=".18"/>
+          <g>
+            <path d="M176 22 V36 M222 22 V40" stroke="#0c0414" stroke-width="2"/>
+            <ellipse cx="176" cy="54" rx="14" ry="18" fill="#e0102f" stroke="#0c0414" stroke-width="2.5"/><path d="M162 54 h28 M164 44 h24 M164 64 h24" stroke="#ffd23f" stroke-width="1.5"/>
+            <ellipse cx="222" cy="58" rx="14" ry="18" fill="#e0102f" stroke="#0c0414" stroke-width="2.5"/><path d="M208 58 h28 M210 48 h24 M210 68 h24" stroke="#ffd23f" stroke-width="1.5"/>
+            <g opacity=".18"><ellipse cx="176" cy="54" rx="22" ry="26" fill="#ff8a3d" class="tvglow"/></g><g opacity=".18"><ellipse cx="222" cy="58" rx="22" ry="26" fill="#ff8a3d" class="tvglow"/></g>
+          </g>
+          <g transform="rotate(-2 80 70)">
+            <rect x="18" y="38" width="124" height="64" fill="#ffd23f" stroke="#0c0414" stroke-width="3"/>
+            <rect x="24" y="44" width="112" height="52" fill="none" stroke="#c4001d" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <g font-family="VT323,K47 VT,monospace" text-anchor="middle" fill="#0c0414"><text x="80" y="57" font-size="13">MAIS PEDIDA DO MÊS</text><text x="80" y="80" font-size="23" fill="#c4001d">EVIDÊNCIAS</text><text x="80" y="93" font-size="11">CHITÃOZINHO &amp; XORORÓ</text></g>
+          </g>
+          <rect x="150" y="96" width="104" height="6" fill="#3a1f14"/><rect x="150" y="150" width="104" height="6" fill="#3a1f14"/>
+          <g stroke="#0c0414" stroke-width="1.5"><rect x="156" y="70" width="10" height="26" rx="2" fill="#2f8f4e"/><rect x="170" y="64" width="9" height="32" rx="2" fill="#c58b4e"/><rect x="183" y="72" width="11" height="24" rx="2" fill="#f7ecff"/><rect x="198" y="66" width="9" height="30" rx="2" fill="#b18cff"/><rect x="211" y="74" width="12" height="22" rx="2" fill="#e0102f"/><rect x="227" y="68" width="9" height="28" rx="2" fill="#2de2e6"/><rect x="240" y="72" width="10" height="24" rx="2" fill="#ffd23f"/>
+            <rect x="158" y="124" width="10" height="26" rx="2" fill="#c58b4e"/><rect x="172" y="120" width="10" height="30" rx="2" fill="#2f8f4e"/><rect x="186" y="128" width="12" height="22" rx="2" fill="#f7ecff"/><rect x="202" y="122" width="9" height="28" rx="2" fill="#ff8a3d"/><rect x="215" y="126" width="11" height="24" rx="2" fill="#2de2e6"/><rect x="230" y="120" width="10" height="30" rx="2" fill="#e0102f"/></g>
+          <rect x="262" y="40" width="94" height="292" fill="#0c0414"/>
+          <rect x="268" y="46" width="82" height="286" fill="#2de2e6" opacity=".12"/>
+          <g stroke="#0c0414" stroke-width="2"><path d="M268 46 h27 v96 h-27z" fill="#1b2a6e"/><path d="M296 46 h27 v104 h-27z" fill="#1b2a6e"/><path d="M324 46 h26 v96 h-26z" fill="#1b2a6e"/></g>
+          <circle cx="309" cy="84" r="15" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/><circle cx="309" cy="84" r="8" fill="#e0102f"/>
+          <text x="309" y="132" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="13" fill="#f7ecff">COZINHA</text>
+          <rect x="0" y="216" width="258" height="14" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <rect x="0" y="230" width="258" height="100" fill="#5a2a16" stroke="#0c0414" stroke-width="3"/>
+          <path d="M0 254 H258 M0 304 H258" stroke="#3a1f14" stroke-width="3"/>
+          <path d="M0 230 H258" stroke="#ffd23f" stroke-width="2" opacity=".5"/>
+          <g id="catArt">
+            <ellipse cx="54" cy="202" rx="20" ry="15" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M40 168 l3 -13 l9 9z M68 168 l-3 -13 l-9 9z" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+            <path d="M42 167 l2 -7 l4 4z" fill="#ff8aa8"/>
+            <circle cx="54" cy="180" r="15" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M46 178 q3 -3 6 0 M56 178 q3 -3 6 0" stroke="#0c0414" stroke-width="2" fill="none"/>
+            <path d="M52 185 q2 2 4 0" stroke="#0c0414" stroke-width="1.5" fill="none"/>
+            <circle cx="45" cy="185" r="2.5" fill="#ff8aa8"/><circle cx="63" cy="185" r="2.5" fill="#ff8aa8"/>
+            <path d="M40 193 q14 6 28 0" stroke="#e0102f" stroke-width="4" fill="none"/>
+            <circle cx="54" cy="198" r="4" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/>
+            <ellipse cx="54" cy="210" rx="9" ry="6" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/>
+            <rect class="paw" x="68" y="164" width="9" height="20" rx="4" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          </g>
+          <g id="catBroken" style="display:none" stroke="#0c0414" stroke-width="1.5">
+            <path d="M30 216 l10 -10 l8 10z" fill="#f7ecff"/><path d="M52 216 l6 -14 l10 14z" fill="#f7ecff"/><path d="M70 216 l4 -8 l8 8z" fill="#f7ecff"/><path d="M42 210 l6 -4 l2 6z" fill="#f7ecff"/>
+            <ellipse cx="62" cy="212" rx="7" ry="4" fill="#ffd23f"/><path d="M76 208 l6 -6 l3 4z" fill="#e0102f"/>
+          </g>
+          <path d="M100 216 l6 -36 h66 l6 36z" fill="#c9ccd6" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="116" y="166" width="42" height="15" fill="#06210f" stroke="#0c0414" stroke-width="2"/>
+          <text x="137" y="178" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="12" fill="#3dff8b">R$ 0,00</text>
+          <g fill="#7a7a8a"><rect x="112" y="190" width="9" height="6"/><rect x="124" y="190" width="9" height="6"/><rect x="136" y="190" width="9" height="6"/><rect x="148" y="190" width="9" height="6"/><rect x="160" y="190" width="9" height="6"/><rect x="112" y="200" width="9" height="6"/><rect x="124" y="200" width="9" height="6"/><rect x="136" y="200" width="9" height="6"/><rect x="148" y="200" width="9" height="6" fill="#e0102f"/><rect x="160" y="200" width="9" height="6" fill="#3dff8b"/></g>
+          <g id="cashTray" style="display:none"><rect x="102" y="216" width="74" height="16" fill="#9aa0ad" stroke="#0c0414" stroke-width="2"/><rect x="108" y="218" width="18" height="10" fill="#3dff8b" stroke="#0c0414" stroke-width="1"/><rect x="130" y="218" width="18" height="10" fill="#3dff8b" stroke="#0c0414" stroke-width="1"/><rect x="152" y="218" width="18" height="10" fill="#ff8a3d" stroke="#0c0414" stroke-width="1"/></g>
+          <rect x="196" y="192" width="44" height="24" fill="#c9ccd6" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="204" y="156" width="9" height="36" rx="3" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/>
+          <rect x="224" y="150" width="9" height="42" rx="3" fill="#2de2e6" stroke="#0c0414" stroke-width="2"/>
+          <rect x="202" y="200" width="12" height="16" fill="#ffd23f" opacity=".7" stroke="#0c0414" stroke-width="1.5"/><rect x="202" y="198" width="12" height="5" fill="#f7ecff"/>
+          <path d="M0 330 H360 V480 H0z" fill="#2a0b45"/>
+          <g class="floorlines"></g>
+          <g stroke="#0c0414" stroke-width="2.5"><ellipse cx="70" cy="350" rx="26" ry="8" fill="#e0102f"/><path d="M60 356 l-8 80 M80 356 l8 80" fill="none"/><ellipse cx="190" cy="350" rx="26" ry="8" fill="#e0102f"/><path d="M180 356 l-8 80 M200 356 l8 80" fill="none"/></g>
+          <g class="discoLayer" style="display:none"><g class="disco"><circle cx="60" cy="60" r="9" fill="#2de2e6" opacity=".5"/><circle cx="140" cy="200" r="8" fill="#ffd23f" opacity=".5"/><circle cx="250" cy="90" r="10" fill="#3dff8b" opacity=".5"/><circle cx="320" cy="250" r="9" fill="#ff2e88" opacity=".5"/><circle cx="40" cy="300" r="11" fill="#b18cff" opacity=".5"/><circle cx="200" cy="410" r="10" fill="#fff" opacity=".5"/><circle cx="300" cy="400" r="8" fill="#2de2e6" opacity=".45"/><circle cx="110" cy="440" r="9" fill="#ffd23f" opacity=".45"/></g></g>
+        </g>
+
+        <!-- ===== S: FUNDOS ===== -->
+        <g id="v-S" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pBrick)"/>
+          <rect x="140" y="28" width="80" height="22" fill="#0f5a2e" stroke="#0c0414" stroke-width="2"/>
+          <text x="180" y="44" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="16" fill="#3dff8b" filter="url(#fGlow)">SAÍDA ►</text>
+          <rect x="104" y="56" width="152" height="276" fill="#0c0414"/>
+          <rect x="112" y="64" width="136" height="268" fill="#5c6670" stroke="#0c0414" stroke-width="3"/>
+          <rect x="112" y="64" width="40" height="268" fill="#fff" opacity=".06"/>
+          <path d="M112 110 H248 M112 280 H248" stroke="#3d4a5c" stroke-width="3"/>
+          <g fill="#3d4a5c"><circle cx="120" cy="72" r="2.5"/><circle cx="240" cy="72" r="2.5"/><circle cx="120" cy="324" r="2.5"/><circle cx="240" cy="324" r="2.5"/></g>
+          <rect x="124" y="214" width="112" height="12" rx="4" fill="#9aa0ad" stroke="#0c0414" stroke-width="2"/>
+          <path d="M150 300 q10 -14 22 -4" stroke="#3a1020" stroke-width="3" fill="none" opacity=".6"/>
+          <g id="chainArt">
+            <path d="M114 140 L246 236 M114 236 L246 140" stroke="#0c0414" stroke-width="10"/>
+            <path d="M114 140 L246 236 M114 236 L246 140" stroke="#c9ccd6" stroke-width="6" stroke-dasharray="9 4"/>
+          </g>
+          <g id="padlock">
+            <path d="M170 184 v-10 a10 10 0 0 1 20 0 v10" stroke="#9aa0ad" stroke-width="5" fill="none"/>
+            <rect x="164" y="184" width="32" height="30" rx="4" fill="#ffd23f" stroke="#0c0414" stroke-width="2.5"/>
+            <g fill="#0c0414"><rect x="168" y="194" width="5" height="10"/><rect x="176" y="194" width="5" height="10"/><rect x="184" y="194" width="5" height="10"/><rect x="190" y="194" width="3" height="10"/></g>
+          </g>
+          <g id="padOpen" style="display:none">
+            <path d="M206 300 v-14 a10 10 0 0 1 20 0" stroke="#9aa0ad" stroke-width="5" fill="none"/>
+            <rect x="200" y="300" width="32" height="28" rx="4" fill="#ffd23f" stroke="#0c0414" stroke-width="2.5"/>
+          </g>
+          <g>
+            <rect x="22" y="150" width="52" height="82" rx="6" fill="#e0102f" stroke="#0c0414" stroke-width="3"/>
+            <rect x="26" y="156" width="14" height="60" rx="6" fill="#b8000f" stroke="#0c0414" stroke-width="2"/>
+            <g fill="#f7ecff"><circle cx="50" cy="168" r="2.5"/><circle cx="58" cy="168" r="2.5"/><circle cx="66" cy="168" r="2.5"/><circle cx="50" cy="178" r="2.5"/><circle cx="58" cy="178" r="2.5"/><circle cx="66" cy="178" r="2.5"/><circle cx="50" cy="188" r="2.5"/><circle cx="58" cy="188" r="2.5"/><circle cx="66" cy="188" r="2.5"/></g>
+            <path d="M33 216 q-6 10 4 14 q10 4 0 10 q-10 6 2 12 q10 4 2 12" stroke="#0c0414" stroke-width="2" fill="none"/>
+          </g>
+          <rect x="294" y="44" width="10" height="16" fill="#3a2a4f"/>
+          <path d="M286 58 l54 -6 l4 22 l-54 6z" fill="#c9ccd6" stroke="#0c0414" stroke-width="2.5"/>
+          <circle cx="342" cy="64" r="7" fill="#0c0414" stroke="#3a2a4f" stroke-width="2"/>
+          <circle id="camLed" class="siren" cx="298" cy="66" r="3.5" fill="#e0102f" filter="url(#fGlow)"/>
+          <g id="camCut" style="display:none"><path d="M290 76 q-6 30 6 50 q4 8 -2 16" stroke="#0c0414" stroke-width="3" fill="none"/><path d="M292 140 l-6 6 M296 142 l4 6" stroke="#ffd23f" stroke-width="2"/></g>
+          <path d="M274 332 q-8 -52 32 -62 q34 6 30 62z" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <path d="M298 274 l6 -12 l8 12" stroke="#0c0414" stroke-width="3" fill="#1b1622"/>
+          <path d="M316 332 q0 -38 26 -42 q20 10 16 42z" fill="#2a2531" stroke="#0c0414" stroke-width="3"/>
+          <path d="M282 300 q10 -8 20 0" stroke="#3a2a4f" stroke-width="2" fill="none"/>
+          <path d="M0 330 H360 V480 H0z" fill="#3b3346"/>
+          <g class="floorlines"></g>
+          <ellipse cx="120" cy="420" rx="60" ry="12" fill="#2de2e6" opacity=".18"/>
+          <ellipse cx="120" cy="420" rx="40" ry="7" fill="#ff2e88" opacity=".15"/>
+        </g>
+
+        <!-- ===== O: SOFÁS ===== -->
+        <g id="v-O" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#24103d"/>
+          <rect x="0" y="0" width="360" height="330" fill="url(#pFoam)" opacity=".5"/>
+          <text x="180" y="88" text-anchor="middle" font-family="Rubik Wet Paint,K47 Wet,Impact,sans-serif" font-size="42" fill="#ff2e88" stroke="#ffd23f" stroke-width="1" class="tvglow" filter="url(#fGlow)">KARAOKÊ</text>
+          <text x="180" y="120" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="24" fill="#2de2e6" letter-spacing="6" filter="url(#fGlow)">TÓQUIO · VIP</text>
+          <rect x="10" y="168" width="300" height="72" rx="16" fill="#9e1250" stroke="#0c0414" stroke-width="3"/>
+          <path d="M60 172 V236 M110 172 V236 M160 172 V236 M210 172 V236 M260 172 V236" stroke="#7a0d3c" stroke-width="2"/>
+          <rect x="10" y="232" width="300" height="56" rx="10" fill="#c2185b" stroke="#0c0414" stroke-width="3"/>
+          <rect x="2" y="200" width="30" height="92" rx="10" fill="#9e1250" stroke="#0c0414" stroke-width="3"/>
+          <rect x="288" y="200" width="30" height="92" rx="10" fill="#9e1250" stroke="#0c0414" stroke-width="3"/>
+          <path d="M30 288 v40 M290 288 v40" stroke="#3a1f14" stroke-width="6"/>
+          <g id="juliaLie">
+            <path d="M44 212 q-4 26 20 30 q20 0 18 -24z" fill="#5a2a16"/>
+            <circle cx="62" cy="220" r="15" fill="#e0a882" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M48 214 q14 -16 30 -2 q-10 -4 -30 2z" fill="#5a2a16"/>
+            <path d="M56 222 l4 -1 M64 222 l4 -1" stroke="#0c0414" stroke-width="2"/>
+            <rect x="76" y="212" width="112" height="30" rx="13" fill="#2de2e6" stroke="#0c0414" stroke-width="2.5"/>
+            <rect x="184" y="218" width="98" height="20" rx="8" fill="#1b1622" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M282 220 l10 -4 l2 10 l-12 2z" fill="#e0102f" stroke="#0c0414" stroke-width="2"/>
+            <path d="M124 240 q2 30 -2 62" stroke="#0c0414" stroke-width="11" stroke-linecap="round"/>
+            <path d="M124 240 q2 30 -2 62" stroke="#e0a882" stroke-width="7" stroke-linecap="round"/>
+          </g>
+          <g id="juliaSide" style="display:none">
+            <path d="M40 212 q-6 30 24 32 q16 -4 12 -26z" fill="#5a2a16"/>
+            <circle cx="60" cy="226" r="15" fill="#e0a882" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M54 228 l5 0" stroke="#0c0414" stroke-width="2"/>
+            <path d="M74 214 q50 -10 100 6 q6 14 -6 22 q-48 6 -94 -4z" fill="#2de2e6" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M168 220 q40 -20 70 6 l-4 14 q-30 -10 -60 4z" fill="#1b1622" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M200 240 q20 6 46 0" stroke="#1b1622" stroke-width="14" stroke-linecap="round"/>
+            <path d="M90 236 q-10 10 -24 6" stroke="#e0a882" stroke-width="7" stroke-linecap="round"/>
+            <text x="110" y="200" font-family="VT323,K47 VT,monospace" font-size="16" fill="#f7ecff" opacity=".8">z z</text>
+          </g>
+          <path d="M0 330 H360 V480 H0z" fill="#2a0b45"/>
+          <g class="floorlines"></g>
+          <ellipse cx="180" cy="372" rx="110" ry="14" fill="#0c0414" opacity=".35"/>
+          <rect x="80" y="340" width="200" height="14" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <path d="M92 354 v26 M268 354 v26" stroke="#1b1622" stroke-width="6"/>
+          <path d="M150 340 l8 -16 h74 l8 16z" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/>
+          <path d="M195 324 v16" stroke="#0c0414" stroke-width="2"/>
+          <path d="M162 330 h26 M164 335 h24 M202 330 h26 M202 335 h24" stroke="#7a5a10" stroke-width="1.2"/>
+          <path d="M212 326 l8 6" stroke="#e0102f" stroke-width="3"/>
+          <rect x="104" y="324" width="12" height="16" fill="#f7ecff" opacity=".7" stroke="#0c0414" stroke-width="1.5"/>
+          <rect x="250" y="326" width="10" height="14" fill="#3dff8b" opacity=".6" stroke="#0c0414" stroke-width="1.5"/>
+          <path d="M292 412 l8 -40 h40 l8 40z" fill="#ff5fa8" stroke="#0c0414" stroke-width="3"/>
+          <path d="M304 372 q16 -26 32 0" stroke="#0c0414" stroke-width="3" fill="none"/>
+          <g id="juliaPhone"><rect x="314" y="364" width="12" height="18" rx="2" fill="#0c0414"/><rect x="316" y="367" width="8" height="11" fill="#2de2e6" class="twinkle"/></g>
+          <g class="discoLayer" style="display:none"><g class="disco"><circle cx="50" cy="120" r="9" fill="#ffd23f" opacity=".5"/><circle cx="150" cy="40" r="8" fill="#2de2e6" opacity=".5"/><circle cx="290" cy="130" r="10" fill="#3dff8b" opacity=".5"/><circle cx="330" cy="300" r="9" fill="#ff2e88" opacity=".5"/><circle cx="20" cy="260" r="11" fill="#fff" opacity=".5"/><circle cx="180" cy="430" r="10" fill="#b18cff" opacity=".5"/><circle cx="260" cy="460" r="8" fill="#2de2e6" opacity=".45"/><circle cx="90" cy="400" r="9" fill="#ff2e88" opacity=".45"/></g></g>
+        </g>
+
+        <!-- ===== C: COZINHA ===== -->
+        <g id="v-C" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pTile)"/>
+          <rect x="0" y="0" width="360" height="330" fill="#1aa7ad" opacity=".18"/>
+          <rect x="18" y="104" width="150" height="6" fill="#7a7a8a"/>
+          <g stroke="#0c0414" stroke-width="1.5"><rect x="24" y="80" width="22" height="24" fill="#e0102f"/><rect x="50" y="76" width="22" height="28" fill="#ffd23f"/><rect x="76" y="82" width="22" height="22" fill="#ff8a3d"/><rect x="104" y="72" width="26" height="32" fill="#f7ecff"/><rect x="134" y="80" width="26" height="24" fill="#2f8f4e"/></g>
+          <g font-family="VT323,K47 VT,monospace" font-size="9" fill="#0c0414"><text x="27" y="96">LÁMEN</text><text x="107" y="92">ARROZ</text></g>
+          <circle cx="210" cy="80" r="22" fill="#9aa0ad" stroke="#0c0414" stroke-width="2.5"/><circle cx="210" cy="80" r="14" fill="#7a7a8a"/><path d="M210 58 v-18" stroke="#0c0414" stroke-width="3"/>
+          <rect x="0" y="216" width="176" height="14" fill="#c9ccd6" stroke="#0c0414" stroke-width="3"/>
+          <rect x="0" y="230" width="176" height="100" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+          <path d="M88 230 V330" stroke="#0c0414" stroke-width="3"/>
+          <rect x="70" y="270" width="10" height="16" fill="#5c6670"/><rect x="96" y="270" width="10" height="16" fill="#5c6670"/>
+          <rect x="22" y="204" width="110" height="12" rx="2" fill="#d9b27a" stroke="#0c0414" stroke-width="2"/>
+          <path d="M84 206 q20 -14 44 -4 l-4 6 q-20 -6 -40 2z" fill="#ff8a3d" stroke="#0c0414" stroke-width="1.5"/>
+          <path d="M92 202 l4 4 M102 200 l4 4 M112 200 l4 4" stroke="#f7ecff" stroke-width="1.5"/>
+          <g id="sushiKnife">
+            <rect x="26" y="196" width="26" height="8" rx="3" fill="#7a3b1c" stroke="#0c0414" stroke-width="1.5"/>
+            <path d="M52 197 L132 194 L126 202 L52 203z" fill="#e6e8ef" stroke="#0c0414" stroke-width="1.5"/>
+            <path d="M60 198 h50" stroke="#fff" stroke-width="1"/>
+          </g>
+          <rect x="180" y="216" width="88" height="14" fill="#c9ccd6" stroke="#0c0414" stroke-width="3"/>
+          <rect x="180" y="230" width="88" height="100" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+          <path d="M212 216 v-28 h24 v10" stroke="#7a7a8a" stroke-width="5" fill="none"/>
+          <ellipse cx="224" cy="222" rx="34" ry="5" fill="#5c6670"/>
+          <circle class="drip" cx="236" cy="202" r="2.5" fill="#bfefff"/>
+          <rect x="274" y="56" width="82" height="276" fill="#c9ccd6" stroke="#0c0414" stroke-width="3"/>
+          <rect x="274" y="56" width="82" height="276" fill="#bfefff" opacity=".25"/>
+          <path d="M274 156 H356" stroke="#0c0414" stroke-width="3"/>
+          <rect x="284" y="110" width="6" height="36" fill="#7a7a8a"/><rect x="284" y="170" width="6" height="56" fill="#7a7a8a"/>
+          <rect x="304" y="72" width="40" height="20" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/>
+          <text x="324" y="86" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="12" fill="#0c0414">-18 °C</text>
+          <path d="M300 300 l8 -8 l8 8 M330 290 l6 -6 l6 6" stroke="#fff" stroke-width="1.5" fill="none" opacity=".8"/>
+          <path d="M0 330 H360 V480 H0z" fill="url(#pTileDark)"/>
+          <g class="floorlines" opacity=".4"></g>
+          <ellipse cx="224" cy="380" rx="40" ry="8" fill="#bfefff" opacity=".4"/>
+        </g>
+</svg></template>
+
+<template id="art-arquivo"><svg xmlns="http://www.w3.org/2000/svg">
+        <!-- ===== N: ARQUIVOS ===== -->
+        <g id="v-N" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pConcrete)"/>
+          <path d="M0 30 H360" stroke="#2c3646" stroke-width="6"/><path d="M40 30 v-8 M320 30 v-8" stroke="#2c3646" stroke-width="4"/>
+          <rect x="10" y="44" width="172" height="288" fill="#5c6670" stroke="#0c0414" stroke-width="3"/>
+          <g fill="#3b3346"><rect x="10" y="108" width="172" height="6"/><rect x="10" y="174" width="172" height="6"/><rect x="10" y="240" width="172" height="6"/><rect x="10" y="306" width="172" height="6"/></g>
+          <rect x="16" y="50" width="160" height="58" fill="url(#pBoxes)"/>
+          <rect x="16" y="116" width="160" height="58" fill="url(#pBoxes)"/>
+          <rect x="16" y="182" width="160" height="58" fill="url(#pBoxes)"/>
+          <rect x="16" y="248" width="94" height="58" fill="url(#pBoxes)"/>
+          <rect x="112" y="248" width="64" height="58" fill="#1b1622"/>
+          <rect x="120" y="270" width="40" height="34" fill="#c8a46a" stroke="#6a4a1a" stroke-width="2" transform="rotate(-12 140 287)"/>
+          <text x="140" y="292" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="11" fill="#0c0414" transform="rotate(-12 140 287)">2025</text>
+          <g font-family="VT323,K47 VT,monospace" font-size="10" fill="#5a4a70"><text x="30" y="68">1986</text><text x="30" y="134">1999</text><text x="30" y="200">2010</text><text x="30" y="266">2018</text></g>
+          <rect x="198" y="44" width="156" height="288" fill="#1b1622"/>
+          <g fill="#3a2a4f"><rect x="210" y="120" width="40" height="30"/><rect x="254" y="126" width="30" height="24"/><rect x="290" y="200" width="50" height="40"/></g>
+          <rect x="226" y="170" width="44" height="34" fill="#c4001d" opacity=".75"/>
+          <g id="cageDoor"><rect x="198" y="44" width="156" height="288" fill="url(#pMesh)"/></g>
+          <g id="cageOpenArt" style="display:none">
+            <rect x="198" y="44" width="78" height="288" fill="url(#pMesh)"/>
+            <path d="M276 44 L336 30 L336 346 L276 332z" fill="url(#pMesh)" stroke="#7a7a8a" stroke-width="4"/>
+            <rect x="276" y="44" width="78" height="288" fill="#ffd23f" opacity=".06"/>
+          </g>
+          <rect x="198" y="44" width="156" height="288" fill="none" stroke="#7a7a8a" stroke-width="5"/>
+          <path d="M276 44 V332" stroke="#7a7a8a" stroke-width="4"/>
+          <rect x="212" y="62" width="128" height="22" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/>
+          <text x="276" y="78" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#0c0414">ACESSO RESTRITO</text>
+          <g id="cageLock"><path d="M266 200 v-8 a8 8 0 0 1 16 0 v8" stroke="#c9ccd6" stroke-width="4" fill="none"/><rect x="262" y="200" width="24" height="22" rx="3" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/><circle cx="274" cy="210" r="3" fill="#0c0414"/></g>
+          <rect x="160" y="26" width="40" height="10" fill="#3a2a4f"/>
+          <path class="siren" d="M164 36 h32 l-4 10 h-24z" fill="#e0102f" filter="url(#fGlow)"/>
+          <g class="powerOn" style="display:none"><rect x="60" y="34" width="80" height="6" fill="#f7ecff" class="flicker"/><rect x="230" y="34" width="80" height="6" fill="#f7ecff"/></g>
+          <path d="M0 330 H360 V480 H0z" fill="#2c3646"/>
+          <g class="floorlines"></g>
+          <g>
+            <rect x="46" y="372" width="122" height="48" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+            <path d="M168 372 l14 -26" stroke="#0c0414" stroke-width="4"/>
+            <rect x="54" y="338" width="48" height="34" fill="url(#pBoxes)" stroke="#0c0414" stroke-width="2"/>
+            <rect x="106" y="346" width="42" height="26" fill="url(#pBoxes)" stroke="#0c0414" stroke-width="2"/>
+            <g id="tapeArt"><circle cx="128" cy="342" r="8" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/><circle cx="128" cy="342" r="3" fill="#0c0414" opacity=".5"/></g>
+            <circle cx="62" cy="428" r="8" fill="#0c0414"/><circle cx="152" cy="428" r="8" fill="#0c0414"/>
+          </g>
+          <g fill="#f7ecff" stroke="#0c0414" stroke-width="1"><rect x="200" y="380" width="22" height="16" transform="rotate(20 211 388)"/><rect x="250" y="430" width="22" height="16" transform="rotate(-14 261 438)"/><rect x="300" y="370" width="22" height="16" transform="rotate(8 311 378)"/></g>
+          <rect class="blackout" x="0" y="22" width="360" height="458" fill="#14000a" opacity=".5"/>
+        </g>
+
+        <!-- ===== L: SERVIDORES ===== -->
+        <g id="v-L" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pConcrete)"/>
+          <rect x="18" y="112" width="74" height="124" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+          <rect x="26" y="122" width="58" height="104" fill="#5c6670"/>
+          <path d="M48 102 l8 -14 l-2 10 h8 l-10 14 l2 -10z" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/>
+          <g stroke="#0c0414" stroke-width="1.5"><rect x="32" y="130" width="18" height="12" fill="#c9ccd6"/><rect x="58" y="130" width="18" height="12" fill="#c9ccd6"/><rect x="32" y="150" width="18" height="12" fill="#c9ccd6"/><rect id="fuseSlot" x="58" y="150" width="18" height="12" fill="#0c0414"/><rect x="32" y="170" width="18" height="12" fill="#c9ccd6"/><rect x="58" y="170" width="18" height="12" fill="#c9ccd6"/></g>
+          <path d="M62 150 q4 -6 10 -2" stroke="#3a2a4f" stroke-width="2" fill="none"/>
+          <path d="M40 196 h36 M40 206 h28" stroke="#3d4a5c" stroke-width="3"/>
+          <g>
+            <rect x="104" y="48" width="52" height="284" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+            <rect x="158" y="48" width="52" height="284" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+            <rect x="212" y="48" width="52" height="284" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+            <g fill="#2a2531"><rect x="110" y="60" width="40" height="14"/><rect x="110" y="80" width="40" height="14"/><rect x="110" y="100" width="40" height="14"/><rect x="110" y="120" width="40" height="14"/><rect x="110" y="140" width="40" height="14"/><rect x="110" y="160" width="40" height="14"/><rect x="110" y="180" width="40" height="14"/>
+              <rect x="164" y="60" width="40" height="14"/><rect x="164" y="80" width="40" height="14"/><rect x="164" y="100" width="40" height="14"/><rect x="164" y="120" width="40" height="14"/><rect x="164" y="140" width="40" height="14"/><rect x="164" y="160" width="40" height="14"/><rect x="164" y="180" width="40" height="14"/>
+              <rect x="218" y="60" width="40" height="14"/><rect x="218" y="80" width="40" height="14"/><rect x="218" y="100" width="40" height="14"/><rect x="218" y="120" width="40" height="14"/><rect x="218" y="140" width="40" height="14"/><rect x="218" y="160" width="40" height="14"/><rect x="218" y="180" width="40" height="14"/></g>
+            <text x="184" y="44" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="12" fill="#ab93cc">HALDEN-BKP</text>
+          </g>
+          <g class="powerOn" style="display:none">
+            <g fill="#3dff8b"><circle cx="144" cy="67" r="2" class="twinkle"/><circle cx="144" cy="87" r="2" class="twinkle b"/><circle cx="144" cy="107" r="2"/><circle cx="144" cy="127" r="2" class="twinkle"/><circle cx="198" cy="67" r="2" class="twinkle b"/><circle cx="198" cy="107" r="2" class="twinkle"/><circle cx="198" cy="147" r="2"/><circle cx="252" cy="87" r="2" class="twinkle"/><circle cx="252" cy="127" r="2" class="twinkle b"/><circle cx="252" cy="167" r="2"/></g>
+            <g fill="#ffd23f"><circle cx="138" cy="147" r="2" class="twinkle b"/><circle cx="192" cy="87" r="2" class="twinkle"/><circle cx="246" cy="147" r="2" class="twinkle"/></g>
+          </g>
+          <rect x="136" y="210" width="102" height="64" rx="3" fill="#2a2531" stroke="#0c0414" stroke-width="3"/>
+          <rect x="142" y="216" width="90" height="50" fill="#0c0414"/>
+          <g id="monOn" style="display:none">
+            <rect x="142" y="216" width="90" height="50" fill="#1a5fb4"/>
+            <rect x="142" y="216" width="90" height="10" fill="#e0102f"/>
+            <g font-family="VT323,K47 VT,monospace" fill="#fff"><text x="146" y="224" font-size="9">LEMBRETE</text><text x="146" y="240" font-size="11">AUDITORIA</text><text x="146" y="252" font-size="11">EXTERNA</text><text x="190" y="262" font-size="14" fill="#ffd23f">15/03</text></g>
+          </g>
+          <rect x="176" y="274" width="22" height="20" fill="#3a2a4f"/><rect x="150" y="294" width="74" height="38" fill="#5c6670" stroke="#0c0414" stroke-width="2"/>
+          <g>
+            <path d="M294 130 q-4 -26 20 -26 q24 0 20 26 l-4 50 h-32z" fill="#2de2e6" opacity=".55" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M296 150 h36" stroke="#1aa7ad" stroke-width="2"/>
+            <rect x="290" y="180" width="48" height="152" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+            <rect x="298" y="198" width="32" height="24" fill="#c9ccd6" stroke="#0c0414" stroke-width="1.5"/>
+            <circle cx="306" cy="232" r="4" fill="#2d6bff"/><circle cx="322" cy="232" r="4" fill="#e0102f"/>
+            <g fill="#f7ecff" stroke="#0c0414" stroke-width="1"><path d="M342 210 h10 l-2 12 h-6z"/><path d="M342 224 h10 l-2 12 h-6z"/></g>
+          </g>
+          <path d="M0 330 H360 V480 H0z" fill="#2c3646"/>
+          <g class="floorlines"></g>
+          <path d="M130 332 q-20 50 40 80 q50 20 0 68 M220 332 q30 40 0 80" stroke="#0c0414" stroke-width="5" fill="none" opacity=".6"/>
+          <path d="M228 332 q20 50 -20 100" stroke="#2d6bff" stroke-width="3" fill="none" opacity=".7"/>
+          <rect class="blackout" x="0" y="22" width="360" height="458" fill="#14000a" opacity=".5"/>
+        </g>
+
+        <!-- ===== S: PORTA CORTA-FOGO ===== -->
+        <g id="v-S" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pConcrete)"/>
+          <rect x="130" y="26" width="100" height="24" fill="#0c1f14" stroke="#0c0414" stroke-width="2"/>
+          <text id="exitTxt" x="180" y="44" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="18" fill="#1f4a30">SAÍDA ▲</text>
+          <rect x="100" y="56" width="166" height="276" fill="#0c0414"/>
+          <rect x="108" y="64" width="150" height="268" fill="#b3001f" stroke="#0c0414" stroke-width="3"/>
+          <rect x="108" y="64" width="40" height="268" fill="#fff" opacity=".06"/>
+          <rect x="152" y="84" width="62" height="54" fill="#9fd9e6" opacity=".55" stroke="#0c0414" stroke-width="3"/>
+          <rect x="152" y="84" width="62" height="54" fill="url(#pMesh)"/>
+          <rect x="118" y="206" width="130" height="14" rx="4" fill="#c9ccd6" stroke="#0c0414" stroke-width="2.5"/>
+          <g font-family="VT323,K47 VT,monospace" font-size="11" fill="#f7ecff" text-anchor="middle"><text x="183" y="164">PORTA CORTA-FOGO</text><text x="183" y="178">MANTENHA FECHADA</text></g>
+          <rect x="270" y="168" width="44" height="76" rx="3" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <circle id="ledPower" cx="282" cy="180" r="4" fill="#e0102f" filter="url(#fGlow)"/>
+          <circle id="ledCode" cx="302" cy="180" r="4" fill="#3a2a4f" filter="url(#fGlow)"/>
+          <g fill="#3a2a4f"><rect x="276" y="192" width="9" height="8"/><rect x="288" y="192" width="9" height="8"/><rect x="300" y="192" width="9" height="8"/><rect x="276" y="204" width="9" height="8"/><rect x="288" y="204" width="9" height="8"/><rect x="300" y="204" width="9" height="8"/><rect x="276" y="216" width="9" height="8"/><rect x="288" y="216" width="9" height="8"/><rect x="300" y="216" width="9" height="8"/><rect x="288" y="228" width="9" height="8"/></g>
+          <rect x="16" y="50" width="76" height="86" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M24 64 h60 v50 h-60z M24 90 h30 M54 64 v50" stroke="#2d6bff" stroke-width="2" fill="none"/>
+          <path d="M60 104 l14 -20" stroke="#3dff8b" stroke-width="3"/><path d="M70 82 l4 2 l-1 4" stroke="#3dff8b" stroke-width="2" fill="none"/>
+          <circle cx="38" cy="104" r="4" fill="#e0102f" class="twinkle"/>
+          <text x="54" y="128" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="10" fill="#0c0414">VOCÊ ESTÁ AQUI</text>
+          <rect x="26" y="150" width="54" height="84" rx="4" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+          <g fill="#3d4a5c"><rect x="34" y="160" width="38" height="3"/><rect x="34" y="166" width="38" height="3"/><rect x="34" y="172" width="38" height="3"/><rect x="34" y="178" width="38" height="3"/></g>
+          <rect x="40" y="196" width="26" height="16" rx="3" fill="#c4001d" stroke="#0c0414" stroke-width="2"/>
+          <circle class="powerOn" style="display:none" cx="53" cy="222" r="3" fill="#3dff8b"/>
+          <path d="M0 330 H360 V480 H0z" fill="#2c3646"/>
+          <g class="floorlines"></g>
+          <rect x="100" y="332" width="166" height="12" fill="url(#pCheck)"/>
+          <g class="powerOn" style="display:none"><rect x="130" y="26" width="100" height="24" fill="#3dff8b" opacity=".18" filter="url(#fGlow)"/></g>
+          <rect class="blackout" x="0" y="22" width="360" height="458" fill="#14000a" opacity=".5"/>
+        </g>
+
+        <!-- ===== O: MESA DO NOGUEIRA ===== -->
+        <g id="v-O" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pConcrete)"/>
+          <rect x="20" y="48" width="96" height="70" fill="#ffd23f" stroke="#0c0414" stroke-width="2.5" transform="rotate(-3 68 83)"/>
+          <g font-family="VT323,K47 VT,monospace" font-size="12" fill="#0c0414" text-anchor="middle" transform="rotate(-3 68 83)"><text x="68" y="68">HALDEN</text><text x="68" y="84">SEGURANÇA</text><text x="68" y="100">EM 1º LUGAR</text></g>
+          <rect x="60" y="214" width="214" height="14" fill="#5c6670" stroke="#0c0414" stroke-width="3"/>
+          <rect x="70" y="228" width="194" height="102" fill="#7a8494" stroke="#0c0414" stroke-width="3"/>
+          <path d="M70 262 H264 M70 296 H264 M167 228 V330" stroke="#0c0414" stroke-width="2.5"/>
+          <g fill="#2c3646"><rect x="110" y="242" width="20" height="5"/><rect x="110" y="276" width="20" height="5"/><rect x="206" y="242" width="20" height="5"/><rect x="206" y="276" width="20" height="5"/></g>
+          <path d="M108 214 l4 -60 h66 l4 60z" fill="#e8dcc0" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="120" y="164" width="50" height="38" fill="#2a3a2a" stroke="#0c0414" stroke-width="2"/>
+          <g class="powerOn" style="display:none"><rect x="120" y="164" width="50" height="38" fill="#3dff8b" opacity=".35"/><text x="124" y="180" font-family="VT323,K47 VT,monospace" font-size="10" fill="#3dff8b">C:\&gt;_</text></g>
+          <path d="M226 214 l6 -30 l20 -16" stroke="#3a2a4f" stroke-width="4" fill="none"/>
+          <path d="M244 160 l22 8 l-10 14z" fill="#3a2a4f" stroke="#0c0414" stroke-width="2"/>
+          <g opacity=".25"><ellipse cx="256" cy="180" rx="22" ry="12" fill="#ffd23f" class="flicker"/></g>
+          <g fill="#f7ecff" stroke="#0c0414" stroke-width="1.2"><rect x="190" y="204" width="32" height="10"/><rect x="192" y="198" width="30" height="6"/><rect x="194" y="192" width="28" height="6" transform="rotate(4 208 195)"/></g>
+          <rect x="284" y="214" width="62" height="116" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <rect x="290" y="236" width="50" height="88" fill="#bfefff" opacity=".2" stroke="#0c0414" stroke-width="2"/>
+          <path d="M294 246 l6 12 l-6 12 l6 12 l-6 12 l6 12 M306 250 l5 10 l-5 10 l5 10 l-5 10 l5 10 M318 244 l6 12 l-6 12 l6 12 l-6 12 l6 12 M330 252 l5 10 l-5 10 l5 10 l-5 10" stroke="#f7ecff" stroke-width="2" fill="none"/>
+          <rect x="290" y="218" width="50" height="6" fill="#0c0414"/>
+          <circle cx="336" cy="228" r="2.5" fill="#e0102f" class="twinkle"/>
+          <g id="stripsWall" style="display:none" transform="rotate(3 314 145)">
+            <rect x="288" y="108" width="54" height="72" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+            <path d="M298 108 V180 M308 108 V180 M318 108 V180 M328 108 V180" stroke="#c9ccd6" stroke-width="1"/>
+            <rect x="284" y="104" width="62" height="8" fill="#ffd23f" opacity=".7"/><rect x="284" y="176" width="62" height="8" fill="#ffd23f" opacity=".7"/>
+            <g font-family="VT323,K47 VT,monospace" text-anchor="middle"><text x="315" y="128" font-size="9" fill="#0c0414">AUDITORIA</text><text x="315" y="138" font-size="9" fill="#0c0414">EXTERNA</text><text x="315" y="162" font-size="18" fill="#e0102f">15/03</text></g>
+          </g>
+          <path d="M0 330 H360 V480 H0z" fill="#2c3646"/>
+          <g class="floorlines"></g>
+          <g id="nogLie">
+            <ellipse cx="130" cy="420" rx="118" ry="12" fill="#0c0414" opacity=".3"/>
+            <path d="M24 396 l10 -8 l12 4 l-4 16 l-16 2z" fill="#1b1622" stroke="#0c0414" stroke-width="2"/>
+            <rect x="40" y="390" width="78" height="22" rx="8" fill="#2a2a3a" stroke="#0c0414" stroke-width="2.5"/>
+            <rect x="114" y="384" width="86" height="32" rx="12" fill="#9aa0ad" stroke="#0c0414" stroke-width="2.5"/>
+            <rect x="112" y="390" width="8" height="22" fill="#3a1f14"/>
+            <g id="keyringArt"><circle cx="118" cy="414" r="6" fill="none" stroke="#ffd23f" stroke-width="2.5"/><path d="M114 418 l-4 10 M120 420 l2 10 M124 416 l6 8" stroke="#c9ccd6" stroke-width="3"/></g>
+            <circle cx="216" cy="398" r="16" fill="#c98b6b" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M206 388 q10 -8 22 0" stroke="#c9ccd6" stroke-width="5" fill="none"/>
+            <path d="M210 400 l4 0 M220 400 l4 0" stroke="#0c0414" stroke-width="2"/>
+            <circle cx="244" cy="402" r="3" fill="#bfefff"/><circle cx="250" cy="396" r="2" fill="#bfefff"/>
+          </g>
+          <g id="nogSit" style="display:none">
+            <rect x="40" y="350" width="44" height="70" rx="10" fill="#9aa0ad" stroke="#0c0414" stroke-width="2.5"/>
+            <circle cx="62" cy="336" r="16" fill="#c98b6b" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M52 326 q10 -8 22 0" stroke="#c9ccd6" stroke-width="5" fill="none"/>
+            <path d="M84 404 h70 l6 18 h-76z" fill="#2a2a3a" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M56 340 q6 4 12 0" stroke="#0c0414" stroke-width="2" fill="none"/>
+          </g>
+          <rect class="blackout" x="0" y="22" width="360" height="458" fill="#14000a" opacity=".5"/>
+          <circle cx="256" cy="186" r="40" fill="#ffd23f" opacity=".1"/>
+        </g>
+
+        <!-- ===== G: GAIOLA ===== -->
+        <g id="v-G" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="#1b1622"/>
+          <rect x="0" y="0" width="360" height="330" fill="url(#pMesh)" opacity=".35"/>
+          <path d="M180 22 V44" stroke="#0c0414" stroke-width="2"/>
+          <circle cx="180" cy="52" r="9" fill="#ffd23f" class="flicker" filter="url(#fGlow)"/>
+          <g opacity=".07"><ellipse cx="180" cy="220" rx="190" ry="170" fill="#ffd23f" class="flicker"/></g>
+          <rect x="10" y="60" width="174" height="272" fill="#5c6670" stroke="#0c0414" stroke-width="3"/>
+          <g fill="#3b3346"><rect x="10" y="140" width="174" height="6"/><rect x="10" y="256" width="174" height="6"/></g>
+          <rect x="16" y="88" width="160" height="52" fill="url(#pBoxes)"/>
+          <rect x="16" y="262" width="160" height="64" fill="url(#pBoxes)"/>
+          <rect x="28" y="166" width="132" height="90" fill="#c4001d" stroke="#0c0414" stroke-width="3"/>
+          <g id="romeroLid"><rect x="22" y="156" width="144" height="18" fill="#a10f35" stroke="#0c0414" stroke-width="3"/></g>
+          <g font-family="VT323,K47 VT,monospace" fill="#f7ecff" text-anchor="middle"><text x="94" y="204" font-size="22">ROMERO</text><text x="94" y="222" font-size="13">CONFIDENCIAL</text><text x="94" y="242" font-size="13" fill="#ffd23f">TRITURAR</text></g>
+          <g id="pastaArt" style="display:none"><path d="M60 150 h30 l6 -6 h40 v26 h-76z" fill="#ffd23f" stroke="#0c0414" stroke-width="2" transform="rotate(-8 98 158)"/><rect x="70" y="144" width="40" height="5" fill="#f7ecff" transform="rotate(-8 98 158)"/></g>
+          <rect x="198" y="186" width="150" height="114" fill="#7a8494" stroke="#0c0414" stroke-width="3"/>
+          <g fill="#5c6670" stroke="#0c0414" stroke-width="1.5"><rect x="206" y="196" width="40" height="20"/><rect x="252" y="196" width="40" height="20"/><rect x="298" y="196" width="40" height="20"/><rect x="206" y="222" width="40" height="20"/><rect x="252" y="222" width="40" height="20"/><rect x="298" y="222" width="40" height="20"/><rect x="206" y="248" width="40" height="20"/><rect x="252" y="248" width="40" height="20"/><rect x="298" y="248" width="40" height="20"/><rect x="206" y="274" width="40" height="20"/><rect x="252" y="274" width="40" height="20"/><rect x="298" y="274" width="40" height="20"/></g>
+          <g font-family="VT323,K47 VT,monospace" font-size="9" fill="#ffd23f"><text x="208" y="210">ELÉTRICA</text><text x="254" y="210">HIDRÁUL.</text><text x="300" y="210">DIVERSOS</text></g>
+          <path d="M0 330 H360 V480 H0z" fill="#232b38"/>
+          <g class="floorlines"></g>
+          <g>
+            <ellipse cx="282" cy="438" rx="44" ry="8" fill="#0c0414" opacity=".4"/>
+            <path d="M252 436 q-12 -50 12 -70 v-20 h36 v20 q24 20 12 70z" fill="#2f8f4e" opacity=".85" stroke="#0c0414" stroke-width="3"/>
+            <path d="M258 380 q24 14 48 0 M254 404 q28 14 56 0" stroke="#c8a46a" stroke-width="5" fill="none"/>
+            <rect x="268" y="334" width="28" height="12" fill="#c8a46a" stroke="#0c0414" stroke-width="2"/>
+          </g>
+          <rect class="blackout" x="0" y="22" width="360" height="458" fill="#14000a" opacity=".3"/>
+        </g>
+</svg></template>
+
+<template id="art-lancha"><svg xmlns="http://www.w3.org/2000/svg">
+        <!-- ===== N: PROA ===== -->
+        <g id="v-N" class="view">
+          <rect x="0" y="0" width="360" height="192" fill="url(#gDawn)"/>
+          <circle cx="252" cy="178" r="44" fill="#ffd23f" opacity=".25"/>
+          <circle cx="252" cy="180" r="30" fill="#ffd23f"/>
+          <g fill="#2a0b45" opacity=".85"><rect x="20" y="160" width="14" height="30"/><rect x="36" y="150" width="10" height="40"/><rect x="48" y="166" width="20" height="24"/><rect x="70" y="156" width="12" height="34"/><rect x="84" y="170" width="24" height="20"/><rect x="110" y="162" width="10" height="28"/></g>
+          <g fill="#ffd23f" opacity=".8"><rect x="38" y="158" width="3" height="3"/><rect x="72" y="164" width="3" height="3"/><rect x="24" y="170" width="3" height="3"/></g>
+          <g id="capitania" style="display:none"><path d="M140 182 h36 l-6 8 h-26z" fill="#9aa0ad"/><rect x="150" y="174" width="12" height="8" fill="#9aa0ad"/><rect class="siren" x="152" y="170" width="4" height="4" fill="#2d6bff"/><rect class="siren b" x="157" y="170" width="4" height="4" fill="#e0102f"/></g>
+          <rect x="0" y="190" width="360" height="290" fill="url(#gSea)"/>
+          <g fill="#ffd23f" opacity=".55"><rect x="232" y="196" width="40" height="3"/><rect x="238" y="206" width="28" height="3"/><rect x="226" y="218" width="52" height="3"/><rect x="242" y="232" width="22" height="3"/></g>
+          <g class="wave" stroke="#bfefff" stroke-width="2" fill="none" opacity=".45"><path d="M0 214 q15 -6 30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0"/><path d="M-20 250 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0"/><path d="M0 300 q25 -10 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0"/></g>
+          <g id="trashSea" style="display:none" stroke="#0c0414" stroke-width="1.5"><rect x="60" y="236" width="14" height="6" fill="#2f8f4e" transform="rotate(20 67 239)"/><rect x="120" y="262" width="14" height="6" fill="#c58b4e" transform="rotate(-30 127 265)"/><circle cx="300" cy="250" r="4" fill="#f7ecff"/><rect x="30" y="280" width="5" height="5" fill="#ff2e88"/></g>
+          <g class="bob">
+            <path d="M180 226 L352 480 H8 Z" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+            <path d="M180 248 L322 480 H38 Z" fill="url(#pTeak)" stroke="#0c0414" stroke-width="2"/>
+            <path d="M180 248 L322 480 H38 Z" fill="#ffd23f" opacity=".08"/>
+            <path d="M180 214 L18 440 M180 214 L342 440" stroke="#c9ccd6" stroke-width="4" fill="none"/>
+            <path d="M144 264 v14 M108 314 v16 M72 364 v18 M216 264 v14 M252 314 v16 M288 364 v18" stroke="#c9ccd6" stroke-width="3"/>
+            <rect x="166" y="262" width="28" height="10" rx="3" fill="#9aa0ad" stroke="#0c0414" stroke-width="2"/>
+            <path d="M180 272 q-10 30 6 60" stroke="#c8a46a" stroke-width="4" fill="none"/>
+            <text x="180" y="470" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="16" fill="#3a1f14">HALDEN II</text>
+            <g id="boiaArt">
+              <circle cx="85" cy="319" r="20" fill="none" stroke="#0c0414" stroke-width="16"/>
+              <circle cx="85" cy="319" r="20" fill="none" stroke="#ff8a3d" stroke-width="11"/>
+              <circle cx="85" cy="319" r="20" fill="none" stroke="#f7ecff" stroke-width="11" stroke-dasharray="15.7 15.7"/>
+              <path d="M70 330 q-10 20 6 36" stroke="#c8a46a" stroke-width="3" fill="none"/>
+            </g>
+            <g id="trashArt" stroke="#0c0414" stroke-width="2">
+              <rect x="206" y="392" width="40" height="11" rx="4" fill="#2f8f4e" transform="rotate(-24 226 397)"/>
+              <rect x="226" y="408" width="36" height="10" rx="4" fill="#c58b4e" transform="rotate(16 244 413)"/>
+              <path d="M250 370 l20 0 l-4 30 h-12z" fill="#c9ccd6"/>
+              <rect x="196" y="420" width="10" height="16" fill="#f7ecff" transform="rotate(30 201 428)"/>
+              <g stroke="none"><rect x="212" y="380" width="5" height="5" fill="#ff2e88"/><rect x="268" y="410" width="5" height="5" fill="#2de2e6"/><rect x="230" y="436" width="5" height="5" fill="#ffd23f"/></g>
+            </g>
+          </g>
+        </g>
+
+        <!-- ===== L: PAINEL ===== -->
+        <g id="v-L" class="view">
+          <rect x="0" y="22" width="360" height="110" fill="url(#gDawn)"/>
+          <rect x="0" y="130" width="360" height="80" fill="url(#gSea)"/>
+          <g class="wave" stroke="#bfefff" stroke-width="2" fill="none" opacity=".45"><path d="M0 150 q15 -6 30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0"/><path d="M-10 180 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0"/></g>
+          <path d="M0 22 H360 V54 L320 40 H40 L0 54z" fill="#1b1622"/>
+          <path d="M0 54 L40 40 V200 H0z M360 54 L320 40 V200 H360z" fill="#1b1622"/>
+          <path d="M120 40 V200 M240 40 V200" stroke="#1b1622" stroke-width="8"/>
+          <path d="M60 60 l40 60 M260 60 l30 44" stroke="#fff" stroke-width="3" opacity=".25"/>
+          <path d="M0 196 H360 V330 H0z" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+          <rect x="94" y="206" width="172" height="118" rx="10" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <circle cx="130" cy="240" r="20" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M116 246 a16 16 0 0 1 28 0" stroke="#e0102f" stroke-width="3" fill="none" stroke-dasharray="4 3"/>
+          <text x="130" y="254" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="9" fill="#0c0414">COMB.</text>
+          <path id="fuelNeedle" d="M130 240 V224" stroke="#e0102f" stroke-width="3" stroke-linecap="round" transform="rotate(-55 130 240)"/>
+          <circle cx="130" cy="240" r="3" fill="#0c0414"/>
+          <circle cx="230" cy="240" r="20" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M230 240 l-10 -8" stroke="#0c0414" stroke-width="3" stroke-linecap="round"/>
+          <text x="230" y="254" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="9" fill="#0c0414">RPM</text>
+          <circle id="ledKey" cx="164" cy="222" r="4" fill="#e0102f" filter="url(#fGlow)"/>
+          <circle id="ledCode" cx="180" cy="222" r="4" fill="#e0102f" filter="url(#fGlow)"/>
+          <circle id="ledFuel" cx="196" cy="222" r="4" fill="#e0102f" filter="url(#fGlow)"/>
+          <circle cx="180" cy="290" r="44" fill="none" stroke="#0c0414" stroke-width="12"/>
+          <circle cx="180" cy="290" r="44" fill="none" stroke="#3a1f14" stroke-width="7"/>
+          <path d="M180 290 L180 248 M180 290 L142 310 M180 290 L218 310" stroke="#3a1f14" stroke-width="6"/>
+          <circle cx="180" cy="290" r="9" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/>
+          <circle cx="112" cy="296" r="9" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/><rect x="110" y="290" width="4" height="10" fill="#0c0414"/>
+          <g id="ignKey" style="display:none"><rect x="108" y="270" width="8" height="20" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/><circle cx="112" cy="266" r="7" fill="#c8a46a" stroke="#0c0414" stroke-width="1.5"/></g>
+          <rect x="232" y="276" width="28" height="36" rx="2" fill="#2a2531" stroke="#0c0414" stroke-width="1.5"/>
+          <g fill="#5c5566"><rect x="236" y="280" width="6" height="5"/><rect x="243" y="280" width="6" height="5"/><rect x="250" y="280" width="6" height="5"/><rect x="236" y="288" width="6" height="5"/><rect x="243" y="288" width="6" height="5"/><rect x="250" y="288" width="6" height="5"/><rect x="236" y="296" width="6" height="5"/><rect x="243" y="296" width="6" height="5"/><rect x="250" y="296" width="6" height="5"/><rect x="243" y="304" width="6" height="5"/></g>
+          <rect x="12" y="208" width="76" height="62" rx="4" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <rect x="20" y="216" width="40" height="18" fill="#06210f"/>
+          <text x="40" y="230" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#3dff8b">CH 16</text>
+          <circle cx="72" cy="226" r="6" fill="#5c5566" stroke="#0c0414" stroke-width="1.5"/><circle cx="72" cy="250" r="6" fill="#5c5566" stroke="#0c0414" stroke-width="1.5"/>
+          <rect x="22" y="242" width="28" height="20" rx="4" fill="#2a2531" stroke="#0c0414" stroke-width="1.5"/>
+          <path d="M36 262 q-10 20 6 30 q14 8 0 22" stroke="#0c0414" stroke-width="2" fill="none"/>
+          <rect x="274" y="204" width="78" height="66" rx="4" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <rect x="280" y="210" width="66" height="54" fill="#1a5fb4"/>
+          <path d="M280 210 h30 q10 20 -6 30 q-14 8 -24 24z" fill="#2f8f4e"/>
+          <path d="M296 238 l20 6 l14 10" stroke="#ffd23f" stroke-width="2" stroke-dasharray="3 2" fill="none"/>
+          <circle cx="330" cy="254" r="3" fill="#ff2e88" class="twinkle"/>
+          <g id="gpsAlert"><rect x="280" y="252" width="66" height="12" fill="#e0102f" class="twinkle"/><text x="313" y="261" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="10" fill="#fff">COMB 0%</text></g>
+          <path d="M300 300 l16 -26" stroke="#0c0414" stroke-width="6" stroke-linecap="round"/><circle cx="318" cy="272" r="7" fill="#e0102f" stroke="#0c0414" stroke-width="2"/>
+          <path d="M0 330 H360 V480 H0z" fill="url(#pTeak)"/>
+          <rect x="0" y="330" width="360" height="150" fill="#0c0414" opacity=".15"/>
+        </g>
+
+        <!-- ===== S: POPA ===== -->
+        <g id="v-S" class="view">
+          <rect x="0" y="0" width="360" height="170" fill="url(#gDawn)"/>
+          <rect x="0" y="0" width="360" height="170" fill="#2a0b45" opacity=".35"/>
+          <rect x="0" y="168" width="360" height="312" fill="url(#gSea)"/>
+          <g class="wave" stroke="#bfefff" stroke-width="2" fill="none" opacity=".45"><path d="M0 190 q15 -6 30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0"/><path d="M-20 215 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0"/></g>
+          <g id="valdirWater">
+            <circle cx="312" cy="208" r="14" fill="#8a5a3a" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M300 200 q12 -10 24 0" stroke="#1b0d08" stroke-width="5" fill="none"/>
+            <path d="M306 210 l3 0 M316 210 l3 0" stroke="#0c0414" stroke-width="2"/>
+            <ellipse cx="312" cy="219" rx="5" ry="3" fill="#0c0414"/>
+            <path d="M296 214 l-6 20 M328 214 l4 18" stroke="#8a5a3a" stroke-width="7" stroke-linecap="round"/>
+            <ellipse cx="312" cy="226" rx="28" ry="5" fill="#bfefff" opacity=".6"/>
+          </g>
+          <g id="ringFloat" style="display:none">
+            <circle cx="286" cy="226" r="14" fill="none" stroke="#0c0414" stroke-width="12"/>
+            <circle cx="286" cy="226" r="14" fill="none" stroke="#ff8a3d" stroke-width="8"/>
+            <circle cx="286" cy="226" r="14" fill="none" stroke="#f7ecff" stroke-width="8" stroke-dasharray="11 11"/>
+          </g>
+          <g class="bob">
+            <rect x="12" y="234" width="336" height="66" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+            <path d="M12 246 H348" stroke="#2de2e6" stroke-width="4"/>
+            <text x="70" y="286" font-family="VT323,K47 VT,monospace" font-size="18" fill="#1b2a6e">HALDEN II · RJ</text>
+            <g stroke="#0c0414" stroke-width="2.5">
+              <rect x="118" y="150" width="48" height="74" rx="10" fill="#1b1622"/>
+              <rect x="192" y="150" width="48" height="74" rx="10" fill="#1b1622"/>
+              <rect x="124" y="224" width="36" height="16" fill="#5c5566"/><rect x="198" y="224" width="36" height="16" fill="#5c5566"/>
+            </g>
+            <g font-family="VT323,K47 VT,monospace" font-size="11" fill="#2de2e6"><text x="124" y="176">HALDEN</text><text x="198" y="176">HALDEN</text></g>
+            <path d="M120 164 h44 M194 164 h44" stroke="#3a2a4f" stroke-width="3"/>
+            <circle cx="178" cy="262" r="10" fill="#c9ccd6" stroke="#0c0414" stroke-width="2.5"/>
+            <text x="178" y="266" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="9" fill="#0c0414">GAS</text>
+            <path d="M302 236 V160 M326 236 V160 M302 180 h24 M302 204 h24" stroke="#c9ccd6" stroke-width="5"/>
+            <path d="M12 300 H348 V480 H12z" fill="url(#pTeak)" stroke="#0c0414" stroke-width="3"/>
+            <rect x="12" y="300" width="336" height="16" fill="#0c0414" opacity=".25"/>
+            <g>
+              <rect x="22" y="330" width="86" height="58" rx="6" fill="#2de2e6" stroke="#0c0414" stroke-width="3"/>
+              <rect x="22" y="330" width="86" height="16" rx="6" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+              <rect x="54" y="322" width="22" height="8" rx="3" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/>
+              <text x="65" y="372" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="12" fill="#0c0414">ICE</text>
+            </g>
+            <g id="valdirDeck" style="display:none">
+              <ellipse cx="300" cy="420" rx="46" ry="10" fill="#0c0414" opacity=".3"/>
+              <path d="M276 412 q-6 -40 24 -50 q30 10 24 50z" fill="#1b1622" stroke="#0c0414" stroke-width="2.5"/>
+              <circle cx="300" cy="350" r="15" fill="#8a5a3a" stroke="#0c0414" stroke-width="2.5"/>
+              <path d="M288 342 q12 -10 24 0" stroke="#1b0d08" stroke-width="5" fill="none"/>
+              <path d="M260 414 h40 M300 414 h40" stroke="#2a2a3a" stroke-width="10" stroke-linecap="round"/>
+              <g fill="#bfefff"><circle cx="276" cy="380" r="2"/><circle cx="326" cy="372" r="2"/><circle cx="290" cy="430" r="2.5"/></g>
+            </g>
+            <g id="valdirBlanket" style="display:none">
+              <path d="M270 414 q-8 -46 30 -56 q38 10 30 56z" fill="#ff2e88" stroke="#0c0414" stroke-width="2.5"/>
+              <path d="M276 380 h48 M274 396 h52" stroke="#f7ecff" stroke-width="3"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- ===== O: CABINE ===== -->
+        <g id="v-O" class="view">
+          <rect x="0" y="0" width="360" height="330" fill="url(#pWood)"/>
+          <rect x="0" y="22" width="360" height="14" fill="#3a1f0c"/>
+          <g>
+            <circle cx="180" cy="80" r="26" fill="url(#gSea)" stroke="#c9ccd6" stroke-width="6"/>
+            <path d="M156 82 q12 -6 24 0 t24 0" stroke="#bfefff" stroke-width="2" fill="none"/>
+            <circle cx="300" cy="80" r="26" fill="url(#gDawn)" stroke="#c9ccd6" stroke-width="6"/>
+            <circle cx="180" cy="80" r="26" fill="none" stroke="#0c0414" stroke-width="2"/><circle cx="300" cy="80" r="26" fill="none" stroke="#0c0414" stroke-width="2"/>
+          </g>
+          <rect x="26" y="54" width="74" height="86" fill="#ffd23f" stroke="#0c0414" stroke-width="3"/>
+          <rect x="33" y="61" width="60" height="62" fill="#2de2e6"/>
+          <rect x="33" y="100" width="60" height="23" fill="#1a5fb4"/>
+          <circle cx="52" cy="84" r="8" fill="#c98b6b" stroke="#0c0414" stroke-width="1.5"/><path d="M42 80 h20 l-2 -5 h-16z" fill="#1b1622"/>
+          <path d="M44 92 h16 v14 h-16z" fill="#f7ecff"/>
+          <circle cx="74" cy="92" r="6" fill="#c98b6b" stroke="#0c0414" stroke-width="1.5"/><path d="M68 88 q6 -8 12 0" stroke="#5a2a16" stroke-width="4" fill="none"/>
+          <rect x="68" y="98" width="12" height="10" fill="#ff2e88"/>
+          <text x="63" y="135" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="11" fill="#0c0414">BIA ♥</text>
+          <circle cx="240" cy="160" r="8" fill="#ffd23f" class="tvglow" filter="url(#fGlow)"/><path d="M240 140 v12" stroke="#0c0414" stroke-width="3"/>
+          <rect x="110" y="258" width="164" height="10" fill="#3a1f14" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M190 268 v62" stroke="#3a1f14" stroke-width="10"/>
+          <g id="caseShut">
+            <rect x="128" y="220" width="104" height="38" rx="4" fill="#5a2a16" stroke="#0c0414" stroke-width="3"/>
+            <path d="M160 220 v-8 h40 v8" stroke="#0c0414" stroke-width="3" fill="none"/>
+            <rect x="142" y="230" width="10" height="7" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/><rect x="208" y="230" width="10" height="7" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/>
+          </g>
+          <g id="caseOpen" style="display:none">
+            <path d="M128 222 l12 -36 h80 l12 36z" fill="#3a1f0c" stroke="#0c0414" stroke-width="3"/>
+            <rect x="128" y="222" width="104" height="36" rx="4" fill="#5a2a16" stroke="#0c0414" stroke-width="3"/>
+            <rect x="136" y="226" width="88" height="26" fill="#1b1622"/>
+            <g id="cashArt" stroke="#0c0414" stroke-width="1.5"><rect x="140" y="230" width="26" height="12" fill="#3dff8b"/><rect x="168" y="232" width="26" height="12" fill="#3dff8b"/><rect x="152" y="238" width="26" height="12" fill="#3dff8b"/></g>
+            <rect x="198" y="230" width="22" height="18" fill="#f7ecff" stroke="#0c0414" stroke-width="1.5"/>
+          </g>
+          <rect x="274" y="148" width="82" height="16" fill="#5a2a16" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="274" y="236" width="82" height="16" fill="#5a2a16" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="278" y="164" width="78" height="20" rx="4" fill="#1b2a6e" stroke="#0c0414" stroke-width="2"/>
+          <rect x="278" y="252" width="78" height="24" rx="4" fill="#1b2a6e" stroke="#0c0414" stroke-width="2"/>
+          <rect x="274" y="276" width="82" height="54" fill="#5a2a16" stroke="#0c0414" stroke-width="2.5"/>
+          <g id="mantaArt"><rect x="288" y="232" width="56" height="20" rx="4" fill="#ff2e88" stroke="#0c0414" stroke-width="2"/><path d="M288 240 h56 M288 246 h56" stroke="#f7ecff" stroke-width="2"/></g>
+          <ellipse cx="300" cy="172" rx="16" ry="6" fill="#f7ecff" stroke="#0c0414" stroke-width="1.5"/>
+          <path d="M0 330 H360 V480 H0z" fill="url(#pTeak)"/>
+          <g class="floorlines" opacity=".5"></g>
+          <path d="M112 370 h136 l14 84 h-164z" fill="#9a6430" stroke="#0c0414" stroke-width="3"/>
+          <path d="M112 370 h136 l14 84 h-164z" fill="none" stroke="#3a1f0c" stroke-width="2" stroke-dasharray="6 4" transform="translate(0 0)"/>
+          <circle cx="180" cy="412" r="9" fill="none" stroke="#c9ccd6" stroke-width="4"/>
+          <text x="180" y="446" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#3a1f0c">PORÃO ▼</text>
+        </g>
+
+        <!-- ===== P: PORÃO ===== -->
+        <g id="v-P" class="view">
+          <rect x="0" y="0" width="360" height="480" fill="#14101c"/>
+          <path d="M0 70 H360 M0 96 H360" stroke="#3a2a4f" stroke-width="10"/>
+          <path d="M60 60 V140 M300 60 V130" stroke="#5c5566" stroke-width="8"/>
+          <path d="M180 22 V40" stroke="#0c0414" stroke-width="2"/>
+          <circle cx="180" cy="48" r="8" fill="#ffd23f" class="flicker" filter="url(#fGlow)"/>
+          <g opacity=".06"><ellipse cx="180" cy="260" rx="200" ry="200" fill="#ffd23f" class="flicker"/></g>
+          <rect x="128" y="150" width="104" height="140" rx="8" fill="#5c5566" stroke="#0c0414" stroke-width="3"/>
+          <rect x="140" y="164" width="80" height="40" fill="#3a2a4f"/>
+          <g fill="#9aa0ad"><circle cx="146" cy="220" r="5"/><circle cx="166" cy="220" r="5"/><circle cx="194" cy="220" r="5"/><circle cx="214" cy="220" r="5"/></g>
+          <path d="M150 290 v30 M210 290 v30" stroke="#3a2a4f" stroke-width="8"/>
+          <text x="180" y="190" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#ff8a3d">MOTOR</text>
+          <g id="galaoArt">
+            <path d="M36 262 h52 l16 16 v62 h-68z" fill="#e0102f" stroke="#0c0414" stroke-width="3"/>
+            <path d="M48 250 h28 v12 h-28z" fill="none" stroke="#0c0414" stroke-width="5"/>
+            <rect x="88" y="252" width="10" height="12" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/>
+            <path d="M46 280 l46 50 M92 280 l-46 50" stroke="#0c0414" stroke-width="2.5" opacity=".35"/>
+            <rect x="36" y="262" width="12" height="78" fill="#fff" opacity=".15"/>
+          </g>
+          <rect x="246" y="276" width="96" height="50" fill="#ff8a3d" stroke="#0c0414" stroke-width="3"/>
+          <path d="M246 290 h96" stroke="#0c0414" stroke-width="2"/>
+          <path d="M276 276 v-10 h36 v10" stroke="#0c0414" stroke-width="4" fill="none"/>
+          <rect x="288" y="284" width="12" height="8" fill="#c9ccd6" stroke="#0c0414" stroke-width="1.5"/>
+          <g id="toolsOpen" style="display:none"><path d="M246 276 l10 -26 h76 l10 26z" fill="#c25a1a" stroke="#0c0414" stroke-width="2.5"/><path d="M262 268 l24 -10 M300 266 l20 -8" stroke="#c9ccd6" stroke-width="4"/></g>
+          <rect id="bilge" x="0" y="368" width="360" height="112" fill="url(#gSea)" opacity=".8"/>
+          <g class="wave" stroke="#bfefff" stroke-width="2" fill="none" opacity=".4"><path d="M0 376 q15 -5 30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0"/></g>
+          <g id="phoneFloat"><rect x="170" y="384" width="18" height="30" rx="3" fill="#0c0414" transform="rotate(70 179 399)"/><rect x="172" y="388" width="14" height="20" fill="#b18cff" class="twinkle" transform="rotate(70 179 399)"/></g>
+          <g fill="#c9ccd6" opacity=".7"><rect x="60" y="430" width="16" height="4"/><rect x="250" y="450" width="20" height="4"/></g>
+        </g>
+</svg></template>
+
 <script>
 (() => {
 "use strict";
 const DUR = 300000, BRIEF_MAX = 45000;
 const $ = id => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
+// the scene's <defs> live in an always-rendered 0×0 svg so every copy of the art (lobby cards, heatmaps, polaroid) can use them
+(() => { const d=document.querySelector("#scene defs"), g=document.createElementNS(NS,"svg");
+  g.setAttribute("aria-hidden","true"); g.setAttribute("width","0"); g.setAttribute("height","0"); g.style.cssText="position:absolute;width:0;height:0;overflow:hidden";
+  g.append(d); document.body.prepend(g); })();
 const PALETTE = ["#ff2e88","#2de2e6","#ffd23f","#3dff8b","#b18cff","#ff8a3d"];
 const QUICK = ["Achei uma pista!","Vem pra cá","Qual a senha?","Deixa comigo","Não mexe nisso","Tá vivo?"];
 
@@ -912,9 +1722,13 @@ kitnet:{
   exit:{h:"porta",l:"SAIR",can:s=>s.keyUsed&&s.codeOk&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Abriu a porta"}
 },
   items:{
-  gelo:{n:"bloco de gelo",c:"#bfefff"}, chave:{n:"chave pequena",c:"#ffd23f"}, faca:{n:"faca suja",c:"#e0102f"},
-  carteira:{n:"carteira do Renato",c:"#c58b4e"}, remedio:{n:"remédio sem nome",c:"#3dff8b"}
+  gelo:{n:"bloco de gelo",c:"#bfefff",ic:"icekey",d:"Um bloco de gelo do tamanho de um tijolo. Tem algo de metal preso lá dentro."},
+  chave:{n:"chave pequena",c:"#ffd23f",ic:"key",d:"Chave pequena, dourada. Parece de tranca de porta."},
+  faca:{n:"faca suja",c:"#e0102f",ic:"knife",d:"Faca de cozinha com sangue seco na lâmina. Pesada o bastante pra quebrar coisas."},
+  carteira:{n:"carteira do Renato",c:"#c58b4e",ic:"wallet",d:"R$ 340, CNH de Renato M. e um cartão: “Ed. Alvorada — APTO 47”."},
+  remedio:{n:"remédio sem nome",c:"#3dff8b",ic:"pills",d:"Cartela de comprimidos sem rótulo. Pra dor de cabeça? Tomara."}
 },
+  locks:[{n:"Tranca",ok:s=>s.keyUsed},{n:"Senha",ok:s=>s.codeOk}],
   paint(S){
     $("steam").setAttribute("opacity",S.showerOn?"1":"0");
     $("fog").setAttribute("opacity",S.showerOn?".55":"0");
@@ -1010,7 +1824,12 @@ escritorio:{
     plaque:{h:"placa",l:"Ler a placa",can:s=>!s.plaque,run:s=>{s.plaque=true},msg:"HALDEN CORP · DESDE 1986.",key:"Achou o ano de fundação"},
     trophy:{h:"trofeu",l:"Pegar o troféu",can:s=>!s.trophyTaken,run:s=>{s.trophyTaken=true;s.inv.add("trofeu")},msg:"Pesado. A base está grudenta."}
   },
-  items:{ cracha:{n:"crachá",c:"#2de2e6"}, kit:{n:"kit de primeiros socorros",c:"#f7ecff"}, trofeu:{n:"troféu sujo",c:"#ffd23f"} },
+  items:{
+    cracha:{n:"crachá",c:"#2de2e6",ic:"badge",d:"Crachá da Halden. O leitor do elevador vai querer ver isso."},
+    kit:{n:"kit de primeiros socorros",c:"#f7ecff",ic:"medkit",d:"Gaze, esparadrapo e soro. Dá pra fazer um curativo decente."},
+    trofeu:{n:"troféu sujo",c:"#ffd23f",ic:"trophy",d:"“Melhor Equipe 2025”. A base está amassada e grudenta de sangue."}
+  },
+  locks:[{n:"Crachá",ok:s=>s.badged},{n:"Código",ok:s=>s.codeOk}],
   paint(S){
     $("ledKey").setAttribute("fill",S.badged?"#3dff8b":"#e0102f");
     $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
@@ -1096,9 +1915,14 @@ motel:{
     exit:{h:"portao",l:"ABRIR O PORTÃO",can:s=>s.paid&&s.remote&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Abriu o portão"}
   },
   items:{
-    dinheiro:{n:"R$ 380",c:"#3dff8b"}, bolsa:{n:"bolsa com R$ 50 mil",c:"#8a8a99"}, cartao:{n:"cartão do Paulo",c:"#2de2e6"},
-    celular:{n:"celular do Paulo",c:"#b18cff"}, carteira:{n:"sua carteira",c:"#c58b4e"}, controle:{n:"controle do portão",c:"#ffd23f"}
+    dinheiro:{n:"R$ 380",c:"#3dff8b",ic:"cash",d:"R$ 380 em notas de 100 e de 50. Exatamente o valor da suíte."},
+    bolsa:{n:"bolsa com R$ 50 mil",c:"#8a8a99",ic:"bag",d:"Bolsa de academia com uns R$ 50 mil. Dinheiro da Halden. Alguém vai vir buscar."},
+    cartao:{n:"cartão do Paulo",c:"#2de2e6",ic:"card",d:"Cartão corporativo da Halden, no nome do Paulo do financeiro."},
+    celular:{n:"celular do Paulo",c:"#b18cff",ic:"phone",d:"Celular do Paulo, desbloqueado. A galeria está cheia de fotos da festa."},
+    carteira:{n:"sua carteira",c:"#c58b4e",ic:"wallet",d:"Sua carteira. Documento, cartão e R$ 12."},
+    controle:{n:"controle do portão",c:"#ffd23f",ic:"remote",d:"Controle da garagem. Um botão verde gasto de tanto uso."}
   },
+  locks:[{n:"Conta",ok:s=>s.paid},{n:"Controle",ok:s=>s.remote}],
   paint(S){
     $("ledPaid").setAttribute("fill",S.paid?"#3dff8b":"#e0102f");
     $("ledRemote").setAttribute("fill",S.remote?"#3dff8b":"#e0102f");
@@ -1127,8 +1951,387 @@ motel:{
     return L;
   }
 },
-
+karaoke:{
+  id:"karaoke", isNew:true, name:"Karaokê Tóquio", short:"Sala VIP de um karaokê na Liberdade, a Júlia do RH apagada no sofá e a porta dos fundos acorrentada.",
+  pitch:"Você acorda no palco da sala VIP do Karaokê Tóquio, na Liberdade, abraçado num microfone. A Júlia do RH está apagada no sofá. A grade da frente está baixada; a porta dos fundos, acorrentada e com cadeado. O Tanaka abre às 7h. Saiam antes.",
+  views:{ N:"Palco", L:"Bar", S:"Fundos", O:"Sofás", C:"Cozinha" }, ring:["N","L","S","O"], start:"N", backTo:"L", back:"‹ Voltar pro bar",
+  code:"1520", codeCredit:"Abriu o cadeado dos fundos",
+  clues:[
+    "O Tanaka troca a senha do cadeado dos fundos toda semana: é sempre o número da música mais pedida da casa.",
+    "Você cantou a mesma música três vezes seguidas. Todo mundo vaiou. A máquina guarda o histórico.",
+    "A chave da corrente fica com o gato da sorte. “Ele guarda a sorte na barriga”, disse o Tanaka."
+  ],
+  locks:[{n:"Corrente",ok:s=>s.keyUsed},{n:"Cadeado",ok:s=>s.codeOk}],
+  hs:{
+    telao:{v:"N",n:"Telão",r:[66,36,228,140]},
+    globo:{v:"N",n:"Globo espelhado",r:[12,32,54,58]},
+    microfone:{v:"N",n:"Microfone",r:[150,176,60,106]},
+    maquina:{v:"N",n:"Máquina de karaokê",r:[266,198,90,90]},
+    placa:{v:"L",n:"Placa do bar",r:[14,34,134,72]},
+    gato:{v:"L",n:"Gato da sorte",r:[24,152,74,66]},
+    caixa:{v:"L",n:"Caixa registradora",r:[98,160,84,58]},
+    chopeira:{v:"L",n:"Chopeira",r:[188,140,60,78]},
+    cozinha:{v:"L",n:"Cozinha",r:[258,40,98,292],nav:"C"},
+    telefone:{v:"S",n:"Telefone",r:[16,144,66,96]},
+    porta:{v:"S",n:"Porta dos fundos",r:[102,54,156,278]},
+    camera:{v:"S",n:"Câmera",r:[278,38,78,50]},
+    sacos:{v:"S",n:"Sacos de lixo",r:[270,258,86,74]},
+    julia:{v:"O",n:"Júlia",r:[8,180,300,110]},
+    catalogo:{v:"O",n:"Catálogo de músicas",r:[140,316,110,40]},
+    bolsa_j:{v:"O",n:"Bolsa da Júlia",r:[284,350,72,70]},
+    bancada:{v:"C",n:"Bancada",r:[6,180,168,70]},
+    pia:{v:"C",n:"Pia",r:[178,180,92,70]},
+    freezer:{v:"C",n:"Freezer",r:[272,54,86,280]}
+  },
+  desc:{
+    telao:s=>!s.machine?"Telão apagado, só um aviso piscando: INSIRA O CÓDIGO.":(s.history?"Histórico da sala VIP: 1520 EVIDÊNCIAS ×3 · 0712 MALANDRAGEM · 2290 BOATE AZUL. Nota média: 41.":"A letra de “Evidências” rolando sozinha, sem som. No canto: MENU ▸ HISTÓRICO."),
+    globo:s=>s.disco?"Girando. Pontinhos de luz correndo pelas paredes. Sua ressaca odeia isso.":"Globo espelhado pendurado no teto. Tem um interruptor no fio.",
+    microfone:s=>s.micTaken?"Só o pedestal. O microfone está na bolsa.":"Microfone sem fio no pedestal. A grade está amassada. Tem cabelo grudado.",
+    maquina:s=>s.machine?`Máquina ligada. Visor: ${s.history?"1520":"ON"}.`+(s.erased?" A memória de vídeo está vazia.":" Tem um vídeo gravado na memória."):"Máquina de karaokê desligada. Um botão vermelho grande: POWER.",
+    placa:()=>"Placa amarela atrás do balcão: MAIS PEDIDA DO MÊS — EVIDÊNCIAS (Chitãozinho & Xororó).",
+    gato:s=>s.catBroken?"Cacos de porcelana branca e uma moeda dourada.":(s.catOpen?"O gato da sorte continua acenando, com a tampinha da barriga aberta.":"Maneki-neko de porcelana acenando no balcão. Quando você mexe, algo chacoalha."),
+    caixa:s=>s.till?(s.cash?"Gaveta vazia. Só o bilhete.":"Gaveta aberta: uns R$ 1.200 e um bilhete."):"Caixa registradora antiga. A gaveta abre no tranco.",
+    chopeira:s=>s.beer?"Chopeira gelada. Um copo sujo do lado.":"Chopeira gelada. Ainda sai chope.",
+    telefone:s=>"Telefone vermelho de parede, com fio enrolado."+(s.samu?" Você já ligou pro 192.":""),
+    porta:s=>`Porta de aço dos fundos. Corrente atravessada${s.keyUsed?" (solta)":""}. Cadeado de 4 dígitos${s.codeOk?" (aberto)":""}.`,
+    camera:s=>s.camCut?"A câmera pende do fio arrancado.":"Câmera de segurança com a luz vermelha piscando. Pega a sala inteira.",
+    sacos:s=>s.comanda?"Sacos revirados. Cheiro de shoyu e saquê.":"Sacos de lixo pretos, estufados.",
+    julia:s=>s.lateral?"Júlia, do RH, deitada de lado. Respira melhor."+(s.iced?" Gelo na nuca.":""):(s.pulse?"Júlia, do RH. Pulso firme, mas está de barriga pra cima e engasga às vezes.":"Júlia, do RH, apagada no sofá. Um braço caído pra fora. Não responde."),
+    catalogo:s=>s.catalog?"Catálogo aberto na página marcada com batom: EVIDÊNCIAS — 1520.":"Catálogo grosso de músicas, cheio de orelhas e manchas de saquê.",
+    bolsa_j:s=>s.jphone?"Bolsa da Júlia. Batom, chiclete, crachá da Halden.":"Bolsa rosa da Júlia, aberta no chão. Um celular piscando lá dentro.",
+    bancada:s=>s.knifeTaken?"Tábua, meio salmão. A faca não está mais aqui.":"Tábua de corte, meio salmão e uma faca de sushi comprida.",
+    pia:()=>"Pia de inox. A torneira pinga.",
+    freezer:s=>"Freezer industrial. Gelo, peixe congelado e uma garrafa de saquê"+(s.sake?" (aberta).":".")
+  },
+  act:{
+    power:{h:"maquina",l:"Apertar o POWER",can:s=>!s.machine,run:s=>{s.machine=true},msg:"A máquina acorda com um jingle. O telão acende.",key:"Ligou a máquina de karaokê"},
+    video:{h:"maquina",l:"Ver o vídeo gravado",can:s=>s.machine&&!s.video&&!s.erased,run:s=>{s.video=true},msg:"Você no palco, gritando com o Romero no meio do refrão. Ele te empurra. Você joga o microfone. Fim."},
+    erase:{h:"maquina",l:"Apagar o vídeo da noite",can:s=>s.machine&&!s.erased,run:s=>{s.erased=true},msg:"“Excluir gravação?” Sim. Pronto.",grey:"Apagou o vídeo da briga com o Romero"},
+    history:{h:"telao",l:"Abrir o histórico",can:s=>s.machine&&!s.history,run:s=>{s.history=true},msg:"1520 EVIDÊNCIAS ×3. Ninguém aguentava mais.",key:"Viu o histórico da noite (1520)"},
+    disco_on:{h:"globo",l:"Ligar o globo",can:s=>!s.disco,run:s=>{s.disco=true},msg:"Luzinhas girando por todo lado. Péssimo pra ressaca. Ótimo pro clima."},
+    disco_off:{h:"globo",l:"Desligar o globo",can:s=>s.disco,run:s=>{s.disco=false},msg:"Ufa."},
+    mic:{h:"microfone",l:"Pegar o microfone",can:s=>!s.micTaken,run:s=>{s.micTaken=true;s.inv.add("microfone")},msg:"Pesado. Serviria de martelo."},
+    sign:{h:"placa",l:"Ler a placa com atenção",can:s=>!s.sign,run:s=>{s.sign=true},msg:"MAIS PEDIDA DO MÊS: EVIDÊNCIAS.",key:"Descobriu a música mais pedida"},
+    shake:{h:"gato",l:"Sacudir o gato",can:s=>!s.catOpen&&!s.catBroken&&!s.shook,run:s=>{s.shook=true},msg:"Chacoalha. Tem metal lá dentro. Embaixo, uma tampinha colada."},
+    cat_smash:{h:"gato",l:"Quebrar com o microfone",can:s=>s.inv.has("microfone")&&!s.catOpen&&!s.catBroken,run:s=>{s.catBroken=true;s.inv.add("chave")},msg:"CRASH. Porcelana pra todo lado. Uma chavinha no meio dos cacos.",key:"Tirou a chave do gato (quebrando)"},
+    cat_pry:{h:"gato",l:"Descolar a tampa com a faca",can:s=>s.inv.has("faca")&&!s.catOpen&&!s.catBroken,run:s=>{s.catOpen=true;s.inv.add("chave")},msg:"A tampinha solta inteira. A chave cai na sua mão. O gato continua acenando.",key:"Tirou a chave do gato (sem quebrar)"},
+    till:{h:"caixa",l:"Abrir a gaveta",can:s=>!s.till,run:s=>{s.till=true},msg:"R$ 1.200 e um bilhete: “Conta da Halden: R$ 4.870. Pendurada. Romero paga.”"},
+    cash:{h:"caixa",l:"Pegar o dinheiro",can:s=>s.till&&!s.cash,run:s=>{s.cash=true;s.inv.add("dinheiro")},msg:"Dobra, enfia no bolso. O Tanaka conta o caixa todo dia.",grey:"Pegou o dinheiro do caixa"},
+    beer:{h:"chopeira",l:"Tirar um chope",can:s=>!s.beer,run:s=>{s.beer=true;s.hang=Math.min(4,s.hang+1)},msg:"Colarinho perfeito. O chão balança."},
+    samu:{h:"telefone",l:"Ligar 192 pra Júlia",can:s=>!s.samu,run:s=>{s.samu=true},msg:"“Mulher desacordada, Liberdade, Karaokê Tóquio.” — “Viatura a caminho.”",good:"Chamou socorro para a Júlia"},
+    tanaka:{h:"telefone",l:"Ligar pro Tanaka",can:s=>!s.tanaka,run:s=>{s.tanaka=true},msg:"Caixa postal: “Tanaka. Abro às sete. Se for a Halden, paga a conta primeiro.”"},
+    key_use:{h:"porta",l:"Abrir a corrente com a chave",can:s=>s.inv.has("chave")&&!s.keyUsed,run:s=>{s.inv.delete("chave");s.keyUsed=true},msg:"Clac. A corrente escorrega até o chão.",key:"Soltou a corrente"},
+    code_ui:{h:"porta",l:"Girar os números do cadeado",can:s=>!s.codeOk,ui:"keypad"},
+    force:{h:"porta",l:"Puxar a corrente na força",can:s=>!(s.keyUsed&&s.codeOk),run:s=>{s.forced++},msg:"A corrente tilinta. A porta nem se mexe. O cachorro do vizinho late."},
+    exit:{h:"porta",l:"SAIR PELOS FUNDOS",can:s=>s.keyUsed&&s.codeOk&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Abriu a porta dos fundos"},
+    cam_cut:{h:"camera",l:"Arrancar o fio da câmera",can:s=>!s.camCut,run:s=>{s.camCut=true},msg:"A luz vermelha apaga. O que já foi gravado, foi.",grey:"Arrancou o fio da câmera"},
+    trash:{h:"sacos",l:"Revirar os sacos",can:s=>!s.comanda,run:s=>{s.comanda=true},msg:"Uma comanda: “VIP — Romero — 14 saquês, 2 whiskies. Quem pediu a 1520 de novo?”"},
+    pulse:{h:"julia",l:"Checar o pulso",can:s=>!s.pulse,run:s=>{s.pulse=true},msg:"Pulso firme. Ela engasga um pouco. Barriga pra cima não é bom.",good:"Checou se a Júlia estava bem"},
+    lateral:{h:"julia",l:"Virar ela de lado",can:s=>!s.lateral,run:s=>{s.lateral=true},msg:"Posição de segurança. Ela tosse, respira fundo e resmunga “Evidências…”",good:"Pôs a Júlia em posição de segurança"},
+    ice:{h:"julia",l:"Pôr gelo na nuca dela",can:s=>s.inv.has("gelo")&&!s.iced,run:s=>{s.inv.delete("gelo");s.iced=true},msg:"Ela arrepia e abre um olho. “Que horas são?”",good:"Cuidou da Júlia com gelo"},
+    catalog:{h:"catalogo",l:"Folhear o catálogo",can:s=>!s.catalog,run:s=>{s.catalog=true},msg:"Uma página marcada com batom: EVIDÊNCIAS — CHITÃOZINHO & XORORÓ — 1520.",key:"Achou o número de Evidências no catálogo"},
+    jphone:{h:"bolsa_j",l:"Pegar o celular dela",can:s=>!s.jphone,run:s=>{s.jphone=true;s.inv.add("celular")},msg:"Você guarda. Por quê? Você também não sabe.",grey:"Pegou o celular da Júlia"},
+    knife:{h:"bancada",l:"Pegar a faca de sushi",can:s=>!s.knifeTaken,run:s=>{s.knifeTaken=true;s.inv.add("faca")},msg:"Leve, fina, perigosa."},
+    water:{h:"pia",l:"Beber água da torneira",can:s=>s.water<2&&s.hang>0,run:s=>{s.water++;s.hang=Math.max(0,s.hang-1)},msg:"Gelada. A cabeça clareia um pouco."},
+    ice_take:{h:"freezer",l:"Pegar um saco de gelo",can:s=>!s.iceTaken,run:s=>{s.iceTaken=true;s.inv.add("gelo")},msg:"Um saquinho de gelo. Vai que precisa."},
+    sake:{h:"freezer",l:"Tomar um gole de saquê",can:s=>!s.sake,run:s=>{s.sake=true;s.hang=Math.min(4,s.hang+1)},msg:"Gelado e traiçoeiro. Tudo gira."}
+  },
+  items:{
+    microfone:{n:"microfone",c:"#c9ccd6",ic:"mic",d:"Microfone sem fio, pesado, com a grade amassada. Pelo jeito já bateu em alguém."},
+    faca:{n:"faca de sushi",c:"#c9ccd6",ic:"knife",d:"Lâmina fina e afiadíssima. Boa pra descolar coisas sem quebrar."},
+    chave:{n:"chave da corrente",c:"#ffd23f",ic:"key",d:"Chavinha de cadeado com um pingente de gato."},
+    gelo:{n:"saco de gelo",c:"#bfefff",ic:"ice",d:"Gelo do freezer da cozinha. Bom pra acordar alguém."},
+    dinheiro:{n:"dinheiro do caixa",c:"#3dff8b",ic:"cash",d:"R$ 1.200 do caixa do Tanaka."},
+    celular:{n:"celular da Júlia",c:"#ff5fa8",ic:"phone",d:"Celular da Júlia. Na tela: 14 chamadas perdidas de “Mãe”."}
+  },
+  paint(S){
+    show("telaoOff",!S.machine); show("telaoOn",S.machine&&!S.history); show("telaoHist",S.history);
+    $("machineDisp").textContent=S.machine?(S.history?"1520":"ON"):"----";
+    $("ledMachine").setAttribute("fill",S.machine?"#3dff8b":"#e0102f");
+    show("micArt",!S.micTaken); show("catArt",!S.catBroken); show("catBroken",S.catBroken);
+    show("cashTray",S.till&&!S.cash);
+    show("chainArt",!S.keyUsed); show("padlock",!S.codeOk); show("padOpen",S.codeOk);
+    show("camLed",!S.camCut); show("camCut",S.camCut);
+    show("juliaLie",!S.lateral); show("juliaSide",S.lateral);
+    show("juliaPhone",!S.jphone); show("sushiKnife",!S.knifeTaken);
+    showAll(".discoLayer",S.disco);
+  },
+  win:"A corrente cai. Beco, gato preto, padaria abrindo. Ninguém viu vocês sair.",
+  lose:"A grade sobe. O Tanaka entra com o pão debaixo do braço e para: “Vocês de novo?”",
+  ending(S){
+    const L=[];
+    if(S.samu) L.push("A ambulância chega pra Júlia antes do Tanaka.");
+    else if(S.lateral) L.push("A Júlia ficou de lado, respirando. Sozinha.");
+    else if(S.pulse) L.push("Você viu que a Júlia engasgava. E saiu mesmo assim.");
+    else L.push("Ninguém olhou a Júlia direito.");
+    if(S.iced) L.push("Ela acordou com o gelo. Vai lembrar de quem cuidou dela.");
+    if(S.erased) L.push("O vídeo da briga com o Romero sumiu da máquina.");
+    else if(S.video) L.push("O vídeo da briga continua na máquina. O Tanaka vai assistir.");
+    if(S.camCut) L.push("A câmera morreu às 6h12. Bem na hora em que vocês mexeram nela.");
+    if(S.cash) L.push("Faltam R$ 1.200 no caixa do Tanaka.");
+    if(S.jphone) L.push("O celular da Júlia está no seu bolso. A mãe dela continua ligando.");
+    if(S.catBroken) L.push("O gato da sorte não acena mais.");
+    return L;
+  }
+},
+arquivo:{
+  id:"arquivo", isNew:true, name:"Arquivo Morto", short:"O subsolo escuro da Halden, o Seu Nogueira desmaiado e uma fragmentadora cheia de segredos.",
+  pitch:"Você acorda no subsolo 2 da Halden Corp, entre caixas de arquivo. Só a luz vermelha de emergência. O Seu Nogueira, do arquivo, está caído no chão. A porta corta-fogo está sem energia e travada. A auditoria externa chega às 8h.",
+  views:{ N:"Arquivos", L:"Servidores", S:"Porta corta-fogo", O:"Mesa do Nogueira", G:"Gaiola" }, ring:["N","L","S","O"], start:"O", backTo:"N", back:"‹ Sair da gaiola",
+  code:"1503", codeCredit:"Acertou a senha da porta corta-fogo",
+  clues:[
+    "A senha da porta corta-fogo é a data da próxima auditoria: dia e mês, quatro dígitos. O Romero repetia essa data como quem reza.",
+    "O fusível reserva fica na gaiola. A chave da gaiola nunca sai do cinto do Seu Nogueira.",
+    "Ontem à noite alguém triturou papéis aqui embaixo. Com fita adesiva dá pra remontar."
+  ],
+  locks:[{n:"Energia",ok:s=>s.power},{n:"Senha",ok:s=>s.codeOk}],
+  hs:{
+    estantes:{v:"N",n:"Estantes",r:[8,40,176,292]},
+    gaiola:{v:"N",n:"Gaiola",r:[194,40,164,294],nav:"G",lock:s=>!s.cageOpen},
+    carrinho:{v:"N",n:"Carrinho",r:[36,334,150,110]},
+    quadro:{v:"L",n:"Quadro de força",r:[12,84,86,160]},
+    servidor:{v:"L",n:"Servidores",r:[100,36,176,296]},
+    bebedouro:{v:"L",n:"Bebedouro",r:[282,100,74,232]},
+    mapa:{v:"S",n:"Mapa de evacuação",r:[12,46,84,94]},
+    interfone:{v:"S",n:"Interfone",r:[18,144,70,100]},
+    porta:{v:"S",n:"Porta corta-fogo",r:[98,50,220,284]},
+    mesa:{v:"O",n:"Mesa",r:[56,140,220,130]},
+    fragmentadora:{v:"O",n:"Fragmentadora",r:[280,100,76,232]},
+    nogueira:{v:"O",n:"Seu Nogueira",r:[16,326,250,110]},
+    caixa_romero:{v:"G",n:"Caixa do Romero",r:[18,140,156,120]},
+    pecas:{v:"G",n:"Armário de peças",r:[194,184,158,120]},
+    cachaca:{v:"G",n:"Garrafão",r:[236,326,100,124]}
+  },
+  desc:{
+    estantes:s=>"Estantes de aço até o teto. Caixas de 1986 a 2025, em ordem."+(s.shelf?" A de 2025 está vazia.":""),
+    gaiola:s=>s.cageOpen?"A grade da gaiola está aberta.":"Gaiola de tela com cadeado. Placa: ACESSO RESTRITO. Lá dentro, uma caixa vermelha.",
+    carrinho:s=>s.tape?"Carrinho de caixas, já revirado.":"Carrinho com caixas meio abertas e papel por todo lado.",
+    quadro:s=>s.power?"Todos os fusíveis no lugar. Luz verde.":"Quadro de força aberto. Um encaixe vazio, preto de fuligem: o fusível queimou.",
+    servidor:s=>s.power?(s.reminder?"Monitor: LEMBRETE — AUDITORIA EXTERNA 15/03. Pasta “ROMERO” no backup.":"Os servidores voltaram. O monitor pisca com um lembrete."):"Racks de servidor mortos. Sem energia, sem luzinha.",
+    bebedouro:()=>"Bebedouro com o galão pela metade. Copinhos de plástico.",
+    mapa:()=>"VOCÊ ESTÁ AQUI: SUBSOLO 2. Saída: porta corta-fogo → rampa → garagem.",
+    interfone:s=>s.power?(s.help?"A portaria já sabe do Seu Nogueira.":"Interfone da portaria. Luz verde."):"Interfone mudo. Sem energia.",
+    porta:s=>s.power?`Porta corta-fogo. Teclado aceso${s.codeOk?" (verde)":""}.`:"Porta corta-fogo travada. O teclado está apagado: sem energia, sem senha.",
+    mesa:s=>"Mesa de aço do Seu Nogueira. Monitor velho, abajur, uma pilha de ordens de serviço."+(s.drawer?" Gaveta aberta.":" Gaveta fechada."),
+    fragmentadora:s=>s.strips?"Na parede, a folha remontada: AUDITORIA EXTERNA — 15/03.":"Fragmentadora cheia até a boca. Tiras de papel, algumas com números.",
+    nogueira:s=>s.med?"Seu Nogueira, sentado no chão, tomando fôlego. “Obrigado, filho.”":(s.pulse?"Seu Nogueira. Pulso acelerado, suando frio. A pressão dele…":"Seu Nogueira, do arquivo, caído de lado. Chaveiro enorme no cinto."),
+    caixa_romero:s=>s.boxOpen?(s.folder?"Caixa revirada. A pasta não está mais aqui.":"Notas frias, contratos de consultoria. Uma pasta com seu nome."):"Caixa vermelha: ROMERO — CONFIDENCIAL — TRITURAR.",
+    pecas:s=>s.fuse?"Gavetinhas de peças elétricas, reviradas.":"Armário de gavetinhas: ELÉTRICA, HIDRÁULICA, DIVERSOS.",
+    cachaca:s=>s.beer?"Garrafão de cachaça, um gole mais vazio.":"Garrafão de cachaça escondido atrás das caixas. Alguém aqui embaixo tem um segredo."
+  },
+  act:{
+    shelf:{h:"estantes",l:"Procurar a caixa de 2025",can:s=>!s.shelf,run:s=>{s.shelf=true},msg:"A caixa de 2025 está vazia. Alguém levou tudo pra fragmentadora."},
+    tape:{h:"carrinho",l:"Revirar o carrinho",can:s=>!s.tape,run:s=>{s.tape=true;s.inv.add("fita")},msg:"Etiquetas, grampeador… e um rolo de fita larga."},
+    cage_open:{h:"gaiola",l:"Abrir com o chaveiro",can:s=>s.inv.has("chaveiro")&&!s.cageOpen,run:s=>{s.cageOpen=true},msg:"A chave “GAIOLA” gira. A grade range e abre.",key:"Abriu a gaiola"},
+    cage_shake:{h:"gaiola",l:"Sacudir a grade",can:s=>!s.cageOpen,run:s=>{s.forced++},msg:"Tela de aço. Só faz barulho."},
+    fuse_swap:{h:"quadro",l:"Trocar o fusível queimado",can:s=>s.inv.has("fusivel")&&!s.power,run:s=>{s.inv.delete("fusivel");s.power=true},msg:"Clunk. As lâmpadas piscam, zumbem e acendem. Os servidores roncam.",key:"Religou a energia"},
+    reminder:{h:"servidor",l:"Ler o monitor",can:s=>s.power&&!s.reminder,run:s=>{s.reminder=true},msg:"LEMBRETE: AUDITORIA EXTERNA — 15/03 — NÃO PODE ADIAR.",key:"Viu a data da auditoria no monitor"},
+    copy:{h:"servidor",l:"Mandar a pasta ROMERO pro seu e-mail",can:s=>s.power&&!s.copied&&!s.wiped,run:s=>{s.copied=true},msg:"Enviando… 312 arquivos. Enviado."},
+    wipe:{h:"servidor",l:"Formatar o backup",can:s=>s.power&&!s.wiped,run:s=>{s.wiped=true},msg:"“Isso apagará 40 anos de registros.” Confirmar. Pronto.",grey:"Formatou o backup da Halden"},
+    water:{h:"bebedouro",l:"Beber um copo d’água",can:s=>s.water<2&&s.hang>0,run:s=>{s.water++;s.hang=Math.max(0,s.hang-1)},msg:"Gosto de plástico. Funciona."},
+    help:{h:"interfone",l:"Chamar a portaria",can:s=>s.power&&!s.help,run:s=>{s.help=true},msg:"“Seu Nogueira passando mal no subsolo 2!” — “Mandando a brigada agora.”",good:"Chamou socorro para o Seu Nogueira"},
+    code_ui:{h:"porta",l:"Digitar a senha",can:s=>s.power&&!s.codeOk,ui:"keypad"},
+    force:{h:"porta",l:"Empurrar a barra",can:s=>!(s.power&&s.codeOk),run:s=>{s.forced++},msg:"A barra desce, a porta não. Trava eletromagnética."},
+    exit:{h:"porta",l:"ABRIR A PORTA",can:s=>s.power&&s.codeOk&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Abriu a porta corta-fogo"},
+    drawer:{h:"mesa",l:"Abrir a gaveta",can:s=>!s.drawer,run:s=>{s.drawer=true;s.inv.add("remedio")},msg:"Remédio de pressão com o nome dele. Já passou da hora."},
+    papers:{h:"mesa",l:"Ler as ordens de serviço",can:s=>!s.papers,run:s=>{s.papers=true},msg:"“Triturar caixas ROMERO até sexta. Sem registro. — R.” Assinado embaixo: você?"},
+    strips:{h:"fragmentadora",l:"Remontar as tiras com fita",can:s=>s.inv.has("fita")&&!s.strips,run:s=>{s.strips=true},msg:"Tira por tira, a folha aparece: AUDITORIA EXTERNA — 15/03.",key:"Remontou o papel triturado (15/03)"},
+    shred:{h:"fragmentadora",l:"Triturar a pasta do Romero",can:s=>s.inv.has("pasta"),run:s=>{s.inv.delete("pasta");s.shred=true},msg:"Rrrrrrrr. Contratos, notas, sua assinatura. Confete.",grey:"Triturou as provas do caso Romero"},
+    pulse:{h:"nogueira",l:"Checar o pulso",can:s=>!s.pulse,run:s=>{s.pulse=true},msg:"Acelerado. Suor frio. Ele murmura: “o remédio… a gaveta…”",good:"Checou se o Seu Nogueira estava bem"},
+    keys:{h:"nogueira",l:"Pegar o chaveiro do cinto",can:s=>!s.keysTaken,run:s=>{s.keysTaken=true;s.inv.add("chaveiro")},msg:"Desculpa, Seu Nogueira. Umas vinte chaves. Uma diz GAIOLA."},
+    med:{h:"nogueira",l:"Dar o remédio pra ele",can:s=>s.inv.has("remedio")&&!s.med,run:s=>{s.inv.delete("remedio");s.med=true},msg:"Ele engole com dificuldade. Aos poucos, a cor volta.",good:"Deu o remédio ao Seu Nogueira"},
+    wallet:{h:"nogueira",l:"Pegar a carteira dele",can:s=>!s.wallet,run:s=>{s.wallet=true;s.inv.add("carteira")},msg:"R$ 60 e uma foto dos netos.",grey:"Pegou a carteira do Seu Nogueira"},
+    box_open:{h:"caixa_romero",l:"Abrir a caixa",can:s=>!s.boxOpen,run:s=>{s.boxOpen=true},msg:"Notas frias, contratos de consultoria, recibo do Motel Flamingo. E uma pasta com SEU nome."},
+    folder:{h:"caixa_romero",l:"Levar a pasta",can:s=>s.boxOpen&&!s.folder,run:s=>{s.folder=true;s.inv.add("pasta")},msg:"Pesada. Prova de muita coisa. Contra quem?"},
+    fuse_find:{h:"pecas",l:"Procurar um fusível",can:s=>!s.fuse,run:s=>{s.fuse=true;s.inv.add("fusivel")},msg:"Gaveta ELÉTRICA: um fusível de 30 A, novinho.",key:"Achou o fusível reserva"},
+    cachaca:{h:"cachaca",l:"Tomar um gole",can:s=>!s.beer,run:s=>{s.beer=true;s.hang=Math.min(4,s.hang+1)},msg:"Desce rasgando. A sala dá uma volta."}
+  },
+  items:{
+    fita:{n:"fita adesiva",c:"#ffd23f",ic:"tape",d:"Rolo de fita larga. Gruda até papel picado."},
+    chaveiro:{n:"chaveiro do Nogueira",c:"#c9ccd6",ic:"keyring",d:"Umas vinte chaves. Uma tem etiqueta: “GAIOLA”."},
+    fusivel:{n:"fusível reserva",c:"#ff8a3d",ic:"fuse",d:"Fusível de 30 A. Do tamanho certo pro quadro de força."},
+    remedio:{n:"remédio de pressão",c:"#3dff8b",ic:"pills",d:"“Losartana — Sr. Nogueira — 1 comprimido de manhã.” Já passou da hora."},
+    pasta:{n:"pasta do Romero",c:"#e0102f",ic:"folder",d:"Notas frias, contratos de consultoria e uma assinatura sua que você não lembra de ter feito."},
+    carteira:{n:"carteira do Nogueira",c:"#c58b4e",ic:"wallet",d:"R$ 60, vale-transporte e uma foto dos netos."}
+  },
+  paint(S){
+    showAll(".blackout",!S.power); showAll(".powerOn",S.power);
+    $("ledPower").setAttribute("fill",S.power?"#3dff8b":"#e0102f");
+    $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":(S.power?"#ffd23f":"#3a2a4f"));
+    $("exitTxt").setAttribute("fill",S.power?"#3dff8b":"#1f4a30");
+    $("fuseSlot").setAttribute("fill",S.power?"#3dff8b":"#0c0414");
+    show("monOn",S.power);
+    show("cageLock",!S.cageOpen); show("cageDoor",!S.cageOpen); show("cageOpenArt",S.cageOpen);
+    show("stripsWall",S.strips); show("keyringArt",!S.keysTaken);
+    show("nogLie",!S.med); show("nogSit",S.med);
+    show("romeroLid",!S.boxOpen); show("pastaArt",S.boxOpen&&!S.folder); show("tapeArt",!S.tape);
+  },
+  win:"A porta corta-fogo abre com um suspiro. Rampa, garagem, rua. São 7h58.",
+  lose:"Passos na escada. Crachás pendurados, pastas na mão: “Bom dia. Auditoria externa.”",
+  ending(S){
+    const L=[];
+    if(S.help) L.push("A brigada desce pro subsolo 2. O Seu Nogueira vai ficar bem.");
+    else if(S.med) L.push("O Seu Nogueira tomou o remédio. Ficou sozinho no escuro, mas vivo.");
+    else if(S.pulse) L.push("Você sentiu o pulso do Seu Nogueira disparado. E foi embora.");
+    else L.push("Ninguém olhou o Seu Nogueira direito.");
+    if(S.shred) L.push("A pasta do Romero virou confete. Com ela, a única prova de que você foi usado.");
+    else if(S.folder) L.push("A pasta do Romero saiu do prédio com vocês.");
+    if(S.copied) L.push("312 arquivos da pasta ROMERO estão no seu e-mail.");
+    if(S.wiped) L.push("O backup de 40 anos da Halden não existe mais. A auditoria vai perguntar por quê.");
+    if(S.wallet) L.push("A carteira do Seu Nogueira, com a foto dos netos, está com você.");
+    if(S.papers) L.push("“Assinado embaixo: você.” Você lembra de ter assinado? Não.");
+    return L;
+  }
+},
+lancha:{
+  id:"lancha", isNew:true, name:"Halden II", short:"A lancha do Romero à deriva na baía, o segurança agarrado na escada e um motor que não pega.",
+  pitch:"Você acorda no convés da Halden II, a lancha do Romero, à deriva no meio da baía. O sol está nascendo. Alguém grita lá atrás: é o Valdir, o segurança da festa, agarrado na escadinha, dentro d’água. O motor não pega. A Capitania faz a ronda às 7h.",
+  views:{ N:"Proa", L:"Painel", S:"Popa", O:"Cabine", P:"Porão" }, ring:["N","L","S","O"], start:"N", backTo:"O", back:"‹ Subir pra cabine",
+  code:"2808", codeCredit:"Destravou o imobilizador",
+  clues:[
+    "O Romero usa o aniversário da filha em todas as senhas: dia e mês. Ele mostrou a foto dela pra todo mundo na festa.",
+    "O Valdir, o segurança, tirou a chave da ignição de você: “Ninguém pilota bêbado no meu turno.” Depois, um tchibum.",
+    "O tanque secou na volta da ilha. Tem um galão de reserva lá embaixo, no porão."
+  ],
+  locks:[{n:"Chave",ok:s=>s.keyUsed},{n:"Código",ok:s=>s.codeOk},{n:"Tanque",ok:s=>s.fuel}],
+  hs:{
+    costa:{v:"N",n:"Horizonte",r:[10,40,340,140]},
+    boia:{v:"N",n:"Boia salva-vidas",r:[52,286,66,66]},
+    garrafas:{v:"N",n:"Lixo da festa",r:[192,362,100,84]},
+    radio:{v:"L",n:"Rádio",r:[8,200,84,84]},
+    painel:{v:"L",n:"Painel",r:[94,200,174,128]},
+    gps:{v:"L",n:"GPS",r:[270,198,86,84]},
+    motor:{v:"S",n:"Motores",r:[104,140,152,140]},
+    caixa_termica:{v:"S",n:"Caixa térmica",r:[16,318,98,80]},
+    valdir:{v:"S",n:"Valdir",r:[262,168,94,272]},
+    foto:{v:"O",n:"Porta-retrato",r:[22,50,82,96]},
+    maleta:{v:"O",n:"Maleta",r:[114,180,152,84]},
+    beliche:{v:"O",n:"Beliche",r:[272,140,84,190]},
+    escotilha:{v:"O",n:"Escotilha do porão",r:[100,364,170,96],nav:"P"},
+    galao:{v:"P",n:"Galão",r:[26,236,92,108]},
+    ferramentas:{v:"P",n:"Caixa de ferramentas",r:[238,250,112,84]},
+    agua:{v:"P",n:"Água no porão",r:[16,358,328,110]}
+  },
+  desc:{
+    costa:s=>"Marina Halden lá longe, uns 2 km. Uma lancha cinza da Capitania faz a ronda devagar"+(s.mayday?", vindo na direção de vocês.":", ainda sem ver vocês."),
+    boia:s=>s.ringTaken?"O suporte vazio da boia.":"Boia salva-vidas laranja, presa no guarda-corpo com uma corda.",
+    garrafas:s=>s.dumped?"Convés limpo. O mar, nem tanto.":"Garrafas de espumante, copos, confete e um balde de gelo derretido.",
+    radio:s=>"Rádio VHF no canal 16."+(s.mayday?" A Capitania confirmou o chamado.":s.lied?" A Capitania acha que está tudo bem.":" Chiado e uma voz: “Halden II, Halden II, responda.”"),
+    painel:s=>`Painel. Ignição${s.keyUsed?" com a chave encaixada":" vazia"}. Imobilizador de 4 dígitos${s.codeOk?" (verde)":""}. Combustível: ${s.fuel?"cheio":"zero"}.`,
+    gps:s=>"GPS: rota pra marina, 2,1 km."+(s.fuel?" Combustível OK.":" Alerta piscando: COMBUSTÍVEL 0%."),
+    motor:s=>s.fuel?"Dois motores de popa. Tanque cheio, cheiro de gasolina.":"Dois motores de popa. A tampa do tanque (GAS) está aberta e seca.",
+    caixa_termica:()=>"Caixa térmica: gelo derretido, água mineral e umas latas de cerveja boiando.",
+    valdir:s=>s.saved?(s.warm?"Valdir, enrolado na manta, batendo queixo. “Valeu, chefe.”":"Valdir, no convés, encharcado e tremendo. Lábios roxos."):(s.ring?"Valdir agarrado na boia, do lado da escadinha. Dá pra puxar ele.":"Valdir, o segurança, na água, agarrado na escadinha. “Me tira daqui! Não sinto as pernas!”"),
+    foto:s=>s.photo?"Romero e a filha num barco. Atrás, à mão: “Bia, 9 anos — 28/08”.":"Porta-retrato preso na parede com velcro. Uma menina e um homem de boné.",
+    maleta:s=>s.caseOpen?(s.dollars?"Maleta aberta. Só o contrato.":"Maleta aberta: maços de dólares e um contrato."):"Maleta de couro em cima da mesa. Não está trancada. Só fechada.",
+    beliche:s=>s.manta?"Beliche desarrumado.":"Beliche com uma manta grossa, dobrada.",
+    galao:s=>s.galao?"Só a marca do galão no chão molhado.":"Galão vermelho de 20 litros. Cheio. Pesado.",
+    ferramentas:s=>s.tools?"Caixa de ferramentas aberta e revirada.":"Caixa de ferramentas laranja, com trinco.",
+    agua:s=>(s.pump?"A bomba ronca. A água baixou.":"Água até o tornozelo no porão.")+(s.phone?"":" Um celular boia, aceso.")
+  },
+  act:{
+    coast:{h:"costa",l:"Olhar a marina",can:s=>!s.coast,run:s=>{s.coast=true},msg:"2 km. Dá pra chegar em cinco minutos. Com motor."},
+    ring_take:{h:"boia",l:"Pegar a boia",can:s=>!s.ringTaken,run:s=>{s.ringTaken=true;s.inv.add("boia")},msg:"Você solta o nó. Boia na mão."},
+    dump:{h:"garrafas",l:"Jogar o lixo no mar",can:s=>!s.dumped,run:s=>{s.dumped=true},msg:"Garrafas, copos, confete. Tudo boiando atrás da lancha.",grey:"Jogou o lixo da festa no mar"},
+    mayday:{h:"radio",l:"Chamar a Capitania: homem ao mar",can:s=>!s.mayday&&!s.lied,run:s=>{s.mayday=true},msg:"“Capitania, Halden II, homem ao mar!” — “Ciente. Indo até vocês.”",good:"Avisou a Capitania sobre o homem ao mar"},
+    lie:{h:"radio",l:"Dizer que está tudo bem",can:s=>!s.mayday&&!s.lied,run:s=>{s.lied=true},msg:"“Tudo tranquilo aqui, Capitania. Câmbio.”",grey:"Mentiu para a Capitania"},
+    gps:{h:"gps",l:"Ver a rota",can:s=>!s.gps,run:s=>{s.gps=true},msg:"Rota traçada. 2,1 km. COMBUSTÍVEL 0%."},
+    key_use:{h:"painel",l:"Encaixar a chave",can:s=>s.inv.has("chave")&&!s.keyUsed,run:s=>{s.inv.delete("chave");s.keyUsed=true},msg:"A chave entra. O painel acende.",key:"Encaixou a chave na ignição"},
+    code_ui:{h:"painel",l:"Digitar o código do imobilizador",can:s=>!s.codeOk,ui:"keypad"},
+    force:{h:"painel",l:"Dar a partida assim mesmo",can:s=>!(s.keyUsed&&s.codeOk&&s.fuel),run:s=>{s.forced++},msg:"Tec-tec-tec. Nada. Só o barulho do mar."},
+    exit:{h:"painel",l:"LIGAR E VOLTAR PRA MARINA",can:s=>s.keyUsed&&s.codeOk&&s.fuel&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Ligou o motor"},
+    refuel:{h:"motor",l:"Abastecer com o galão",can:s=>s.inv.has("galao")&&!s.fuel,run:s=>{s.inv.delete("galao");s.fuel=true},msg:"Glub-glub-glub. 20 litros. O cheiro sobe direto pra sua ressaca.",key:"Abasteceu o tanque"},
+    water:{h:"caixa_termica",l:"Beber uma água",can:s=>s.water<2&&s.hang>0,run:s=>{s.water++;s.hang=Math.max(0,s.hang-1)},msg:"Gelada. O enjoo dá uma trégua."},
+    beer:{h:"caixa_termica",l:"Abrir uma cerveja",can:s=>!s.beer,run:s=>{s.beer=true;s.hang=Math.min(4,s.hang+1)},msg:"Cerveja quente num barco balançando. Péssima ideia."},
+    reach:{h:"valdir",l:"Estender a mão",can:s=>!s.ring&&!s.saved&&!s.reached,run:s=>{s.reached=true},msg:"Os dedos escorregam. Ele afunda e volta, cuspindo água. Precisa de algo que boie."},
+    throw_ring:{h:"valdir",l:"Jogar a boia",can:s=>s.inv.has("boia")&&!s.ring,run:s=>{s.inv.delete("boia");s.ring=true},msg:"Cai bem do lado dele. Ele se agarra.",good:"Jogou a boia para o Valdir"},
+    pull:{h:"valdir",l:"Puxar ele pra bordo",can:s=>s.ring&&!s.saved,run:s=>{s.saved=true;if(!s.keyUsed)s.inv.add("chave")},msg:"Ele desaba no convés e tira uma chave do bolso: “Toma. Mas quem pilota sou eu.”",good:"Tirou o Valdir da água",key:"Recebeu a chave do Valdir"},
+    warm:{h:"valdir",l:"Enrolar ele na manta",can:s=>s.saved&&s.inv.has("manta")&&!s.warm,run:s=>{s.inv.delete("manta");s.warm=true},msg:"Ele para de tremer aos poucos.",good:"Aqueceu o Valdir com a manta"},
+    photo:{h:"foto",l:"Olhar o porta-retrato",can:s=>!s.photo,run:s=>{s.photo=true},msg:"Atrás da foto, à mão: “Bia, 9 anos — 28/08”.",key:"Achou o aniversário da Bia"},
+    case_open:{h:"maleta",l:"Abrir a maleta",can:s=>!s.caseOpen,run:s=>{s.caseOpen=true},msg:"Dólares. E um contrato: “Halden II — transferência de propriedade para:” seu nome. Falta só sua assinatura."},
+    dollars:{h:"maleta",l:"Pegar os dólares",can:s=>s.caseOpen&&!s.dollars,run:s=>{s.dollars=true;s.inv.add("dolares")},msg:"US$ 20 mil. Pesam mais do que parece.",grey:"Pegou os dólares da maleta"},
+    manta:{h:"beliche",l:"Pegar a manta",can:s=>!s.manta,run:s=>{s.manta=true;s.inv.add("manta")},msg:"Grossa e quentinha. Alguém aqui precisa disso mais que você."},
+    galao:{h:"galao",l:"Pegar o galão",can:s=>!s.galao,run:s=>{s.galao=true;s.inv.add("galao")},msg:"20 litros de gasolina. Seus braços reclamam."},
+    tools:{h:"ferramentas",l:"Abrir a caixa",can:s=>!s.tools,run:s=>{s.tools=true;if(!s.keyUsed)s.inv.add("chave")},msg:"Chave de fenda, fita isolante… e uma chave reserva com chaveiro de cortiça.",key:"Achou a chave reserva"},
+    pump:{h:"agua",l:"Ligar a bomba de porão",can:s=>!s.pump,run:s=>{s.pump=true},msg:"A bomba ronca e cospe água pelo casco. O nível desce."},
+    phone:{h:"agua",l:"Pescar o celular",can:s=>!s.phone,run:s=>{s.phone=true;s.inv.add("celular")},msg:"Celular do Romero. Molhado, mas acende. Tem uma mensagem aberta."}
+  },
+  items:{
+    boia:{n:"boia salva-vidas",c:"#ff8a3d",ic:"buoy",d:"Boia laranja com corda. Feita pra jogar pra quem está na água."},
+    galao:{n:"galão de gasolina",c:"#e0102f",ic:"can",d:"20 litros. Dá pra voltar pra marina com folga."},
+    chave:{n:"chave da ignição",c:"#ffd23f",ic:"key",d:"Chave com chaveiro de cortiça, pra boiar se cair no mar."},
+    manta:{n:"manta térmica",c:"#ff2e88",ic:"blanket",d:"Manta grossa do beliche. Esquenta qualquer um."},
+    dolares:{n:"maço de dólares",c:"#3dff8b",ic:"cash",d:"US$ 20 mil em notas de 100. Dinheiro de quem?"},
+    celular:{n:"celular do Romero",c:"#b18cff",ic:"phone",d:"Molhado, mas liga. Última mensagem, do “Advogado”: “Transfere a lancha antes da auditoria. Pro nome de quem estiver mais encrencado.”"}
+  },
+  paint(S){
+    show("boiaArt",!S.ringTaken); show("trashArt",!S.dumped); show("trashSea",S.dumped); show("capitania",S.mayday);
+    $("ledKey").setAttribute("fill",S.keyUsed?"#3dff8b":"#e0102f");
+    $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
+    $("ledFuel").setAttribute("fill",S.fuel?"#3dff8b":"#e0102f");
+    $("fuelNeedle").setAttribute("transform",`rotate(${S.fuel?55:-55} 130 240)`);
+    show("ignKey",S.keyUsed); show("gpsAlert",!S.fuel);
+    show("valdirWater",!S.saved); show("ringFloat",S.ring&&!S.saved);
+    show("valdirDeck",S.saved); show("valdirBlanket",S.warm);
+    show("mantaArt",!S.manta); show("caseShut",!S.caseOpen); show("caseOpen",S.caseOpen); show("cashArt",!S.dollars);
+    show("galaoArt",!S.galao); show("toolsOpen",S.tools); show("phoneFloat",!S.phone);
+    $("bilge").setAttribute("y",S.pump?420:368);
+  },
+  win:"O motor ronca. A Halden II aponta pra marina, cortando o sol da manhã.",
+  lose:"Uma lancha cinza encosta. “Capitania dos Portos. Documentos da embarcação e do condutor, por favor.”",
+  ending(S){
+    const L=[];
+    if(S.saved&&S.warm) L.push("O Valdir chega na marina enrolado na manta. Vivo.");
+    else if(S.saved) L.push("O Valdir saiu da água. Tremendo, mas saiu.");
+    else if(S.ring) L.push("O Valdir ficou agarrado na boia, lá atrás.");
+    else L.push("O Valdir ficou na água, agarrado na escadinha.");
+    if(S.mayday) L.push("A Capitania sabia do homem ao mar. Chegou rápido.");
+    if(S.lied) L.push("Você disse à Capitania que estava tudo bem. Não estava.");
+    if(S.dumped) L.push("Uma trilha de garrafas e confete marca o caminho de vocês na baía.");
+    if(S.dollars) L.push("US$ 20 mil do Romero estão na sua mochila.");
+    if(S.caseOpen) L.push("O contrato da lancha, no seu nome, ficou na maleta. Sem assinatura. Por enquanto.");
+    if(S.phone) L.push("O celular do Romero: “Transfere a lancha pro nome de quem estiver mais encrencado.”");
+    return L;
+  }
+}
 };
+const show=(id,on)=>{ const n=$(id); if(n) n.style.display=on?"":"none"; };
+const showAll=(sel,on)=>document.querySelectorAll("#views "+sel).forEach(n=>n.style.display=on?"":"none");
+
+// ---------------- item icons (40×40), drawn in the same ink-outline style as the rooms ----------------
+const O='stroke="#0c0414" stroke-width="2.5"';
+const ICONS={
+  key:c=>`<circle cx="12" cy="20" r="8" fill="${c}" ${O}/><circle cx="12" cy="20" r="3" fill="#0c0414"/><rect x="19" y="17" width="18" height="6" fill="${c}" ${O}/><rect x="29" y="22" width="4" height="8" fill="${c}" stroke="#0c0414" stroke-width="2"/><rect x="34" y="22" width="3" height="5" fill="${c}" stroke="#0c0414" stroke-width="1.5"/>`,
+  ice:c=>`<rect x="5" y="12" width="18" height="18" rx="3" fill="${c}" ${O}/><rect x="17" y="6" width="18" height="18" rx="3" fill="${c}" ${O}/><path d="M9 17 l5 -3 M21 11 l6 -3" stroke="#fff" stroke-width="2.5"/>`,
+  icekey:c=>`<rect x="6" y="6" width="28" height="28" rx="4" fill="${c}" ${O}/><rect x="13" y="17" width="16" height="6" rx="2" fill="#ffd23f" opacity=".85" transform="rotate(-20 21 20)"/><circle cx="13" cy="23" r="3.5" fill="#ffd23f" opacity=".85"/><path d="M11 12 l7 -3 M10 16 l3 -1" stroke="#fff" stroke-width="2.5"/>`,
+  knife:c=>`<path d="M3 28 l11 -4 l3 5 l-11 4z" fill="#5a2a16" stroke="#0c0414" stroke-width="2"/><path d="M15 23 L37 8 L35 17 L18 28z" fill="#dfe2ea" stroke="#0c0414" stroke-width="2"/><path d="M21 22 l9 -6 l-1 4 l-6 4z" fill="${c}"/>`,
+  wallet:c=>`<rect x="4" y="10" width="32" height="22" rx="3" fill="${c}" ${O}/><path d="M4 16 h32" stroke="#0c0414" stroke-width="1.5" opacity=".5"/><path d="M24 18 h12 v9 h-12z" fill="#0c0414" opacity=".3"/><circle cx="29" cy="22.5" r="2.2" fill="#ffd23f"/><rect x="8" y="6" width="14" height="6" fill="#3dff8b" stroke="#0c0414" stroke-width="1.5"/>`,
+  pills:c=>`<rect x="5" y="9" width="30" height="22" rx="3" fill="#f7ecff" ${O}/><g fill="${c}" stroke="#0c0414" stroke-width="1.2"><ellipse cx="13" cy="16" rx="4" ry="3"/><ellipse cx="20" cy="16" rx="4" ry="3"/><ellipse cx="27" cy="16" rx="4" ry="3"/><ellipse cx="13" cy="24" rx="4" ry="3"/><ellipse cx="27" cy="24" rx="4" ry="3"/></g>`,
+  badge:c=>`<path d="M13 3 L20 12 L27 3" stroke="${c}" stroke-width="3.5" fill="none"/><rect x="9" y="11" width="22" height="26" rx="2" fill="#f7ecff" ${O}/><rect x="9" y="11" width="22" height="6" fill="${c}"/><circle cx="20" cy="23" r="4.5" fill="#c98b6b" stroke="#0c0414" stroke-width="1.5"/><rect x="14" y="30" width="12" height="3" fill="#0c0414"/>`,
+  medkit:c=>`<path d="M15 10 v-4 h10 v4" fill="none" stroke="#0c0414" stroke-width="2.5"/><rect x="5" y="10" width="30" height="24" rx="3" fill="${c}" ${O}/><path d="M17 15 h6 v5 h5 v6 h-5 v5 h-6 v-5 h-5 v-6 h5z" fill="#e0102f"/>`,
+  trophy:c=>`<path d="M11 6 h18 q0 14 -9 16 q-9 -2 -9 -16z" fill="${c}" ${O}/><path d="M11 9 q-6 0 -5 5 q1 4 6 4 M29 9 q6 0 5 5 q-1 4 -6 4" stroke="#0c0414" stroke-width="2" fill="none"/><rect x="17" y="22" width="6" height="6" fill="${c}" stroke="#0c0414" stroke-width="2"/><rect x="11" y="28" width="18" height="7" fill="#5a2a16" ${O}/><path d="M11 34 q6 -4 12 0" stroke="#c4001d" stroke-width="3" fill="none"/>`,
+  cash:c=>`<rect x="3" y="10" width="30" height="16" fill="${c}" ${O} transform="rotate(-10 18 18)"/><rect x="7" y="15" width="30" height="16" fill="${c}" ${O}/><circle cx="22" cy="23" r="4.5" fill="none" stroke="#0c0414" stroke-width="2"/><path d="M11 19 v8 M33 19 v8" stroke="#0c0414" stroke-width="1.5" opacity=".5"/>`,
+  bag:c=>`<path d="M12 14 q8 -12 16 0" stroke="#5c5566" stroke-width="3" fill="none"/><rect x="14" y="9" width="12" height="8" fill="#3dff8b" stroke="#0c0414" stroke-width="1.5"/><rect x="4" y="14" width="32" height="20" rx="7" fill="#1b1622" ${O}/><path d="M8 22 h24" stroke="${c}" stroke-width="2"/>`,
+  card:c=>`<rect x="4" y="9" width="32" height="22" rx="3" fill="${c}" ${O}/><rect x="4" y="13" width="32" height="5" fill="#0c0414"/><rect x="8" y="22" width="9" height="6" rx="1" fill="#ffd23f" stroke="#0c0414" stroke-width="1"/><path d="M21 26 h10" stroke="#0c0414" stroke-width="2"/>`,
+  phone:c=>`<rect x="11" y="3" width="18" height="34" rx="4" fill="#0c0414"/><rect x="13" y="7" width="14" height="24" fill="${c}"/><path d="M14 9 l11 19" stroke="#0c0414" stroke-width="1.2" opacity=".7"/><circle cx="20" cy="34" r="1.5" fill="#5c5566"/>`,
+  remote:c=>`<rect x="10" y="5" width="20" height="30" rx="6" fill="#2a2531" ${O}/><circle cx="20" cy="15" r="5" fill="${c}" stroke="#0c0414" stroke-width="1.5"/><circle cx="20" cy="27" r="3.5" fill="#e0102f" stroke="#0c0414" stroke-width="1.5"/>`,
+  mic:c=>`<rect x="16" y="18" width="8" height="19" rx="3" fill="#1b1622" stroke="#0c0414" stroke-width="2"/><circle cx="20" cy="13" r="9" fill="${c}" ${O}/><path d="M13 10 h14 M12 14 h16" stroke="#7a7a8a" stroke-width="1.5"/><rect x="16" y="25" width="8" height="3" fill="#ff2e88"/>`,
+  keyring:c=>`<circle cx="15" cy="13" r="8" fill="none" stroke="#ffd23f" stroke-width="3"/><circle cx="15" cy="13" r="8" fill="none" stroke="#0c0414" stroke-width="1" opacity=".6"/><g fill="${c}" stroke="#0c0414" stroke-width="1.5"><path d="M18 19 l12 12 l-3 3 l-2 -2 l-2 2 l-7 -9z"/><path d="M12 20 l-2 15 h4 l1 -3 h2 l0 -11z"/><path d="M21 15 l14 2 l0 4 l-3 0 l0 2 l-11 -3z"/></g><rect x="5" y="2" width="10" height="7" fill="#f7ecff" stroke="#0c0414" stroke-width="1.2"/>`,
+  fuse:c=>`<rect x="2" y="15" width="8" height="10" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/><rect x="30" y="15" width="8" height="10" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/><rect x="9" y="12" width="22" height="16" rx="3" fill="#bfefff" ${O} opacity=".95"/><path d="M10 20 q5 -6 10 0 t10 0" stroke="${c}" stroke-width="2.5" fill="none"/><text x="20" y="27" text-anchor="middle" font-size="6" font-family="monospace" fill="#0c0414">30A</text>`,
+  tape:c=>`<circle cx="18" cy="20" r="14" fill="${c}" ${O}/><circle cx="18" cy="20" r="6" fill="#2a2531" stroke="#0c0414" stroke-width="2"/><path d="M31 24 l7 10 l-6 2 l-4 -9z" fill="${c}" stroke="#0c0414" stroke-width="1.5" opacity=".85"/>`,
+  folder:c=>`<path d="M4 10 h11 l3 3 h18 v21 h-32z" fill="#ffd23f" ${O}/><path d="M4 16 h32 v18 h-32z" fill="#f2c94c" ${O}/><rect x="12" y="20" width="16" height="7" fill="${c}" transform="rotate(-8 20 23)"/><text x="20" y="26" text-anchor="middle" font-size="5" font-family="monospace" fill="#fff" transform="rotate(-8 20 23)">CONF.</text>`,
+  buoy:c=>`<circle cx="20" cy="20" r="12" fill="none" stroke="#0c0414" stroke-width="13"/><circle cx="20" cy="20" r="12" fill="none" stroke="${c}" stroke-width="9"/><circle cx="20" cy="20" r="12" fill="none" stroke="#f7ecff" stroke-width="9" stroke-dasharray="9.42 9.42"/>`,
+  can:c=>`<path d="M8 11 h18 l7 7 v18 h-25z" fill="${c}" ${O}/><path d="M12 5 h11 v6 h-11z" fill="none" stroke="#0c0414" stroke-width="3"/><rect x="27" y="5" width="5" height="6" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/><path d="M12 18 l16 15 M28 18 l-16 15" stroke="#0c0414" stroke-width="2" opacity=".35"/>`,
+  blanket:c=>`<rect x="5" y="11" width="30" height="20" rx="4" fill="${c}" ${O}/><path d="M5 17 h30 M5 24 h30" stroke="#f7ecff" stroke-width="2.5"/><path d="M30 11 q6 6 0 20" fill="none" stroke="#0c0414" stroke-width="1.5" opacity=".5"/>`,
+  box:c=>`<rect x="8" y="8" width="24" height="24" rx="3" fill="${c}" ${O}/><text x="20" y="26" text-anchor="middle" font-size="16" font-family="monospace" fill="#0c0414">?</text>`,
+  lock:c=>`<path d="M13 18 v-5 a7 7 0 0 1 14 0 v5" fill="none" stroke="${c}" stroke-width="4"/><rect x="9" y="18" width="22" height="17" rx="3" fill="${c}" stroke="#0c0414" stroke-width="2"/><circle cx="20" cy="26" r="2.5" fill="#0c0414"/>`,
+  unlock:c=>`<path d="M13 18 v-5 a7 7 0 0 1 14 0" fill="none" stroke="${c}" stroke-width="4" transform="translate(-6 -3) rotate(-18 20 13)"/><rect x="9" y="18" width="22" height="17" rx="3" fill="${c}" stroke="#0c0414" stroke-width="2"/><circle cx="20" cy="26" r="2.5" fill="#0c0414"/>`
+};
+function icon(name,c){
+  const s=document.createElementNS(NS,"svg"); s.setAttribute("viewBox","0 0 40 40"); s.setAttribute("aria-hidden","true");
+  s.innerHTML=(ICONS[name]||ICONS.box)(c||"#f7ecff"); return s;
+}
+const itemIcon = it => icon(ITEMS[it]?.ic, ITEMS[it]?.c);
 let STORY=null, VIEWS, RING, HS, DESC, ACT, ITEMS, CLUES, CODE, OBJ, HS_COUNT;
 
 // ---------------- identity ----------------
@@ -1149,6 +2352,7 @@ let peerMap = new Map();   // pk -> {nick,color,view,at,online}
 let screen = "lobby", shownMemory = false, endShownFor = null, seenTaps = 0;
 let chatOpen = false, seenChats = 0, unread = 0, toastT = null, repTab = "team";
 let suppressClick = false, swipe = null, padVal = "";
+let bagOpen = false, bagSel = null, prevInv = null, fxSeen = null, lockPrev = null, pickBuilt = false;
 
 // ---------------- shared clock: every device uses the server's time ----------------
 let clockOffset = 0;
@@ -1291,7 +2495,7 @@ function addEvent(k,data){
 function fold(){
   const evs=[...evMap.values()].sort((a,b)=>a.ts-b.ts||(a.id<b.id?-1:a.id>b.id?1:0));
   const s={inv:new Set(),hang:3,water:0,forced:0,wrong:0,wrongBy:{},brief:null,start:null,end:null,outcome:null,
-    players:new Map(),readyAt:{},waiting:[],taps:[],chats:[],acts:[],credit:[],choices:[]};
+    players:new Map(),readyAt:{},waiting:[],taps:[],chats:[],acts:[],credit:[],choices:[],got:{}};
   const storyEvs=[];
   // pass 1: who is in, when the host pressed start, who has read the card
   for(const e of evs){
@@ -1324,7 +2528,8 @@ function fold(){
         }
       } else {
         const a=ACT[e.a];
-        if(a&&a.run&&a.can(s)){ a.run(s); ok=true;
+        if(a&&a.run&&a.can(s)){ const before=new Set(s.inv); a.run(s); ok=true;
+          for(const it of s.inv) if(!before.has(it)) s.got[it]={p:e.p,ts:e.ts};
           if(a.key) s.credit.push({p:e.p,ts:e.ts,t:a.key});
           if(a.grey) s.choices.push({p:e.p,ts:e.ts,t:a.grey,g:false});
           if(a.good) s.choices.push({p:e.p,ts:e.ts,t:a.good,g:true});
@@ -1377,7 +2582,8 @@ function leave(){
   net.leave(); net.send=()=>{}; net.presence=()=>{}; net.leave=()=>{};
   joined=false; code=null; evMap.clear(); myEvents=[]; peerMap=new Map(); S=null;
   shownMemory=false; seenTaps=0; seenChats=0; unread=0; endShownFor=null;
-  closeSheet(); closeChat(); $("keypad").hidden=true; $("memory").hidden=true;
+  prevInv=null; fxSeen=null; lockPrev=null; bagSel=null;
+  closeSheet(); closeChat(); closeBag(); $("keypad").hidden=true; $("memory").hidden=true;
   roomIn.value=""; store.del("k47.code");
   try{ history.replaceState(null,"",location.pathname); }catch(e){}
   showScreen("lobby"); $("joinCard").hidden=false; $("waitCard").hidden=true; $("lobbyChat").hidden=true;
@@ -1395,15 +2601,33 @@ function copyText(t,btn){
 const isOnline = id => id===pk || !!peerMap.get(id)?.online;
 function canStart(){ return net.kind==="solo" || S.host===pk || !isOnline(S.host); }
 
+// a small svg of any wall of any story, ids stripped so it never collides with the live scene
+function wallArt(storyId,v,vb){
+  const svg=document.createElementNS(NS,"svg"); svg.setAttribute("viewBox",vb||"0 22 360 300"); svg.setAttribute("preserveAspectRatio","xMidYMid slice"); svg.setAttribute("aria-hidden","true");
+  const src = storyId===STORY.id ? $("v-"+v) : $("art-"+storyId).content.querySelector("#v-"+v);
+  const art=src.cloneNode(true); art.removeAttribute("id"); art.style.display=""; art.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id"));
+  if(storyId!==STORY.id) drawFloorlines(art);
+  svg.append(art);
+  const lt=$("lighting").cloneNode(true); lt.removeAttribute("id"); svg.append(lt);
+  return svg;
+}
 function renderStoryPick(){
-  const box=$("storyPick"); box.textContent="";
+  const box=$("storyPick");
   const mine = net.kind==="solo" || S.host===pk;
-  for(const st of Object.values(STORIES)){
-    const b=document.createElement("button"); b.type="button"; b.className="story"; b.setAttribute("aria-pressed",String(st.id===S.story)); b.disabled=!mine;
-    const t=document.createElement("b"); t.textContent=st.name; const d=document.createElement("span"); d.textContent=st.short;
-    b.append(t,d); b.onclick=()=>{ if(mine&&S.story!==st.id) addEvent("story",{s:st.id}); };
-    box.append(b);
+  if(!pickBuilt){
+    pickBuilt=true; box.textContent="";
+    for(const st of Object.values(STORIES)){
+      const b=document.createElement("button"); b.type="button"; b.className="scard"; b.dataset.s=st.id;
+      const th=wallArt(st.id,st.start,"0 30 360 230"); th.setAttribute("class","thumb");
+      const t=document.createElement("b"); t.textContent=st.name; const d=document.createElement("span"); d.textContent=st.short;
+      b.append(th,t);
+      if(st.isNew){ const n=document.createElement("em"); n.className="tagnew"; n.textContent="NOVA"; n.style.fontStyle="normal"; b.append(n); }
+      b.append(d);
+      b.onclick=()=>{ if((net.kind==="solo"||S.host===pk)&&S.story!==st.id) addEvent("story",{s:st.id}); };
+      box.append(b);
+    }
   }
+  box.querySelectorAll(".scard").forEach(b=>{ b.setAttribute("aria-pressed",String(b.dataset.s===S.story)); b.disabled=!mine; });
   $("storyHint").textContent = mine ? "Você escolhe a história. Todo mundo vê a escolha." : `${S.players.get(S.host)?.nick||"Quem criou a sala"} escolhe a história.`;
 }
 
@@ -1433,7 +2657,7 @@ function recompute(){
     renderBrief();
     renderGame();
   } else {
-    closeSheet(); $("keypad").hidden=true; $("memory").hidden=true;
+    closeSheet(); closeBag(); $("keypad").hidden=true; $("memory").hidden=true; $("stage").classList.remove("alarm");
     showScreen("end"); if(endShownFor!==code+S.end){ endShownFor=code+S.end; renderEnd(); }
   }
   renderPeople(); renderChat();
@@ -1512,6 +2736,7 @@ function setView(v,dir){
   drawCursors();
   net.presence();
   renderPeople();
+  if(S&&S.start!=null){ renderBagBar(); renderBag(); }
 }
 function turn(d){ if(!RING.includes(view)) return; const i=RING.indexOf(view); setView(RING[(i+d+4)%4], d); }
 $("turnL").onclick=()=>turn(-1);
@@ -1571,7 +2796,7 @@ $("scene").addEventListener("click",ev=>{
   const h=ev.target?.dataset?.h||null; const {x,y}=svgPoint(ev);
   if(x<0||y<0||x>360||y>480) return;
   if(S.taps.filter(t=>t.p===pk).length<300) addEvent("tap",{x,y,h,vw:view});
-  if(h&&HS[h].nav){ setView(HS[h].nav,1); return; }
+  if(h&&HS[h].nav&&!(HS[h].lock&&HS[h].lock(S))){ setView(HS[h].nav,1); return; }
   if(h) openSheet(h);
 });
 
@@ -1583,10 +2808,11 @@ function renderGame(){
   const w=$("sceneWrap"); w.style.setProperty("--h",S.hang); w.classList.toggle("sway",S.hang>0);
   $("scene").style.filter=`blur(${(S.hang*0.18).toFixed(2)}px) saturate(${1+S.hang*.1})`;
   STORY.paint(S);
-  const inv=$("inv"); inv.textContent="";
-  const l=document.createElement("span"); l.className="lbl"; l.textContent="Bolso"; inv.append(l);
-  if(!S.inv.size){ const e=document.createElement("span"); e.className="empty"; e.textContent="vazio"; inv.append(e); }
-  for(const it of S.inv){ const d=document.createElement("span"); d.className="item"; const sw=document.createElement("i"); sw.style.background=ITEMS[it].c; d.append(sw,ITEMS[it].n); inv.append(d); }
+  renderBagBar(); renderBag(); renderLocks();
+  const invNow=[...S.inv];
+  if(prevInv) invNow.filter(i=>!prevInv.includes(i)).forEach((it,k)=>setTimeout(()=>pickupFx(it),k*450));
+  prevInv=invNow;
+  fxScan();
   if(S.taps.length>seenTaps){
     S.taps.slice(seenTaps).forEach(t=>{ if(t.vw===view) ripple(t.x,t.y,S.players.get(t.p)?.color||"#fff"); });
     seenTaps=S.taps.length;
@@ -1619,6 +2845,7 @@ function drawCursors(){
 
 // ---------------- hotspot sheet ----------------
 function openSheet(h){
+  closeBag();
   sheetH=h; lastRes=null; renderSheet();
   $("sheet").classList.add("open"); $("sheet").setAttribute("aria-hidden","false");
   net.presence(); renderPeople();
@@ -1638,6 +2865,8 @@ function renderSheet(){
   for(const [id,a] of Object.entries(ACT)){
     if(a.h!==h||!a.can(S)) continue;
     const b=document.createElement("button"); b.className="act"+(id==="exit"?" exit":""); b.textContent=a.l;
+    const need=needs(a);
+    if(need.length){ const nd=document.createElement("span"); nd.className="need"; need.forEach(it=>nd.append(itemIcon(it))); b.append(nd); }
     if(id==="code_ui"&&S.wrong){ const sm=document.createElement("small"); sm.textContent=S.wrong+" erro"+(S.wrong>1?"s":""); b.append(sm); }
     b.onclick=()=>doAct(id); box.append(b);
   }
@@ -1736,12 +2965,99 @@ function renderChat(){
   }
 }
 
+// ---------------- bag: the team's shared inventory ----------------
+// which items an action needs: those whose absence would make it unavailable
+function needs(a){ return [...S.inv].filter(it=>!a.can({...S,inv:new Set([...S.inv].filter(x=>x!==it))})); }
+function usesOf(it){ return Object.entries(ACT).filter(([,a])=>a.run&&a.can(S)&&needs(a).includes(it)); }
+const usableHere = it => usesOf(it).some(([,a])=>HS[a.h].v===view);
+function renderBagBar(){
+  const box=$("bagItems"); box.textContent="";
+  const n=S.inv.size; $("bagCount").textContent = n ? n+(n>1?" itens":" item") : "vazia";
+  for(const it of S.inv){ const d=document.createElement("span"); d.className="mini"+(usableHere(it)?" usable":""); d.title=ITEMS[it].n; d.append(itemIcon(it)); box.append(d); }
+}
+function openBag(){
+  if(!S||S.start==null) return;
+  closeSheet(); bagOpen=true;
+  if(!bagSel||!S.inv.has(bagSel)) bagSel=[...S.inv].find(usableHere)||[...S.inv][0]||null;
+  renderBag(); $("bag").classList.add("open"); $("bag").setAttribute("aria-hidden","false");
+}
+function closeBag(){ if(!bagOpen) return; bagOpen=false; $("bag").classList.remove("open"); $("bag").setAttribute("aria-hidden","true"); }
+$("bagBtn").onclick=openBag; $("bagClose").onclick=closeBag;
+function renderBag(){
+  if(!bagOpen||!S) return;
+  if(bagSel&&!S.inv.has(bagSel)) bagSel=[...S.inv][0]||null;
+  const box=$("slots"); box.textContent="";
+  const items=[...S.inv], total=Math.max(8,Math.ceil(items.length/4)*4);
+  for(let i=0;i<total;i++){
+    const it=items[i];
+    if(!it){ const e=document.createElement("div"); e.className="slot empty"; box.append(e); continue; }
+    const b=document.createElement("button"); b.type="button"; b.className="slot"+(usableHere(it)?" usable":""); b.setAttribute("aria-pressed",String(it===bagSel));
+    const nm=document.createElement("span"); nm.textContent=ITEMS[it].n;
+    b.append(itemIcon(it),nm); b.onclick=()=>{ bagSel=it; renderBag(); }; box.append(b);
+  }
+  const det=$("itemDet"); det.textContent="";
+  if(!bagSel){ det.append(el("p","hint","A bolsa está vazia. Examinem os objetos: o que alguém pegar aparece aqui pra todo mundo.")); return; }
+  const it=bagSel, wrap=el("div","idet"), big=el("div","big"); big.append(itemIcon(it));
+  const txt=el("div"); txt.append(el("h3",null,ITEMS[it].n), el("p",null,ITEMS[it].d||""));
+  const g=S.got[it]; if(g){ const p=S.players.get(g.p); txt.append(el("p","by",`Achado por ${p?.nick||"?"} · +${fmt(g.ts-S.start)}`)); }
+  wrap.append(big,txt);
+  const uses=el("div","uses"), all=usesOf(it), here=all.filter(([,a])=>HS[a.h].v===view);
+  here.forEach(([id,a])=>{ const b=el("button","act"); b.append(document.createTextNode(`${a.l} · ${HS[a.h].n}`)); const nd=el("span","need"); nd.append(itemIcon(it)); b.append(nd);
+    b.onclick=()=>{ closeBag(); openSheet(a.h); doAct(id); }; uses.append(b); });
+  if(!here.length) uses.append(el("p","hint", all.length ? "Nada nesta parede combina com isso. Mas serve pra alguma coisa em outro canto…" : "Por enquanto, só ocupa espaço."));
+  wrap.append(uses); det.append(wrap);
+}
+function pickupFx(it){
+  const st=$("stage"), bag=$("bagBtn"); if(screen!=="game"||!ITEMS[it]) return;
+  const bump=()=>{ bag.classList.remove("bump"); void bag.offsetWidth; bag.classList.add("bump"); };
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches||!st.animate){ bump(); return; }
+  const fly=document.createElement("div"); fly.className="fly"; fly.append(itemIcon(it)); const lb=document.createElement("span"); lb.textContent="+ "+ITEMS[it].n; fly.append(lb);
+  st.append(fly);
+  const sr=st.getBoundingClientRect(), br=bag.getBoundingClientRect();
+  const dx=Math.round(br.left+br.width/2-(sr.left+sr.width/2)), dy=Math.round(br.top+br.height/2-(sr.top+sr.height/2));
+  const an=fly.animate([
+    {transform:"translate(-50%,-50%) scale(.2) rotate(-20deg)",opacity:0},
+    {transform:"translate(-50%,-50%) scale(1.15) rotate(4deg)",opacity:1,offset:.25},
+    {transform:"translate(-50%,-50%) scale(1)",opacity:1,offset:.62},
+    {transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.2)`,opacity:.3}
+  ],{duration:1400,easing:"ease-in-out"});
+  an.onfinish=()=>{ fly.remove(); bump(); };
+}
+
+// ---------------- feedback: flashes, shakes, milestone banners, exit locks ----------------
+function flash(kind){ const f=$("flash"); f.className="flash "+kind; void f.offsetWidth; f.classList.add("go"); }
+function banner(text,p){
+  const q=$("fxq"), b=el("div","banner"); b.style.setProperty("--c",p?.color||"#ffd23f");
+  b.append(icon("unlock","#ffd23f")); const t=el("span"); t.append(el("b",null,(p?.nick||"Alguém")+" "),document.createTextNode(text)); b.append(t);
+  q.append(b); while(q.children.length>3) q.firstChild.remove(); setTimeout(()=>b.remove(),3400);
+}
+function fxScan(){
+  if(!fxSeen){ fxSeen={acts:S.acts.length,cred:S.credit.length}; return; }
+  for(const e of S.acts.slice(fxSeen.acts)){
+    if(!e.ok||e.p!==pk) continue; const a=ACT[e.a];
+    if(a?.good) flash("good"); else if(a?.grey) flash("grey");
+    if(e.a==="force"||e.a==="cage_shake"){ const w=$("stage"); w.classList.remove("shake"); void w.offsetWidth; w.classList.add("shake"); }
+  }
+  S.credit.slice(fxSeen.cred).forEach(c=>banner(c.t,S.players.get(c.p)));
+  fxSeen={acts:S.acts.length,cred:S.credit.length};
+}
+function renderLocks(){
+  const box=$("locks"); box.textContent="";
+  const now_=(STORY.locks||[]).map(l=>!!l.ok(S));
+  (STORY.locks||[]).forEach((l,i)=>{
+    const d=el("span","lk"+(now_[i]?" ok":"")+(lockPrev&&now_[i]&&!lockPrev[i]?" pop":""));
+    d.append(icon(now_[i]?"unlock":"lock",now_[i]?"#3dff8b":"#ff7aa8"),document.createTextNode(l.n)); box.append(d);
+  });
+  lockPrev=now_;
+}
+
 // ---------------- timer ----------------
 function tick(){
   if(S&&S.brief!=null&&S.start==null){ $("timer").textContent=fmt(DUR); return; }
   if(!S||S.start==null||S.end!=null) return;
   const left=S.start+DUR-now();
   const t=$("timer"); t.textContent=fmt(left); t.classList.toggle("low",left<30000);
+  $("stage").classList.toggle("alarm",left<60000&&left>0);
   if(left<=0) recompute();
 }
 setInterval(()=>{
@@ -1788,17 +3104,30 @@ function storyLines(){ return [S.outcome==="win"?STORY.win:STORY.lose, ...STORY.
 function renderEnd(){
   const v=$("verdict"); v.className="verdict "+(S.outcome==="win"?"win":"lose");
   v.textContent=S.outcome==="win"?"VOCÊS SAÍRAM.":"TARDE DEMAIS.";
-  const st=$("story"); st.textContent=""; storyLines().forEach(t=>{ const li=document.createElement("li"); li.textContent=t; st.append(li); });
+  const st=$("story"); st.textContent=""; storyLines().forEach((t,i)=>{ const li=document.createElement("li"); li.textContent=t; li.style.animationDelay=(0.6+i*0.25)+"s"; st.append(li); });
+  endArt();
   repTab="team"; renderReport();
+}
+function endArt(){
+  const box=$("endArt"); box.textContent="";
+  const win=S.outcome==="win", v=HS[ACT.exit.h].v;
+  const fig=el("figure","polaroid"); const svg=wallArt(STORY.id,v,"0 22 360 300"); fig.append(svg);
+  fig.append(el("div","stamp "+(win?"win":"lose"),win?"LIVRES":"PEGOS"));
+  fig.append(el("figcaption",null,STORY.name+" · "+fmt(S.end-S.start)));
+  box.append(fig);
+  if(win&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
+    const c=el("div","confetti"); document.body.append(c);
+    for(let i=0;i<70;i++){ const p=document.createElement("i"); p.style.left=Math.random()*100+"vw"; p.style.background=PALETTE[i%PALETTE.length];
+      p.style.animationDuration=(2.2+Math.random()*2.5)+"s"; p.style.animationDelay=(Math.random()*0.8)+"s"; p.style.transform=`rotate(${Math.random()*360}deg)`; c.append(p); }
+    setTimeout(()=>c.remove(),6500);
+  }
 }
 function el(tag,cls,txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
 function heatGrid(filter){
   const grid=el("div","heatgrid");
-  const defs=document.querySelector("#scene defs");
   for(const v of Object.keys(VIEWS)){
     const fig=el("figure");
     const svg=document.createElementNS(NS,"svg"); svg.setAttribute("viewBox","0 0 360 480"); svg.setAttribute("class","heat"); svg.setAttribute("role","img"); svg.setAttribute("aria-label","Cliques em "+VIEWS[v]);
-    svg.append(defs.cloneNode(true));
     const art=$("v-"+v).cloneNode(true); art.removeAttribute("id"); art.style.display=""; art.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id")); art.setAttribute("opacity",".35"); svg.append(art);
     const taps=S.taps.filter(t=>t.vw===v&&(!filter||t.p===filter));
     taps.forEach(t=>{ const c=document.createElementNS(NS,"circle"); c.setAttribute("cx",t.x); c.setAttribute("cy",t.y); c.setAttribute("r",11);
@@ -1878,7 +3207,8 @@ function summaryText(){
 }
 
 window.addEventListener("keydown",e=>{
-  if(e.key==="Escape"){ closeSheet(); closeChat(); $("keypad").hidden=true; $("memory").hidden=true; }
+  if(screen==="game"&&!chatOpen&&document.activeElement?.tagName!=="INPUT"&&(e.key==="b"||e.key==="B")){ bagOpen?closeBag():openBag(); }
+  if(e.key==="Escape"){ closeSheet(); closeChat(); closeBag(); $("keypad").hidden=true; $("memory").hidden=true; }
   if(screen==="game"&&!chatOpen&&document.activeElement?.tagName!=="INPUT"){ if(e.key==="ArrowLeft") turn(-1); if(e.key==="ArrowRight") turn(1); }
 });
 applyStory("kitnet");
