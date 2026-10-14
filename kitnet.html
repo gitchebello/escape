@@ -68,6 +68,9 @@ input[type=text]:focus{border-color:var(--cyan)}
 .scard:disabled{cursor:default}
 .scard:disabled:not([aria-pressed=true]){opacity:.5}
 .scard .new{position:relative}
+.scard.boss{grid-column:1/-1;border-color:var(--blood)}
+.scard.boss .thumb{aspect-ratio:360/150}
+.scard .tagnew.boss{background:var(--blood);color:var(--paper)}
 .scard .tagnew{align-self:flex-start;margin:0 10px;font-size:10px;font-weight:700;letter-spacing:.12em;background:var(--ok);color:var(--ink);padding:1px 5px}
 /* roster (lobby + game) */
 .roster{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
@@ -479,7 +482,7 @@ input[type=text]:focus{border-color:var(--cyan)}
 
 <div class="modal" id="keypad" hidden>
   <div class="pad">
-    <div class="tag">TRAVA ELETRÔNICA · 4 DÍGITOS</div>
+    <div class="tag" id="padTag">TRAVA ELETRÔNICA · 4 DÍGITOS</div>
     <div class="pad-disp" id="padDisp">____</div>
     <div class="keys" id="keys"></div>
     <button class="btn" id="padClose">Fechar</button>
@@ -491,7 +494,7 @@ input[type=text]:focus{border-color:var(--cyan)}
     <h3>flash.</h3>
     <p>Um pedaço da noite volta. <b>Só você lembra disso.</b> Conte pro time pelo chat.</p>
     <div id="clues" style="display:flex;flex-direction:column;gap:10px"></div>
-    <p style="font-size:13px">Use as setas (ou arraste pro lado) para virar. Toque nos objetos para examinar. Água e remédio aliviam a ressaca.</p>
+    <p style="font-size:13px">Use as setas (ou arraste pro lado) para virar. Toque nos objetos para examinar. Água e remédio aliviam a ressaca. Senha errada e besteira custam tempo.</p>
     <p id="memWait" class="clue" style="font-size:18px" hidden></p>
     <button class="btn" id="memClose">Bora</button>
   </div>
@@ -1638,10 +1641,824 @@ input[type=text]:focus{border-color:var(--cyan)}
         </g>
 </svg></template>
 
+<template id="art-cobertura"><svg xmlns="http://www.w3.org/2000/svg">
+        <!-- ===== N: SALA ===== -->
+        <g id="v-N" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#2b1f3a"/>
+          <rect x="0" y="22" width="360" height="10" fill="#c8a46a" opacity=".5"/>
+          <g stroke="#43305c" stroke-width="2" fill="none"><rect x="14" y="46" width="64" height="150"/><rect x="282" y="46" width="64" height="150"/></g>
+          <path d="M180 32 l-80 34 h160z" fill="#fff6d8" opacity=".07"/>
+          <rect x="100" y="56" width="160" height="110" fill="#f7ecff" stroke="#c8a46a" stroke-width="6"/>
+          <rect x="100" y="56" width="160" height="110" fill="none" stroke="#0c0414" stroke-width="2"/>
+          <circle cx="146" cy="108" r="32" fill="#ff2e88"/>
+          <rect x="168" y="70" width="76" height="40" fill="#2de2e6"/>
+          <rect x="196" y="118" width="46" height="40" fill="#ffd23f"/>
+          <path d="M108 154 L252 80" stroke="#0c0414" stroke-width="6"/>
+          <text x="250" y="160" text-anchor="end" font-family="VT323,K47 VT,monospace" font-size="11" fill="#0c0414">R.R.</text>
+          <g id="postit" style="display:none"><rect x="250" y="136" width="26" height="24" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5" transform="rotate(8 263 148)"/><path d="M255 144 h14 M255 150 h10" stroke="#0c0414" stroke-width="1.2" transform="rotate(8 263 148)"/></g>
+          <path d="M26 326 V184" stroke="#c8a46a" stroke-width="4"/>
+          <path d="M8 184 h36 l-8 -26 h-20z" fill="#ffd23f" stroke="#0c0414" stroke-width="2.5"/>
+          <circle cx="26" cy="196" r="28" fill="#ffd23f" opacity=".12"/>
+          <path d="M324 326 h26 l-4 -30 h-18z" fill="#5a2a16" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M337 296 q-26 -40 -10 -90 M337 296 q18 -50 10 -100 M337 296 q-6 -60 -24 -70" stroke="#2f8f4e" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <rect x="0" y="330" width="360" height="150" fill="#d8cfe4"/>
+          <g class="floorlines"></g>
+          <path d="M20 360 q60 20 40 80 M250 342 q30 40 90 50" stroke="#a99cbc" stroke-width="2" fill="none" opacity=".7"/>
+          <rect x="62" y="214" width="236" height="66" rx="16" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+          <path d="M140 220 v54 M220 220 v54" stroke="#cbbbe0" stroke-width="2"/>
+          <rect x="56" y="268" width="248" height="48" rx="10" fill="#ece2f5" stroke="#0c0414" stroke-width="3"/>
+          <path d="M140 270 v44 M220 270 v44" stroke="#cbbbe0" stroke-width="2"/>
+          <rect x="46" y="238" width="38" height="86" rx="14" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+          <rect x="276" y="238" width="38" height="86" rx="14" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+          <path d="M64 324 v8 M296 324 v8" stroke="#c8a46a" stroke-width="5"/>
+          <ellipse cx="180" cy="290" rx="34" ry="11" fill="#7a0f2a" opacity=".85"/>
+          <path d="M168 300 q2 14 -2 18 M196 298 q3 10 0 16" stroke="#7a0f2a" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <rect x="100" y="230" width="34" height="30" rx="6" fill="#ff2e88" stroke="#0c0414" stroke-width="2" transform="rotate(-8 117 245)"/>
+          <g id="penPeek"><rect x="232" y="263" width="26" height="7" rx="3" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5" transform="rotate(-14 245 266)"/></g>
+          <path d="M96 386 h168 l12 26 h-192z" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <path d="M90 374 h180 l12 14 h-204z" fill="#bfefff" opacity=".6" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M100 412 v26 M260 412 v26" stroke="#c8a46a" stroke-width="5"/>
+          <g>
+            <path d="M158 334 h28 q0 24 -14 26 q-14 -2 -14 -26z" fill="#bfefff" fill-opacity=".55" stroke="#0c0414" stroke-width="2"/>
+            <path d="M161 344 h22 q-2 13 -11 14 q-9 -1 -11 -14z" fill="#7a0f2a"/>
+            <path d="M172 360 v14" stroke="#0c0414" stroke-width="2.5"/>
+            <ellipse cx="172" cy="377" rx="10" ry="3" fill="#bfefff" stroke="#0c0414" stroke-width="2"/>
+            <g id="tacaDust" style="display:none"><ellipse cx="181" cy="341" rx="5" ry="6" fill="#e8c4a0" opacity=".9"/><g fill="none" stroke="#5a2a16" stroke-width=".8"><ellipse cx="181" cy="341" rx="2" ry="2.5"/><ellipse cx="181" cy="341" rx="3.6" ry="4.4"/></g></g>
+          </g>
+          <path d="M222 376 h46 l5 9 h-56z" fill="#0c0414" stroke="#0c0414" stroke-width="2"/>
+          <g id="tabletOn"><path d="M226 378 h38 l3 5 h-44z" fill="#2de2e6" class="tvglow"/></g>
+        </g>
+
+        <!-- ===== L: VARANDA ===== -->
+        <g id="v-L" class="view">
+          <rect x="0" y="22" width="360" height="250" fill="url(#gDawn)"/>
+          <circle cx="76" cy="206" r="26" fill="#ffd23f" opacity=".85"/>
+          <g fill="#2a0b45"><rect x="0" y="150" width="30" height="120"/><rect x="34" y="120" width="26" height="150"/><rect x="64" y="170" width="40" height="100"/><rect x="108" y="100" width="30" height="170"/><rect x="142" y="140" width="44" height="130"/><rect x="190" y="160" width="24" height="110"/><rect x="218" y="118" width="36" height="152"/><rect x="258" y="176" width="40" height="94"/><rect x="302" y="134" width="26" height="136"/><rect x="332" y="160" width="28" height="110"/></g>
+          <g fill="#ffd23f" opacity=".7"><rect x="40" y="130" width="4" height="4"/><rect x="48" y="146" width="4" height="4"/><rect x="114" y="112" width="4" height="4"/><rect x="124" y="140" width="4" height="4"/><rect x="226" y="130" width="4" height="4"/><rect x="238" y="160" width="4" height="4"/><rect x="308" y="150" width="4" height="4"/></g>
+          <path d="M123 100 v-22" stroke="#2a0b45" stroke-width="3"/><circle class="twinkle" cx="123" cy="76" r="3" fill="#e0102f"/>
+          <rect x="0" y="232" width="360" height="98" fill="#bfefff" opacity=".18"/>
+          <path d="M0 232 H360" stroke="#c9ccd6" stroke-width="6"/>
+          <path d="M60 232 V330 M180 232 V330 M300 232 V330" stroke="#c9ccd6" stroke-width="4"/>
+          <path d="M20 250 l30 50 M200 246 l20 40" stroke="#fff" stroke-width="3" opacity=".3"/>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pTeak)"/>
+          <g class="floorlines" opacity=".5"></g>
+          <path d="M206 288 h144 v52 h-144z" fill="#9a6430" stroke="#0c0414" stroke-width="3"/>
+          <path d="M206 304 h144 M206 320 h144" stroke="#5a2a16" stroke-width="2"/>
+          <ellipse cx="278" cy="288" rx="72" ry="12" fill="#2de2e6" stroke="#0c0414" stroke-width="3"/>
+          <path d="M226 288 q10 -4 20 0 t20 0 t20 0" stroke="#f7ecff" stroke-width="2" fill="none"/>
+          <g class="steam" opacity=".5"><ellipse cx="258" cy="268" rx="16" ry="6" fill="#f7ecff"/><ellipse cx="290" cy="260" rx="12" ry="5" fill="#f7ecff"/></g>
+          <path d="M320 264 h22 l-3 24 h-16z" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/>
+          <path d="M327 264 l3 -26 h6 l-1 26" fill="#2f8f4e" stroke="#0c0414" stroke-width="2"/>
+          <g id="soniaLie">
+            <ellipse cx="120" cy="432" rx="96" ry="10" fill="#0c0414" opacity=".3"/>
+            <path d="M58 404 q30 -22 92 -14 l18 6 q6 14 -4 22 l-22 4 q-60 4 -84 -8z" fill="#b18cff" stroke="#0c0414" stroke-width="3"/>
+            <path d="M162 404 l36 -2 M160 416 l36 6" stroke="#0c0414" stroke-width="11" stroke-linecap="round"/>
+            <path d="M162 404 l36 -2 M160 416 l36 6" stroke="#c98b6b" stroke-width="7" stroke-linecap="round"/>
+            <path d="M88 392 l-18 -30" stroke="#0c0414" stroke-width="11" stroke-linecap="round"/>
+            <path d="M88 392 l-18 -30" stroke="#c98b6b" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="46" cy="398" r="18" fill="#c98b6b" stroke="#0c0414" stroke-width="3"/>
+            <path d="M28 392 q4 -20 26 -18 q10 2 12 10 q-14 -4 -22 6 q-8 12 -16 2z" fill="#1b0d08"/>
+            <g class="swell"><circle cx="48" cy="404" r="9" fill="#ff5f6d" opacity=".75"/><circle cx="70" cy="412" r="5" fill="#ff5f6d" opacity=".6"/><circle cx="82" cy="404" r="4" fill="#ff5f6d" opacity=".6"/></g>
+          </g>
+          <g id="soniaSit" style="display:none">
+            <ellipse cx="110" cy="404" rx="70" ry="10" fill="#0c0414" opacity=".3"/>
+            <path d="M80 398 q-6 -50 30 -62 q36 12 30 62z" fill="#b18cff" stroke="#0c0414" stroke-width="3"/>
+            <path d="M110 398 l64 4 M110 390 l60 -6" stroke="#0c0414" stroke-width="11" stroke-linecap="round"/>
+            <path d="M110 398 l64 4 M110 390 l60 -6" stroke="#c98b6b" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="110" cy="320" r="18" fill="#c98b6b" stroke="#0c0414" stroke-width="3"/>
+            <path d="M92 316 q2 -22 22 -20 q16 2 14 18 q-8 -10 -20 -8 q-10 2 -16 10z" fill="#1b0d08"/>
+            <g class="swell"><circle cx="108" cy="328" r="8" fill="#ff5f6d" opacity=".75"/><circle cx="122" cy="342" r="4" fill="#ff5f6d" opacity=".6"/></g>
+          </g>
+          <path d="M296 386 q20 -30 40 0" stroke="#0c0414" stroke-width="3" fill="none"/>
+          <rect x="286" y="384" width="60" height="40" rx="6" fill="#ff2e88" stroke="#0c0414" stroke-width="3"/>
+          <g id="bagShut"><rect x="306" y="394" width="20" height="6" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/></g>
+          <g id="bagOpenArt" style="display:none"><path d="M286 384 l10 -10 h40 l10 10z" fill="#c4006a" stroke="#0c0414" stroke-width="2"/><rect x="300" y="372" width="8" height="14" fill="#e0102f" stroke="#0c0414" stroke-width="1"/></g>
+        </g>
+
+        <!-- ===== S: PORTA ===== -->
+        <g id="v-S" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#2b1f3a"/>
+          <rect x="0" y="22" width="360" height="10" fill="#c8a46a" opacity=".5"/>
+          <rect x="104" y="48" width="162" height="284" fill="#1b1226" stroke="#0c0414" stroke-width="3"/>
+          <rect x="112" y="56" width="73" height="276" fill="url(#pWood)" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="185" y="56" width="73" height="276" fill="url(#pWood)" stroke="#0c0414" stroke-width="2.5"/>
+          <g fill="none" stroke="#3a1f0c" stroke-width="2"><rect x="122" y="70" width="53" height="110"/><rect x="195" y="70" width="53" height="70"/><rect x="122" y="196" width="53" height="120"/><rect x="195" y="236" width="53" height="80"/></g>
+          <path d="M178 190 v40 M192 190 v40" stroke="#ffd23f" stroke-width="5" stroke-linecap="round"/>
+          <rect x="206" y="148" width="40" height="80" rx="4" fill="#0c0414" stroke="#c9ccd6" stroke-width="2"/>
+          <circle cx="226" cy="166" r="9" fill="#1b1622" stroke="#2de2e6" stroke-width="1.5"/>
+          <g fill="none" stroke="#2de2e6" stroke-width="1" opacity=".8"><ellipse cx="226" cy="166" rx="3" ry="4"/><ellipse cx="226" cy="166" rx="6" ry="7"/></g>
+          <g fill="#5c5566"><rect x="214" y="182" width="6" height="5"/><rect x="223" y="182" width="6" height="5"/><rect x="232" y="182" width="6" height="5"/><rect x="214" y="190" width="6" height="5"/><rect x="223" y="190" width="6" height="5"/><rect x="232" y="190" width="6" height="5"/><rect x="214" y="198" width="6" height="5"/><rect x="223" y="198" width="6" height="5"/><rect x="232" y="198" width="6" height="5"/><rect x="223" y="206" width="6" height="5"/></g>
+          <circle id="ledKey" cx="216" cy="220" r="3.5" fill="#e0102f" filter="url(#fGlow)"/>
+          <circle id="ledCode" cx="236" cy="220" r="3.5" fill="#e0102f" filter="url(#fGlow)"/>
+          <rect x="24" y="150" width="56" height="88" rx="6" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+          <rect x="32" y="160" width="40" height="28" fill="#0b2a5a"/>
+          <text x="52" y="178" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="11" fill="#2de2e6">PORTARIA</text>
+          <g fill="#5c5566"><circle cx="40" cy="204" r="4"/><circle cx="52" cy="204" r="4"/><circle cx="64" cy="204" r="4"/></g>
+          <rect x="36" y="216" width="32" height="12" rx="3" fill="#3dff8b" stroke="#0c0414" stroke-width="1.5"/>
+          <ellipse cx="316" cy="136" rx="30" ry="52" fill="#bfefff" opacity=".3" stroke="#c8a46a" stroke-width="5"/>
+          <path d="M300 110 l20 30" stroke="#fff" stroke-width="3" opacity=".3"/>
+          <rect x="280" y="226" width="76" height="12" fill="#c8a46a" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M288 238 V330 M348 238 V330" stroke="#c8a46a" stroke-width="5"/>
+          <rect x="284" y="212" width="30" height="14" fill="#f7ecff" stroke="#0c0414" stroke-width="1.5" transform="rotate(-6 299 219)"/>
+          <ellipse cx="300" cy="226" rx="0" ry="0"/>
+          <g id="rolexArt"><rect x="322" y="216" width="26" height="6" fill="#c8a46a" stroke="#0c0414" stroke-width="1.2"/><circle cx="335" cy="218" r="7" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/><circle cx="335" cy="218" r="4" fill="#1b1622"/></g>
+          <rect x="0" y="330" width="360" height="150" fill="#d8cfe4"/>
+          <g class="floorlines"></g>
+          <path d="M120 352 h130 l10 30 h-150z" fill="#3a2a4f" stroke="#0c0414" stroke-width="2"/>
+          <text x="185" y="374" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#c8a46a">R.R.</text>
+        </g>
+
+        <!-- ===== O: COZINHA ===== -->
+        <g id="v-O" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#3a2f4d"/>
+          <rect x="0" y="36" width="182" height="96" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <path d="M60 36 v96 M120 36 v96" stroke="#0c0414" stroke-width="2"/>
+          <g fill="#c8a46a"><rect x="52" y="108" width="4" height="16"/><rect x="112" y="108" width="4" height="16"/><rect x="172" y="108" width="4" height="16"/></g>
+          <rect x="0" y="132" width="182" height="70" fill="url(#pTile)"/>
+          <rect x="0" y="132" width="182" height="70" fill="#2b1f3a" opacity=".35"/>
+          <g>
+            <ellipse cx="56" cy="182" rx="22" ry="18" fill="#c58b4e" stroke="#0c0414" stroke-width="2.5"/>
+            <circle cx="56" cy="158" r="13" fill="#c58b4e" stroke="#0c0414" stroke-width="2.5"/>
+            <circle cx="46" cy="147" r="5" fill="#c58b4e" stroke="#0c0414" stroke-width="2"/><circle cx="66" cy="147" r="5" fill="#c58b4e" stroke="#0c0414" stroke-width="2"/>
+            <circle cx="52" cy="157" r="1.8" fill="#0c0414"/><circle cx="60" cy="157" r="1.8" fill="#0c0414"/>
+            <ellipse cx="56" cy="163" rx="4" ry="3" fill="#f7ecff"/>
+            <text x="56" y="190" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="9" fill="#0c0414">COOKIES</text>
+          </g>
+          <ellipse cx="136" cy="196" rx="24" ry="6" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <circle cx="128" cy="188" r="7" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/><circle cx="142" cy="187" r="7" fill="#3dff8b" stroke="#0c0414" stroke-width="1.5"/>
+          <rect x="0" y="200" width="184" height="12" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="0" y="212" width="182" height="118" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <path d="M0 252 H182 M0 292 H182 M90 212 V330" stroke="#0c0414" stroke-width="2"/>
+          <text x="226" y="44" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="12" fill="#c8a46a">ADEGA · 12°C</text>
+          <rect x="188" y="50" width="80" height="282" fill="#1b1226" stroke="#0c0414" stroke-width="3"/>
+          <g id="adegaShut">
+            <rect x="196" y="58" width="64" height="270" fill="#3a0f1e"/>
+            <path d="M206 74H252M206 100H252M206 126H252M206 152H252M206 178H252M206 204H252M206 230H252M206 256H252M206 282H252M206 308H252" stroke="#0c0414" stroke-width="13" stroke-linecap="round" stroke-dasharray="0 15" fill="none"/>
+            <path d="M206 74H252M206 100H252M206 126H252M206 152H252M206 178H252M206 204H252M206 230H252M206 256H252M206 282H252M206 308H252" stroke="#7a0f2a" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 15" fill="none"/>
+            <rect x="196" y="58" width="64" height="270" fill="#bfefff" opacity=".18"/>
+            <path d="M204 70 l20 40" stroke="#fff" stroke-width="3" opacity=".3"/>
+            <rect x="250" y="180" width="5" height="34" fill="#c9ccd6"/>
+            <circle cx="252" cy="222" r="3" fill="#ffd23f" stroke="#0c0414" stroke-width="1"/>
+          </g>
+          <g id="adegaOpenArt" style="display:none">
+            <rect x="196" y="58" width="64" height="270" fill="#0c0414"/>
+            <rect x="196" y="58" width="64" height="270" fill="#2de2e6" opacity=".14"/>
+            <path d="M196 58 l-24 10 v250 l24 10z" fill="#bfefff" opacity=".3" stroke="#c9ccd6" stroke-width="2"/>
+            <text x="228" y="200" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#2de2e6">▼</text>
+          </g>
+          <rect x="274" y="44" width="82" height="286" rx="4" fill="#c9ccd6" stroke="#0c0414" stroke-width="3"/>
+          <path d="M315 44 v286" stroke="#0c0414" stroke-width="2"/>
+          <path d="M306 150 v60 M324 150 v60" stroke="#5c5566" stroke-width="4" stroke-linecap="round"/>
+          <rect x="282" y="70" width="26" height="40" fill="#2a2531"/>
+          <rect x="0" y="330" width="360" height="150" fill="#2a2531"/>
+          <g class="floorlines"></g>
+          <path d="M70 362 h220 l18 80 h-256z" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <path d="M60 352 h240 l10 14 h-260z" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+          <ellipse cx="180" cy="359" rx="30" ry="4" fill="#9aa0ad" stroke="#0c0414" stroke-width="2"/>
+          <path d="M198 356 v-26 q0 -10 -12 -10 h-8" stroke="#c9ccd6" stroke-width="5" fill="none"/>
+          <circle class="drip" cx="177" cy="324" r="2" fill="#2de2e6"/>
+        </g>
+
+        <!-- ===== A: ADEGA ===== -->
+        <g id="v-A" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="url(#pBrick)"/>
+          <rect x="0" y="22" width="360" height="308" fill="#0c0414" opacity=".45"/>
+          <rect x="8" y="40" width="172" height="290" fill="#3a1f0c" stroke="#0c0414" stroke-width="3"/>
+          <path d="M26 58H168M26 78H168M26 98H168M26 118H168M26 138H168M26 158H168M26 178H168M26 198H168M26 218H168M26 238H168M26 258H168M26 278H168M26 298H168M26 318H168" stroke="#0c0414" stroke-width="17" stroke-linecap="round" stroke-dasharray="0 20" fill="none"/>
+          <path d="M26 58H168M26 78H168M26 98H168M26 118H168M26 138H168M26 158H168M26 178H168M26 198H168M26 218H168M26 238H168M26 258H168M26 278H168M26 298H168M26 318H168" stroke="#4a0f1e" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 20" fill="none"/>
+          <path d="M26 58H168M26 98H168M26 138H168M26 178H168M26 218H168M26 258H168M26 298H168" stroke="#2f8f4e" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 40" fill="none" opacity=".7"/>
+          <rect x="200" y="60" width="146" height="128" fill="#1b0d08" stroke="#c8a46a" stroke-width="4"/>
+          <path d="M273 62 l-50 124 h100z" fill="#fff6d8" opacity=".12"/>
+          <path d="M228 154 l10 20 h60 l10 -20" stroke="#c8a46a" stroke-width="3" fill="none"/>
+          <g id="bottleArt">
+            <path d="M222 128 H296 Q312 128 318 136 H340 V144 H318 Q312 152 296 152 H222 Z" fill="#2f1a10" stroke="#0c0414" stroke-width="2.5"/>
+            <rect x="240" y="129" width="40" height="22" fill="#f7ecff" stroke="#0c0414" stroke-width="1.5"/>
+            <text x="260" y="143" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="9" fill="#7a0f2a">GRAND CRU</text>
+          </g>
+          <path d="M332 144 l4 14" stroke="#c8a46a" stroke-width="1.5"/>
+          <rect x="330" y="156" width="12" height="14" fill="#f7ecff" stroke="#0c0414" stroke-width="1" transform="rotate(12 336 163)"/>
+          <text x="272" y="214" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#2de2e6">12°C</text>
+          <rect x="200" y="250" width="146" height="10" fill="#5a2a16" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M210 260 V330 M336 260 V330" stroke="#5a2a16" stroke-width="6"/>
+          <path d="M226 250 q-18 0 -18 -14 q0 -14 14 -18 v-20 h8 v20 q14 4 14 18 q0 14 -18 14z" fill="#7a0f2a" fill-opacity=".8" stroke="#0c0414" stroke-width="2"/>
+          <rect x="266" y="238" width="50" height="12" fill="#1b2a6e" stroke="#0c0414" stroke-width="2" transform="rotate(-4 291 244)"/>
+          <rect x="328" y="224" width="8" height="26" fill="#f7ecff"/>
+          <circle class="flicker" cx="332" cy="219" r="4" fill="#ffd23f" filter="url(#fGlow)"/>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pWood)"/>
+          <rect x="0" y="330" width="360" height="150" fill="#0c0414" opacity=".35"/>
+          <g class="floorlines"></g>
+          <g fill="#bfefff" opacity=".12"><ellipse cx="100" cy="350" rx="90" ry="10"/><ellipse cx="270" cy="360" rx="80" ry="8"/></g>
+        </g>
+</svg></template>
+
+<template id="art-salao"><svg xmlns="http://www.w3.org/2000/svg">
+        <!-- ===== N: PALCO ===== -->
+        <g id="v-N" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#1b0f2e"/>
+          <rect x="70" y="52" width="220" height="118" fill="#0c0414" stroke="#c9ccd6" stroke-width="4"/>
+          <rect x="76" y="58" width="208" height="106" fill="#1b2a6e"/>
+          <text x="180" y="96" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="26" fill="#ffd23f">HALDEN 40 ANOS</text>
+          <text x="180" y="124" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="20" fill="#2de2e6">1986 — 2026</text>
+          <text x="180" y="150" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="13" fill="#f7ecff">OBRIGADO, TIME!</text>
+          <path d="M0 22 h52 q-12 150 10 308 h-62z" fill="#7a0f2a" stroke="#0c0414" stroke-width="3"/>
+          <path d="M360 22 h-52 q12 150 -10 308 h62z" fill="#7a0f2a" stroke="#0c0414" stroke-width="3"/>
+          <path d="M18 30 q-6 140 8 300 M34 26 q-10 150 6 304 M342 30 q6 140 -8 300 M326 26 q10 150 -6 304" stroke="#4a0618" stroke-width="3" fill="none"/>
+          <path d="M0 22 H360 V42 q-30 14 -60 0 q-30 14 -60 0 q-30 14 -60 0 q-30 14 -60 0 q-30 14 -60 0 q-30 14 -60 0z" fill="#9e1250" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M110 178 h140 l-6 10 l6 10 h-140 l6 -10z" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/>
+          <text x="180" y="193" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#0c0414">FELIZ 2026</text>
+          <rect x="0" y="292" width="360" height="38" fill="#3a1f0c" stroke="#0c0414" stroke-width="3"/>
+          <g><circle class="twinkle" cx="40" cy="312" r="5" fill="#ff2e88"/><circle class="twinkle b" cx="110" cy="312" r="5" fill="#2de2e6"/><circle class="twinkle" cx="180" cy="312" r="5" fill="#ffd23f"/><circle class="twinkle b" cx="250" cy="312" r="5" fill="#3dff8b"/><circle class="twinkle" cx="320" cy="312" r="5" fill="#b18cff"/></g>
+          <rect x="16" y="228" width="122" height="64" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <rect x="28" y="214" width="98" height="14" fill="#2a2531" stroke="#0c0414" stroke-width="2"/>
+          <g fill="#2de2e6"><circle cx="42" cy="221" r="3"/><circle cx="54" cy="221" r="3"/><circle cx="100" cy="221" r="3"/><circle cx="112" cy="221" r="3"/></g>
+          <rect x="66" y="216" width="22" height="8" fill="#ff2e88"/>
+          <text x="77" y="262" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="16" fill="#ff2e88">DJ LUCAS</text>
+          <rect x="34" y="272" width="86" height="18" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/>
+          <g id="caseOpen" style="display:none"><path d="M34 272 l8 -14 h70 l8 14z" fill="#9aa0ad" stroke="#0c0414" stroke-width="2"/></g>
+          <rect x="262" y="176" width="86" height="116" rx="4" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <circle cx="305" cy="212" r="18" fill="#2a2531" stroke="#5c5566" stroke-width="3"/>
+          <circle cx="305" cy="260" r="24" fill="#2a2531" stroke="#5c5566" stroke-width="3"/>
+          <circle cx="305" cy="260" r="8" fill="#5c5566"/>
+          <path d="M346 190 l12 -6 v84 l-12 4z" fill="#2a2a3a" stroke="#0c0414" stroke-width="2"/>
+          <g id="jacketEnv"><rect x="348" y="214" width="8" height="12" fill="#f7ecff" stroke="#0c0414" stroke-width="1"/></g>
+          <g id="toolsShut"><rect x="300" y="282" width="40" height="12" fill="#ff8a3d" stroke="#0c0414" stroke-width="1.5"/></g>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pCheck)"/>
+          <rect x="0" y="330" width="360" height="150" fill="#0c0414" opacity=".45"/>
+          <g class="floorlines"></g>
+          <g stroke="#0c0414" stroke-width="1"><rect x="60" y="360" width="6" height="6" fill="#ff2e88"/><rect x="200" y="400" width="6" height="6" fill="#2de2e6"/><rect x="280" y="370" width="6" height="6" fill="#ffd23f"/><rect x="130" y="440" width="6" height="6" fill="#3dff8b"/></g>
+          <path d="M90 420 q10 -14 20 0 q-4 16 -10 20 q-6 -4 -10 -20z" fill="#ff2e88" stroke="#0c0414" stroke-width="2"/>
+          <path d="M250 440 q12 -10 24 0 q-6 12 -12 14 q-6 -2 -12 -14z" fill="#2de2e6" stroke="#0c0414" stroke-width="2"/>
+        </g>
+
+        <!-- ===== L: BAR ===== -->
+        <g id="v-L" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#2a0b45"/>
+          <text x="120" y="52" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="30" fill="#ff2e88" class="tvglow" filter="url(#fGlow)">BAR IMPERIAL</text>
+          <rect x="8" y="62" width="230" height="68" fill="#1b1226" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M8 96 H238 M8 130 H238" stroke="#c8a46a" stroke-width="4"/>
+          <g stroke="#0c0414" stroke-width="1.5">
+            <rect x="18" y="72" width="10" height="24" fill="#2f8f4e"/><rect x="34" y="68" width="10" height="28" fill="#c58b4e"/><rect x="50" y="74" width="10" height="22" fill="#bfefff"/><rect x="66" y="70" width="10" height="26" fill="#7a0f2a"/><rect x="82" y="72" width="10" height="24" fill="#ffd23f"/><rect x="98" y="68" width="10" height="28" fill="#2de2e6"/><rect x="114" y="72" width="12" height="24" fill="#c58b4e"/>
+            <rect x="140" y="104" width="10" height="26" fill="#2f8f4e"/><rect x="156" y="108" width="10" height="22" fill="#ff8a3d"/><rect x="172" y="102" width="12" height="28" fill="#c58b4e"/><rect x="190" y="106" width="10" height="24" fill="#b18cff"/><rect x="206" y="104" width="10" height="26" fill="#7a0f2a"/><rect x="222" y="108" width="10" height="22" fill="#bfefff"/>
+            <rect x="24" y="104" width="10" height="26" fill="#ffd23f"/><rect x="40" y="106" width="10" height="24" fill="#2de2e6"/><rect x="56" y="102" width="10" height="28" fill="#c58b4e"/>
+          </g>
+          <rect x="172" y="110" width="12" height="10" fill="#f7ecff"/>
+          <g fill="#bfefff" fill-opacity=".6" stroke="#0c0414" stroke-width="1.5">
+            <path d="M60 176 h20 l-10 10z"/><path d="M86 176 h20 l-10 10z"/><path d="M112 176 h20 l-10 10z"/>
+            <path d="M73 160 h20 l-10 10z"/><path d="M99 160 h20 l-10 10z"/>
+            <path d="M86 144 h20 l-10 10z"/>
+          </g>
+          <path d="M70 186 v4 M96 186 v4 M122 186 v4 M83 170 v6 M109 170 v6 M96 154 v6" stroke="#0c0414" stroke-width="1.5"/>
+          <path d="M170 168 h30 l-4 22 h-22z" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/>
+          <path d="M180 168 l2 -26 h6 l1 26" fill="#2f8f4e" stroke="#0c0414" stroke-width="1.5"/>
+          <rect x="140" y="174" width="26" height="16" fill="#f7ecff" stroke="#0c0414" stroke-width="1.5"/>
+          <rect x="0" y="190" width="246" height="14" fill="#c8a46a" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="0" y="204" width="242" height="126" fill="#5a2a16" stroke="#0c0414" stroke-width="3"/>
+          <path d="M0 230 H242 M0 300 H242" stroke="#3a1f0c" stroke-width="3"/>
+          <path d="M40 204 V330 M100 204 V330 M160 204 V330 M220 204 V330" stroke="#3a1f0c" stroke-width="2"/>
+          <text x="304" y="44" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="13" fill="#c9ccd6">COZINHA</text>
+          <rect x="256" y="50" width="96" height="282" fill="#1b1226" stroke="#0c0414" stroke-width="3"/>
+          <rect x="262" y="58" width="42" height="270" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/>
+          <rect x="306" y="58" width="42" height="270" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/>
+          <circle cx="283" cy="130" r="12" fill="#2de2e6" opacity=".6" stroke="#0c0414" stroke-width="2"/>
+          <circle cx="327" cy="130" r="12" fill="#2de2e6" opacity=".6" stroke="#0c0414" stroke-width="2"/>
+          <path d="M268 220 h30 M312 220 h30" stroke="#9aa0ad" stroke-width="6"/>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pCheck)"/>
+          <rect x="0" y="330" width="360" height="150" fill="#0c0414" opacity=".5"/>
+          <g class="floorlines"></g>
+          <g stroke="#0c0414" stroke-width="2.5"><ellipse cx="60" cy="356" rx="24" ry="8" fill="#e0102f"/><path d="M60 364 V440" stroke="#c9ccd6" stroke-width="5"/><ellipse cx="160" cy="356" rx="24" ry="8" fill="#e0102f"/><path d="M160 364 V440" stroke="#c9ccd6" stroke-width="5"/></g>
+        </g>
+
+        <!-- ===== S: PORTAS ===== -->
+        <g id="v-S" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="url(#pStripe)"/>
+          <rect x="160" y="28" width="62" height="16" fill="#06210f"/>
+          <text x="191" y="41" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#3dff8b">SAÍDA</text>
+          <rect x="96" y="50" width="190" height="282" fill="#3a1f0c" stroke="#0c0414" stroke-width="3"/>
+          <rect x="104" y="58" width="85" height="270" fill="#ffc371" opacity=".35" stroke="#c8a46a" stroke-width="4"/>
+          <rect x="193" y="58" width="85" height="270" fill="#ffc371" opacity=".35" stroke="#c8a46a" stroke-width="4"/>
+          <g fill="#2a0b45" opacity=".55"><rect x="110" y="200" width="30" height="128"/><rect x="146" y="230" width="36" height="98"/><rect x="200" y="210" width="28" height="118"/><rect x="236" y="190" width="36" height="138"/></g>
+          <path d="M112 80 l30 60 M206 80 l24 48" stroke="#fff" stroke-width="3" opacity=".3"/>
+          <path d="M118 206 h62 M202 206 h62" stroke="#c8a46a" stroke-width="7" stroke-linecap="round"/>
+          <g id="chainArt">
+            <path d="M120 200 Q191 236 262 200" stroke="#0c0414" stroke-width="10" fill="none"/>
+            <path d="M120 200 Q191 236 262 200" stroke="#9aa0ad" stroke-width="7" stroke-dasharray="10 4" fill="none"/>
+            <path d="M120 214 Q191 250 262 214" stroke="#0c0414" stroke-width="10" fill="none"/>
+            <path d="M120 214 Q191 250 262 214" stroke="#9aa0ad" stroke-width="7" stroke-dasharray="10 4" fill="none"/>
+            <path d="M185 238 v-8 a7 7 0 0 1 14 0 v8" stroke="#9aa0ad" stroke-width="3.5" fill="none"/>
+            <rect x="180" y="236" width="24" height="22" rx="3" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/>
+            <circle cx="192" cy="247" r="3" fill="#0c0414"/>
+          </g>
+          <g id="chainOff" style="display:none"><path d="M150 352 q20 -12 40 0 t40 0" stroke="#0c0414" stroke-width="10" fill="none"/><path d="M150 352 q20 -12 40 0 t40 0" stroke="#9aa0ad" stroke-width="7" stroke-dasharray="10 4" fill="none"/></g>
+          <rect x="22" y="120" width="58" height="84" rx="4" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+          <rect x="30" y="128" width="42" height="18" fill="#06210f"/>
+          <text id="alarmDisp" x="51" y="142" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#e0102f">07:00</text>
+          <g fill="#5c5566"><rect x="32" y="152" width="9" height="7"/><rect x="46" y="152" width="9" height="7"/><rect x="60" y="152" width="9" height="7"/><rect x="32" y="163" width="9" height="7"/><rect x="46" y="163" width="9" height="7"/><rect x="60" y="163" width="9" height="7"/><rect x="32" y="174" width="9" height="7"/><rect x="46" y="174" width="9" height="7"/><rect x="60" y="174" width="9" height="7"/><rect x="46" y="185" width="9" height="7"/></g>
+          <circle id="ledCode" cx="70" cy="196" r="3" fill="#e0102f" filter="url(#fGlow)"/>
+          <rect x="302" y="150" width="42" height="70" rx="5" fill="#e0102f" stroke="#0c0414" stroke-width="3"/>
+          <rect x="308" y="156" width="12" height="54" rx="5" fill="#1b1622"/>
+          <g fill="#f7ecff"><rect x="326" y="160" width="6" height="5"/><rect x="334" y="160" width="6" height="5"/><rect x="326" y="168" width="6" height="5"/><rect x="334" y="168" width="6" height="5"/><rect x="326" y="176" width="6" height="5"/><rect x="334" y="176" width="6" height="5"/></g>
+          <path d="M314 210 q-10 30 10 50 q16 16 -4 40" stroke="#0c0414" stroke-width="2" fill="none"/>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pCheck)"/>
+          <rect x="0" y="330" width="360" height="150" fill="#0c0414" opacity=".5"/>
+          <g class="floorlines"></g>
+        </g>
+
+        <!-- ===== O: MESAS ===== -->
+        <g id="v-O" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#2a0b45"/>
+          <path d="M0 40 q45 20 90 0 t90 0 t90 0 t90 0" stroke="#0c0414" stroke-width="1.5" fill="none"/>
+          <g><circle class="twinkle" cx="20" cy="48" r="4" fill="#ffd23f"/><circle class="twinkle b" cx="50" cy="56" r="4" fill="#ff2e88"/><circle class="twinkle" cx="80" cy="48" r="4" fill="#2de2e6"/><circle class="twinkle b" cx="110" cy="48" r="4" fill="#ffd23f"/><circle class="twinkle" cx="140" cy="56" r="4" fill="#ff2e88"/><circle class="twinkle b" cx="170" cy="48" r="4" fill="#3dff8b"/><circle class="twinkle" cx="200" cy="48" r="4" fill="#ffd23f"/><circle class="twinkle b" cx="230" cy="56" r="4" fill="#2de2e6"/><circle class="twinkle" cx="260" cy="48" r="4" fill="#ff2e88"/><circle class="twinkle b" cx="290" cy="48" r="4" fill="#ffd23f"/><circle class="twinkle" cx="320" cy="56" r="4" fill="#3dff8b"/><circle class="twinkle b" cx="350" cy="48" r="4" fill="#b18cff"/></g>
+          <g stroke="#0c0414" stroke-width="2"><circle cx="150" cy="86" r="16" fill="#ff2e88"/><circle cx="176" cy="78" r="16" fill="#2de2e6"/><circle cx="202" cy="86" r="16" fill="#ffd23f"/><circle cx="228" cy="78" r="16" fill="#ff2e88"/><circle cx="254" cy="86" r="16" fill="#2de2e6"/><circle cx="280" cy="78" r="16" fill="#ffd23f"/><circle cx="306" cy="86" r="16" fill="#ff2e88"/><circle cx="332" cy="78" r="16" fill="#2de2e6"/></g>
+          <rect x="12" y="56" width="104" height="274" fill="#e0102f" stroke="#0c0414" stroke-width="3"/>
+          <rect x="12" y="56" width="104" height="30" fill="#ffd23f" stroke="#0c0414" stroke-width="3"/>
+          <text x="64" y="78" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="18" fill="#0c0414">FOTOS ✶</text>
+          <path d="M22 96 h62 v210 h-62z" fill="#7a0f2a" stroke="#0c0414" stroke-width="2"/>
+          <path d="M34 96 q-4 100 0 210 M48 96 q4 100 0 210 M62 96 q-4 100 0 210 M74 96 q4 100 0 210" stroke="#4a0618" stroke-width="2" fill="none"/>
+          <rect x="90" y="186" width="20" height="8" fill="#0c0414"/>
+          <g id="stripArt"><rect x="94" y="190" width="12" height="40" fill="#f7ecff" stroke="#0c0414" stroke-width="1.5"/><g fill="#ff2e88"><rect x="96" y="194" width="8" height="7"/><rect x="96" y="204" width="8" height="7"/><rect x="96" y="214" width="8" height="7"/></g></g>
+          <path d="M122 236 h152 v94 h-152z" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+          <path d="M122 250 q10 10 19 0 q10 10 19 0 q10 10 19 0 q10 10 19 0 q10 10 19 0 q10 10 19 0 q10 10 19 0 q10 10 19 0" stroke="#ff2e88" stroke-width="3" fill="none"/>
+          <rect x="160" y="196" width="76" height="40" rx="3" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="172" y="168" width="52" height="28" rx="3" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="184" y="146" width="28" height="22" rx="3" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M160 202 q6 8 12 0 q6 8 12 0 q6 8 12 0 q6 8 12 0 q6 8 12 0 q6 8 12 0 q4 6 4 0 M172 174 q6 8 13 0 q6 8 13 0 q6 8 13 0 q6 8 13 0" stroke="#ff2e88" stroke-width="3" fill="none"/>
+          <text x="198" y="140" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="18" fill="#ffd23f" stroke="#0c0414" stroke-width=".8">2026</text>
+          <ellipse cx="200" cy="218" rx="12" ry="7" fill="#e8d8f0" stroke="#0c0414" stroke-width="1.2"/>
+          <g id="cakeSlice" style="display:none"><path d="M218 196 h18 v40 h-18z" fill="#2a0b45" stroke="#0c0414" stroke-width="2"/></g>
+          <rect x="280" y="250" width="70" height="80" fill="#5a2a16" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="286" y="196" width="58" height="54" fill="#bfefff" fill-opacity=".35" stroke="#0c0414" stroke-width="2.5"/>
+          <g stroke="#0c0414" stroke-width="1.5"><rect x="292" y="220" width="18" height="26" fill="#ff2e88"/><rect x="312" y="212" width="16" height="34" fill="#3dff8b"/><rect x="330" y="226" width="12" height="20" fill="#ffd23f"/></g>
+          <g id="urnaLid"><rect x="282" y="190" width="66" height="8" fill="#bfefff" stroke="#0c0414" stroke-width="2"/><rect x="306" y="192" width="18" height="3" fill="#0c0414"/></g>
+          <text x="315" y="290" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="11" fill="#f7ecff">AMIGO SECRETO</text>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pCheck)"/>
+          <rect x="0" y="330" width="360" height="150" fill="#0c0414" opacity=".5"/>
+          <g class="floorlines"></g>
+          <g id="bagsArt" stroke="#0c0414" stroke-width="2">
+            <rect x="24" y="378" width="40" height="44" fill="#ff2e88"/><path d="M34 378 q10 -14 20 0" fill="none"/>
+            <rect x="62" y="392" width="40" height="40" fill="#2de2e6"/><path d="M72 392 q10 -14 20 0" fill="none"/>
+            <rect x="100" y="372" width="40" height="46" fill="#ff2e88"/><path d="M110 372 q10 -14 20 0" fill="none"/>
+            <g font-family="VT323,K47 VT,monospace" font-size="10" fill="#0c0414" stroke="none"><text x="44" y="404" text-anchor="middle">H</text><text x="82" y="416" text-anchor="middle">H</text><text x="120" y="398" text-anchor="middle">H</text></g>
+          </g>
+          <g stroke="#0c0414" stroke-width="1"><rect x="200" y="380" width="6" height="6" fill="#ffd23f"/><rect x="250" y="420" width="6" height="6" fill="#ff2e88"/><rect x="300" y="360" width="6" height="6" fill="#2de2e6"/></g>
+        </g>
+
+        <!-- ===== C: COZINHA ===== -->
+        <g id="v-C" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="url(#pTile)"/>
+          <rect x="0" y="22" width="360" height="308" fill="#0c0414" opacity=".3"/>
+          <rect x="8" y="80" width="164" height="8" fill="#5c5566" stroke="#0c0414" stroke-width="1.5"/>
+          <g stroke="#0c0414" stroke-width="2"><path d="M20 80 v-22 h34 v22" fill="#9aa0ad"/><path d="M66 80 v-30 h40 v30" fill="#c9ccd6"/><path d="M118 80 v-18 h38 v18" fill="#9aa0ad"/></g>
+          <path d="M90 196 v-40 q0 -12 14 -12 h10" stroke="#c9ccd6" stroke-width="6" fill="none"/>
+          <circle class="drip" cx="114" cy="150" r="2" fill="#2de2e6"/>
+          <rect x="8" y="196" width="164" height="12" fill="#c9ccd6" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="30" y="198" width="120" height="8" fill="#5c5566"/>
+          <rect x="8" y="208" width="164" height="122" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+          <path d="M8 268 H172 M90 208 V330" stroke="#5c5566" stroke-width="2"/>
+          <rect x="182" y="40" width="176" height="292" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+          <g id="cfShut">
+            <rect x="196" y="54" width="150" height="270" fill="#c9ccd6" stroke="#0c0414" stroke-width="3"/>
+            <rect x="224" y="70" width="94" height="26" fill="#2de2e6" stroke="#0c0414" stroke-width="2"/>
+            <text x="271" y="89" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="17" fill="#0c0414">−18°C</text>
+            <rect x="316" y="156" width="18" height="74" rx="4" fill="#5c5566" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M298 190 h36" stroke="#0c0414" stroke-width="7"/>
+            <path d="M298 190 h36" stroke="#9aa0ad" stroke-width="4"/>
+            <g id="lacre"><path d="M306 184 h34" stroke="#ffd23f" stroke-width="5"/><rect x="336" y="178" width="10" height="12" fill="#ffd23f" stroke="#0c0414" stroke-width="1.2"/></g>
+            <g fill="#f7ecff" opacity=".7"><circle cx="200" cy="60" r="8"/><circle cx="342" cy="318" r="10"/><circle cx="204" cy="316" r="6"/></g>
+          </g>
+          <g id="cfOpenArt" style="display:none">
+            <rect x="196" y="54" width="150" height="270" fill="#0b2a5a"/>
+            <rect x="196" y="54" width="150" height="270" fill="#bfefff" opacity=".2"/>
+            <path d="M206 120 h130 M206 190 h130" stroke="#c9ccd6" stroke-width="4"/>
+            <g fill="#f7ecff" stroke="#0c0414" stroke-width="1.5"><rect x="214" y="96" width="30" height="24"/><rect x="250" y="102" width="30" height="18"/><rect x="290" y="166" width="34" height="24"/></g>
+            <path d="M346 54 l12 -8 v292 l-12 -14z" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/>
+            <g id="duduIn">
+              <path d="M240 312 q-6 -50 30 -60 q34 10 28 60z" fill="#1b2a6e" stroke="#0c0414" stroke-width="2.5"/>
+              <circle cx="268" cy="238" r="16" fill="#9fb6d6" stroke="#0c0414" stroke-width="2.5"/>
+              <path d="M254 232 q14 -14 28 0" stroke="#5a2a16" stroke-width="5" fill="none"/>
+              <path d="M248 280 q20 10 42 0" stroke="#9fb6d6" stroke-width="7" fill="none" stroke-linecap="round"/>
+              <rect x="256" y="262" width="22" height="14" fill="#f7ecff" stroke="#0c0414" stroke-width="1"/>
+            </g>
+          </g>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pTileDark)"/>
+          <rect x="0" y="330" width="360" height="150" fill="#0c0414" opacity=".45"/>
+          <g class="floorlines"></g>
+          <rect x="20" y="360" width="116" height="60" fill="#5c5566" stroke="#0c0414" stroke-width="2.5"/>
+          <circle cx="34" cy="426" r="6" fill="#1b1622"/><circle cx="122" cy="426" r="6" fill="#1b1622"/>
+          <g stroke="#0c0414" stroke-width="1.5" fill="#f7ecff"><rect x="28" y="350" width="100" height="10"/><g id="toalhaTop"><rect x="30" y="340" width="96" height="10"/><rect x="32" y="330" width="92" height="10"/></g></g>
+          <g id="duduOut" style="display:none">
+            <ellipse cx="266" cy="440" rx="60" ry="10" fill="#0c0414" opacity=".3"/>
+            <path d="M226 436 q-6 -54 40 -64 q44 10 38 64z" fill="#1b2a6e" stroke="#0c0414" stroke-width="2.5"/>
+            <circle cx="266" cy="356" r="18" fill="#9fb6d6" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M250 350 q16 -16 32 0" stroke="#5a2a16" stroke-width="5" fill="none"/>
+            <rect x="254" y="384" width="24" height="16" fill="#f7ecff" stroke="#0c0414" stroke-width="1"/>
+            <text x="266" y="395" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="7" fill="#0c0414">ESTAGIÁRIO</text>
+            <g id="duduWarm" style="display:none"><path d="M220 438 q-8 -56 46 -68 q50 12 42 68z" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/><path d="M228 400 h76 M226 418 h80" stroke="#ff2e88" stroke-width="3"/></g>
+          </g>
+        </g>
+</svg></template>
+
+<template id="art-banco"><svg xmlns="http://www.w3.org/2000/svg">
+        <!-- ===== N: COFRES ===== -->
+        <g id="v-N" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#5c5566"/>
+          <rect x="0" y="22" width="360" height="12" fill="#2a2531"/>
+          <rect x="8" y="40" width="148" height="290" fill="#c8a46a" stroke="#0c0414" stroke-width="3"/>
+          <path d="M8 64H156M8 88H156M8 112H156M8 136H156M8 160H156M8 184H156M8 208H156M8 232H156M8 256H156M8 280H156M8 304H156M45 40V330M82 40V330M119 40V330" stroke="#6a4a1a" stroke-width="2"/>
+          <path d="M35 52H156M35 76H156M35 100H156M35 124H156M35 148H156M35 172H156M35 196H156M35 220H156M35 244H156M35 268H156M35 292H156M35 316H156" stroke="#0c0414" stroke-width="4" stroke-linecap="round" stroke-dasharray="0 37" fill="none"/>
+          <path d="M20 52H156M20 76H156M20 100H156M20 124H156M20 148H156M20 172H156M20 196H156M20 220H156M20 244H156M20 268H156M20 292H156M20 316H156" stroke="#f7ecff" stroke-width="5" stroke-dasharray="10 27" fill="none" opacity=".75"/>
+          <rect x="83" y="161" width="35" height="22" fill="#0c0414"/>
+          <rect x="158" y="60" width="66" height="40" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <text x="191" y="76" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="9" fill="#e0102f">SALA DE COFRES</text>
+          <text x="191" y="90" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="8" fill="#0c0414">PROIBIDO CELULAR</text>
+          <rect x="228" y="54" width="114" height="278" fill="#2a2531" stroke="#0c0414" stroke-width="3"/>
+          <rect x="236" y="62" width="98" height="270" fill="#9aa0ad" stroke="#0c0414" stroke-width="2"/>
+          <path d="M236 62 l-14 6 v262 l14 2z" fill="#0c0414" opacity=".6"/>
+          <rect x="250" y="80" width="70" height="40" fill="#bfefff" opacity=".35" stroke="#0c0414" stroke-width="2"/>
+          <path d="M248 200 h16" stroke="#c9ccd6" stroke-width="6" stroke-linecap="round"/>
+          <text x="285" y="150" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="12" fill="#0c0414">CONTAGEM</text>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pConcrete)"/>
+          <g class="floorlines"></g>
+          <path d="M60 376 h240 l20 60 h-280z" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
+          <path d="M54 366 h252 l8 12 h-268z" fill="#5a2a16" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M130 342 l10 -20 h100 l-10 20z" fill="#9aa0ad" stroke="#0c0414" stroke-width="2"/>
+          <rect x="120" y="342" width="120" height="28" fill="#c9ccd6" stroke="#0c0414" stroke-width="2.5"/>
+          <g id="plateFlip" style="display:none"><rect x="160" y="352" width="40" height="12" fill="#ffd23f" stroke="#0c0414" stroke-width="1.2"/><text x="180" y="361" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="10" fill="#0c0414">2147</text></g>
+          <g id="passArt"><rect x="134" y="330" width="22" height="16" fill="#1b2a6e" stroke="#0c0414" stroke-width="1.5" transform="rotate(-10 145 338)"/></g>
+          <g id="euroArt" stroke="#0c0414" stroke-width="1.2"><rect x="186" y="332" width="30" height="12" fill="#b18cff"/><rect x="196" y="328" width="30" height="12" fill="#b18cff" transform="rotate(8 211 334)"/></g>
+        </g>
+
+        <!-- ===== L: MESA DO GERENTE ===== -->
+        <g id="v-L" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#2a2531"/>
+          <rect x="0" y="22" width="360" height="130" fill="url(#pWood)" opacity=".7"/>
+          <rect x="24" y="44" width="80" height="58" fill="#f7ecff" stroke="#c8a46a" stroke-width="4"/>
+          <text x="64" y="64" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="10" fill="#1b2a6e">BANCO PAULISTANO</text>
+          <text x="64" y="80" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#0c0414">AG. 0047</text>
+          <text x="64" y="94" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="8" fill="#5c5566">FUNCIONÁRIO DO MÊS: AMARAL</text>
+          <circle cx="300" cy="74" r="26" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+          <path d="M300 74 V56 M300 74 l14 4" stroke="#0c0414" stroke-width="3" stroke-linecap="round"/>
+          <rect x="110" y="156" width="96" height="64" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <rect x="116" y="162" width="84" height="50" fill="#1a5fb4"/>
+          <text x="158" y="192" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="12" fill="#f7ecff">BLOQUEADO</text>
+          <rect x="182" y="164" width="16" height="14" fill="#ffd23f" transform="rotate(8 190 171)"/>
+          <path d="M158 220 v8 M140 228 h36" stroke="#1b1622" stroke-width="5"/>
+          <rect x="40" y="226" width="222" height="14" fill="#5a2a16" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="48" y="240" width="206" height="90" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
+          <rect x="62" y="250" width="70" height="30" fill="#4a2a18" stroke="#0c0414" stroke-width="2"/><rect x="62" y="286" width="70" height="30" fill="#4a2a18" stroke="#0c0414" stroke-width="2"/>
+          <path d="M88 265 h18 M88 301 h18" stroke="#c8a46a" stroke-width="3"/>
+          <rect x="58" y="214" width="46" height="12" fill="#1b2a6e" stroke="#0c0414" stroke-width="2"/>
+          <rect x="80" y="196" width="22" height="18" fill="#ffd23f" stroke="#0c0414" stroke-width="2"/>
+          <path d="M214 214 h40 v12 h-40z" fill="#1b1622" stroke="#0c0414" stroke-width="2"/>
+          <path d="M218 214 q16 -16 32 0" fill="#2a2531" stroke="#0c0414" stroke-width="2"/>
+          <rect x="282" y="150" width="62" height="100" rx="10" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <path d="M270 252 h86 l-6 20 h-74z" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <path d="M290 272 v58 M336 272 v58" stroke="#5c5566" stroke-width="5"/>
+          <path d="M284 152 q30 -8 60 0 l4 110 h-20 l-6 -60 h-18 l-6 60 h-20z" fill="#1b2a6e" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M306 152 l8 30 l8 -30" fill="none" stroke="#f7ecff" stroke-width="2"/>
+          <rect x="324" y="186" width="16" height="20" fill="#f7ecff" stroke="#0c0414" stroke-width="1.2"/>
+          <rect x="0" y="330" width="360" height="150" fill="#3a2a4f"/>
+          <g class="floorlines"></g>
+        </g>
+
+        <!-- ===== S: PORTA-COFRE ===== -->
+        <g id="v-S" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="url(#pConcrete)"/>
+          <rect x="34" y="96" width="22" height="40" fill="#5c5566" stroke="#0c0414" stroke-width="2"/><rect x="34" y="236" width="22" height="40" fill="#5c5566" stroke="#0c0414" stroke-width="2"/>
+          <circle cx="180" cy="190" r="128" fill="#9aa0ad" stroke="#0c0414" stroke-width="4"/>
+          <circle cx="180" cy="190" r="119" fill="none" stroke="#5c5566" stroke-width="10" stroke-dasharray="0 31" stroke-linecap="round"/>
+          <circle cx="180" cy="190" r="108" fill="#c9ccd6" stroke="#0c0414" stroke-width="3"/>
+          <circle cx="180" cy="190" r="42" fill="none" stroke="#0c0414" stroke-width="11"/>
+          <circle cx="180" cy="190" r="42" fill="none" stroke="#5c5566" stroke-width="7"/>
+          <path d="M180 148 V232 M138 190 H222 M150 160 L210 220 M210 160 L150 220" stroke="#0c0414" stroke-width="9"/>
+          <path d="M180 148 V232 M138 190 H222 M150 160 L210 220 M210 160 L150 220" stroke="#5c5566" stroke-width="6"/>
+          <circle cx="180" cy="190" r="12" fill="#ffd23f" stroke="#0c0414" stroke-width="2.5"/>
+          <circle cx="110" cy="122" r="22" fill="#1b1622" stroke="#0c0414" stroke-width="2.5"/>
+          <circle cx="110" cy="122" r="17" fill="none" stroke="#c9ccd6" stroke-width="2" stroke-dasharray="1.5 3"/>
+          <path d="M110 122 V108" stroke="#ffd23f" stroke-width="3"/>
+          <text x="110" y="160" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="10" fill="#0c0414">SEGREDO</text>
+          <circle id="ledCode" cx="134" cy="102" r="3.5" fill="#e0102f" filter="url(#fGlow)"/>
+          <rect x="242" y="110" width="22" height="26" rx="4" fill="#1b1622" stroke="#0c0414" stroke-width="2"/>
+          <rect x="251" y="116" width="4" height="14" fill="#c9ccd6"/>
+          <text x="253" y="152" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="10" fill="#0c0414">CHAVE</text>
+          <circle id="ledKey" cx="272" cy="104" r="3.5" fill="#e0102f" filter="url(#fGlow)"/>
+          <rect x="146" y="252" width="68" height="40" rx="3" fill="#1b1622" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="152" y="258" width="56" height="18" fill="#06210f"/>
+          <text id="lockDisp" x="180" y="272" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="16" fill="#3dff8b">08:00</text>
+          <rect x="160" y="280" width="40" height="6" fill="#5c5566"/>
+          <circle id="ledCard" cx="206" cy="284" r="3" fill="#e0102f" filter="url(#fGlow)"/>
+          <text x="180" y="304" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="9" fill="#0c0414">RELÓGIO</text>
+          <g id="camNormal"><rect x="300" y="38" width="44" height="22" rx="4" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/><circle cx="306" cy="49" r="7" fill="#1b1622" stroke="#0c0414" stroke-width="2"/></g>
+          <g id="camTurned" style="display:none"><rect x="300" y="38" width="44" height="22" rx="4" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/><circle cx="338" cy="49" r="7" fill="#1b1622" stroke="#0c0414" stroke-width="2"/></g>
+          <circle id="camLed" class="twinkle" cx="322" cy="44" r="3" fill="#e0102f"/>
+          <path d="M344 49 h14" stroke="#0c0414" stroke-width="4"/>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pConcrete)"/>
+          <rect x="0" y="330" width="360" height="150" fill="#0c0414" opacity=".3"/>
+          <g class="floorlines"></g>
+          <path d="M0 330 H360" stroke="#ffd23f" stroke-width="6" stroke-dasharray="20 14"/>
+        </g>
+
+        <!-- ===== O: VIGIA ===== -->
+        <g id="v-O" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#3d4a5c"/>
+          <rect x="0" y="22" width="360" height="8" fill="#2c3646"/>
+          <rect x="30" y="60" width="90" height="64" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+          <text x="75" y="82" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="11" fill="#0c0414">ESCALA NOTURNA</text>
+          <path d="M40 92 h70 M40 102 h56 M40 112 h64" stroke="#5c5566" stroke-width="2"/>
+          <rect x="14" y="226" width="160" height="12" fill="#5c5566" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M26 238 V330 M162 238 V330" stroke="#5c5566" stroke-width="6"/>
+          <rect x="30" y="184" width="30" height="42" rx="4" fill="#1b1622" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M52 184 v-22" stroke="#0c0414" stroke-width="3"/>
+          <circle class="twinkle" cx="45" cy="196" r="3" fill="#3dff8b"/>
+          <rect x="72" y="204" width="44" height="22" rx="4" fill="#2de2e6" stroke="#0c0414" stroke-width="2"/>
+          <path d="M124 222 q10 -20 30 -6 l6 10 h-36z" fill="#1b2a6e" stroke="#0c0414" stroke-width="2"/>
+          <rect x="186" y="218" width="90" height="10" fill="#5a2a16" stroke="#0c0414" stroke-width="2"/>
+          <path d="M196 228 V330 M266 228 V330" stroke="#5a2a16" stroke-width="5"/>
+          <rect x="200" y="164" width="44" height="54" rx="4" fill="#1b1622" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="210" y="194" width="22" height="20" fill="#bfefff" opacity=".4" stroke="#0c0414" stroke-width="1.5"/>
+          <rect x="250" y="194" width="20" height="24" rx="3" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <text x="260" y="210" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="8" fill="#0c0414">AÇÚCAR</text>
+          <rect x="294" y="230" width="54" height="100" fill="#f7ecff" stroke="#0c0414" stroke-width="3"/>
+          <path d="M300 230 l8 -94 h30 l8 94z" fill="#2de2e6" opacity=".55" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="312" y="250" width="18" height="10" fill="#1b1622"/>
+          <g fill="#f7ecff" stroke="#0c0414" stroke-width="1"><path d="M298 280 h12 l-2 14 h-8z"/><path d="M298 296 h12 l-2 14 h-8z"/></g>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pConcrete)"/>
+          <g class="floorlines"></g>
+          <g id="jorgeLie">
+            <ellipse cx="140" cy="436" rx="116" ry="10" fill="#0c0414" opacity=".3"/>
+            <path d="M64 404 q40 -24 120 -16 l24 6 q6 14 -4 22 l-28 4 q-80 6 -112 -6z" fill="#1b2a6e" stroke="#0c0414" stroke-width="3"/>
+            <path d="M206 402 l46 -2 M204 416 l46 6" stroke="#0c0414" stroke-width="13" stroke-linecap="round"/>
+            <path d="M206 402 l46 -2 M204 416 l46 6" stroke="#2a2531" stroke-width="9" stroke-linecap="round"/>
+            <circle cx="50" cy="400" r="18" fill="#8a5a3a" stroke="#0c0414" stroke-width="3"/>
+            <path d="M34 394 q14 -14 32 -2" stroke="#d8d8d8" stroke-width="4" fill="none"/>
+            <g fill="#bfefff"><circle cx="40" cy="390" r="2"/><circle cx="62" cy="396" r="2"/><circle cx="56" cy="410" r="1.6"/></g>
+            <path d="M90 404 l40 0" stroke="#ffd23f" stroke-width="3"/>
+            <ellipse cx="96" cy="452" rx="18" ry="6" fill="#1b2a6e" stroke="#0c0414" stroke-width="2"/>
+          </g>
+          <g id="jorgeSit" style="display:none">
+            <ellipse cx="110" cy="420" rx="70" ry="10" fill="#0c0414" opacity=".3"/>
+            <path d="M74 414 q-6 -54 36 -64 q40 10 34 64z" fill="#1b2a6e" stroke="#0c0414" stroke-width="3"/>
+            <path d="M110 414 l70 4 M110 404 l66 -4" stroke="#0c0414" stroke-width="13" stroke-linecap="round"/>
+            <path d="M110 414 l70 4 M110 404 l66 -4" stroke="#2a2531" stroke-width="9" stroke-linecap="round"/>
+            <circle cx="110" cy="332" r="18" fill="#8a5a3a" stroke="#0c0414" stroke-width="3"/>
+            <path d="M94 326 q14 -14 32 -2" stroke="#d8d8d8" stroke-width="4" fill="none"/>
+            <path d="M110 388 l40 0" stroke="#ffd23f" stroke-width="3"/>
+          </g>
+          <g id="jorgeKeys"><circle cx="150" cy="412" r="7" fill="none" stroke="#c9ccd6" stroke-width="3"/><path d="M150 418 l-4 12 M154 418 l4 10 M150 418 v12" stroke="#c9ccd6" stroke-width="2.5"/></g>
+        </g>
+
+        <!-- ===== M: CONTAGEM ===== -->
+        <g id="v-M" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#2a2531"/>
+          <rect x="186" y="44" width="168" height="124" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <g class="cctvRec">
+            <rect x="194" y="52" width="74" height="52" fill="#1f4a30"/><rect x="272" y="52" width="74" height="52" fill="#1f4a30"/><rect x="194" y="108" width="74" height="52" fill="#1f4a30"/><rect x="272" y="108" width="74" height="52" fill="#1f4a30"/>
+            <circle cx="232" cy="80" r="40" fill="#9aa0ad" opacity=".25"/>
+            <path d="M282 96 h50 M290 70 v26" stroke="#3dff8b" stroke-width="2" opacity=".6"/>
+            <circle class="twinkle" cx="202" cy="60" r="3" fill="#e0102f"/>
+            <text x="230" y="154" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="10" fill="#3dff8b">REC 06:41</text>
+          </g>
+          <g class="cctvOff" style="display:none">
+            <rect x="194" y="52" width="152" height="108" fill="#0c0414"/>
+            <text x="270" y="110" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#e0102f">SEM GRAVAÇÃO</text>
+          </g>
+          <rect x="186" y="246" width="168" height="10" fill="#5c5566" stroke="#0c0414" stroke-width="2"/>
+          <path d="M196 256 V330 M344 256 V330" stroke="#5c5566" stroke-width="5"/>
+          <path d="M212 246 v-40 h96 v40z" fill="#c9ccd6" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="226" y="194" width="68" height="14" fill="#9aa0ad" stroke="#0c0414" stroke-width="2"/>
+          <rect x="240" y="218" width="44" height="14" fill="#06210f"/>
+          <text x="262" y="229" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="11" fill="#3dff8b">0000</text>
+          <g stroke="#0c0414" stroke-width="2.5">
+            <path d="M14 330 q-4 -50 34 -54 q38 4 34 54z" fill="#9aa0ad"/>
+            <path d="M70 330 q-4 -60 40 -64 q44 4 40 64z" fill="#c9ccd6"/>
+            <path d="M130 330 q-2 -44 26 -48 q28 4 24 48z" fill="#9aa0ad"/>
+            <g id="maloteTop"><path d="M40 282 q-4 -40 34 -44 q38 4 34 44z" fill="#c9ccd6"/></g>
+          </g>
+          <g font-family="VT323,K47 VT,monospace" font-size="12" fill="#0c0414"><text x="48" y="312" text-anchor="middle">BP</text><text x="110" y="306" text-anchor="middle">BP</text><text x="156" y="316" text-anchor="middle">BP</text></g>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pConcrete)"/>
+          <g class="floorlines"></g>
+        </g>
+</svg></template>
+
+<template id="art-conselho"><svg xmlns="http://www.w3.org/2000/svg">
+        <!-- ===== N: MESA DO CONSELHO ===== -->
+        <g id="v-N" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="url(#pWood)"/>
+          <rect x="0" y="22" width="360" height="308" fill="#0c0414" opacity=".45"/>
+          <rect x="56" y="34" width="248" height="124" fill="#0c0414" stroke="#c9ccd6" stroke-width="4"/>
+          <g class="blackout"><text x="180" y="102" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="18" fill="#3a2a4f">SEM SINAL</text></g>
+          <g class="powerOn" style="display:none">
+            <rect x="62" y="40" width="236" height="112" fill="#1b2a6e"/>
+            <text x="180" y="70" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="18" fill="#ffd23f">AUDITORIA EXTERNA · HOJE · 9h</text>
+            <text x="180" y="96" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="13" fill="#f7ecff">Responsável pelas fraudes:</text>
+            <rect x="110" y="104" width="140" height="16" fill="#e0102f"/>
+            <text x="180" y="146" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="9" fill="#9aa0ad">Halden Corp · 15/03</text>
+          </g>
+          <g stroke="#0c0414" stroke-width="2.5" fill="#1b1622">
+            <rect x="60" y="210" width="40" height="70" rx="8"/><rect x="40" y="262" width="44" height="80" rx="8"/>
+            <rect x="140" y="176" width="34" height="40" rx="6"/><rect x="186" y="176" width="34" height="40" rx="6"/>
+          </g>
+          <rect x="0" y="330" width="360" height="150" fill="#4a0618"/>
+          <g class="floorlines"></g>
+          <path d="M130 212 h100 l110 268 h-320z" fill="#3a1f14" stroke="#0c0414" stroke-width="3"/>
+          <path d="M140 218 h80 l96 254" stroke="#fff6d8" stroke-width="2" opacity=".12" fill="none"/>
+          <path d="M150 260 l30 -18 l30 18 l-30 14z" fill="#1b1622" stroke="#0c0414" stroke-width="2"/>
+          <circle cx="180" cy="258" r="4" fill="#3dff8b"/>
+          <circle id="callLed" class="twinkle" cx="180" cy="258" r="4" fill="#e0102f"/>
+          <path d="M56 300 h70 l-8 40 h-74z" fill="#1b1622" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M60 304 h62 l-6 30 h-62z" fill="#3a2a4f"/>
+          <g class="powerOn" style="display:none"><path d="M60 304 h62 l-6 30 h-62z" fill="#2de2e6" opacity=".6"/></g>
+          <path d="M150 380 h80 l6 40 h-92z" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <path d="M156 390 h60 M156 398 h66 M156 406 h50" stroke="#9aa0ad" stroke-width="2"/>
+          <path d="M226 376 l-26 30" stroke="#0c0414" stroke-width="4" stroke-linecap="round"/>
+          <g id="signArt" style="display:none"><path d="M168 414 q6 -8 12 0 t12 0 t12 -4" stroke="#1b2a6e" stroke-width="2" fill="none"/></g>
+          <g id="pauloTied">
+            <rect x="262" y="160" width="70" height="104" rx="10" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+            <path d="M268 262 q-4 -60 28 -70 q32 10 28 70z" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M290 194 l6 20 l6 -20" fill="#1b2a6e"/>
+            <circle cx="296" cy="184" r="17" fill="#c98b6b" stroke="#0c0414" stroke-width="2.5" transform="rotate(14 296 184)"/>
+            <path d="M282 174 q12 -12 28 -2" stroke="#5a2a16" stroke-width="5" fill="none"/>
+            <rect x="286" y="188" width="20" height="7" fill="#c9ccd6" stroke="#0c0414" stroke-width="1"/>
+            <path d="M302 172 q6 6 2 14" stroke="#e0102f" stroke-width="3" fill="none"/>
+            <path d="M262 236 h70" stroke="#ffd23f" stroke-width="3"/>
+            <path d="M270 264 v60 M322 264 v60" stroke="#1b1622" stroke-width="6"/>
+            <path d="M282 270 v40 M310 270 v40" stroke="#2a2531" stroke-width="10"/>
+            <path d="M276 300 h40" stroke="#ffd23f" stroke-width="3"/>
+          </g>
+          <g id="pauloFree" style="display:none">
+            <rect x="262" y="160" width="70" height="104" rx="10" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+            <path d="M268 262 q-4 -60 28 -70 q32 10 28 70z" fill="#f7ecff" stroke="#0c0414" stroke-width="2.5"/>
+            <circle cx="296" cy="182" r="17" fill="#c98b6b" stroke="#0c0414" stroke-width="2.5"/>
+            <path d="M282 172 q12 -12 28 -2" stroke="#5a2a16" stroke-width="5" fill="none"/>
+            <path d="M290 192 q6 4 12 0" stroke="#0c0414" stroke-width="2" fill="none"/>
+            <path d="M302 170 q6 6 2 14" stroke="#e0102f" stroke-width="3" fill="none"/>
+            <path d="M282 270 v40 M310 270 v40" stroke="#2a2531" stroke-width="10"/>
+            <g id="pauloBand" style="display:none"><rect x="292" y="166" width="20" height="10" fill="#f7ecff" stroke="#0c0414" stroke-width="1.5"/></g>
+          </g>
+          <g class="blackout"><rect x="0" y="22" width="360" height="458" fill="#e0102f" opacity=".1" class="flicker"/></g>
+        </g>
+
+        <!-- ===== L: JANELÃO ===== -->
+        <g id="v-L" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#1b1622"/>
+          <rect x="6" y="30" width="204" height="270" fill="url(#gDawn)"/>
+          <g fill="#2a0b45"><rect x="6" y="220" width="30" height="80"/><rect x="40" y="196" width="24" height="104"/><rect x="68" y="232" width="34" height="68"/><rect x="106" y="206" width="28" height="94"/><rect x="138" y="226" width="40" height="74"/><rect x="182" y="212" width="28" height="88"/></g>
+          <g class="siren"><rect x="54" y="292" width="6" height="4" fill="#2d6bff"/><rect x="150" y="294" width="6" height="4" fill="#e0102f"/></g>
+          <path d="M20 40 h120" stroke="#0c0414" stroke-width="5"/>
+          <path d="M80 36 l-60 -6 M80 36 l60 -6" stroke="#0c0414" stroke-width="3"/>
+          <path d="M6 30 H210 V300 H6z M108 30 V300" fill="none" stroke="#5c5566" stroke-width="6"/>
+          <path d="M30 60 l40 80 M140 60 l30 60" stroke="#fff" stroke-width="3" opacity=".25"/>
+          <rect x="220" y="46" width="128" height="154" fill="#5c5566" stroke="#0c0414" stroke-width="3"/>
+          <g id="retratoArt">
+            <rect x="220" y="46" width="128" height="154" fill="#c8a46a" stroke="#0c0414" stroke-width="3"/>
+            <rect x="232" y="58" width="104" height="116" fill="#3a1f0c"/>
+            <path d="M252 174 q-2 -40 32 -46 q34 6 32 46z" fill="#1b1622"/>
+            <circle cx="284" cy="104" r="22" fill="#c98b6b" stroke="#0c0414" stroke-width="2"/>
+            <path d="M270 112 q14 8 28 0" stroke="#f7ecff" stroke-width="5" fill="none"/>
+            <path d="M262 92 q22 -16 44 0" stroke="#f7ecff" stroke-width="4" fill="none"/>
+            <rect x="254" y="180" width="60" height="12" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/>
+          </g>
+          <g id="cofreShut" style="display:none">
+            <rect x="244" y="74" width="80" height="80" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+            <circle cx="284" cy="114" r="10" fill="#1b1622"/><rect x="282" y="108" width="4" height="12" fill="#ffd23f"/>
+          </g>
+          <g id="cofreOpen" style="display:none">
+            <rect x="244" y="74" width="80" height="80" fill="#0c0414" stroke="#0c0414" stroke-width="3"/>
+            <path d="M244 74 l-18 8 v66 l18 6z" fill="#9aa0ad" stroke="#0c0414" stroke-width="2"/>
+            <rect x="252" y="130" width="24" height="16" fill="#3dff8b" stroke="#0c0414" stroke-width="1"/>
+          </g>
+          <rect x="0" y="330" width="360" height="150" fill="#4a0618"/>
+          <g class="floorlines"></g>
+          <path d="M60 330 v-12 M44 330 h32" stroke="#c8a46a" stroke-width="5"/>
+          <path d="M28 286 a36 36 0 0 0 64 0" fill="none" stroke="#c8a46a" stroke-width="4"/>
+          <g id="globeShut"><circle cx="60" cy="280" r="30" fill="#2de2e6" stroke="#0c0414" stroke-width="3"/><path d="M42 268 q10 -10 22 -2 q4 10 -6 14 q-10 4 -16 -12z M64 290 q10 -4 14 6 q-4 10 -12 6z" fill="#c58b4e" stroke="#0c0414" stroke-width="1.5"/><path d="M30 280 h60" stroke="#0c0414" stroke-width="1.5" opacity=".5"/></g>
+          <g id="globeOpen" style="display:none"><path d="M30 280 a30 30 0 0 1 60 0z" fill="#2de2e6" stroke="#0c0414" stroke-width="3"/><path d="M30 284 a30 30 0 0 0 54 18 l-20 -26z" fill="#2de2e6" stroke="#0c0414" stroke-width="3" transform="rotate(30 60 284)"/><ellipse cx="60" cy="282" rx="24" ry="5" fill="#0c0414"/></g>
+          <rect x="124" y="256" width="84" height="10" fill="#c8a46a" stroke="#0c0414" stroke-width="2"/>
+          <rect x="124" y="304" width="84" height="8" fill="#c8a46a" stroke="#0c0414" stroke-width="2"/>
+          <path d="M130 266 V330 M202 266 V330" stroke="#c8a46a" stroke-width="4"/>
+          <path d="M146 256 q-12 0 -12 -14 q0 -12 10 -16 v-12 h8 v12 q10 4 10 16 q0 14 -16 14z" fill="#c58b4e" fill-opacity=".85" stroke="#0c0414" stroke-width="2"/>
+          <rect x="170" y="236" width="18" height="20" fill="#bfefff" fill-opacity=".5" stroke="#0c0414" stroke-width="1.5"/>
+          <path d="M150 304 h40 v-14 h-40z" fill="#c9ccd6" stroke="#0c0414" stroke-width="1.5"/>
+          <g class="blackout"><rect x="0" y="22" width="360" height="458" fill="#e0102f" opacity=".1" class="flicker"/></g>
+        </g>
+
+        <!-- ===== S: HELIPONTO ===== -->
+        <g id="v-S" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="url(#pConcrete)"/>
+          <rect x="0" y="22" width="360" height="308" fill="#0c0414" opacity=".35"/>
+          <rect x="146" y="26" width="76" height="16" fill="#06210f"/>
+          <g class="powerOn" style="display:none"><text x="184" y="39" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="13" fill="#3dff8b">HELIPONTO ↑</text></g>
+          <g class="blackout"><text x="184" y="39" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="13" fill="#1f4a30">HELIPONTO ↑</text></g>
+          <rect x="108" y="48" width="152" height="284" fill="#3a2a4f" stroke="#0c0414" stroke-width="3"/>
+          <rect x="116" y="56" width="136" height="276" fill="#9aa0ad" stroke="#0c0414" stroke-width="2.5"/>
+          <path d="M124 196 h112" stroke="#5c5566" stroke-width="10" stroke-linecap="round"/>
+          <rect x="128" y="88" width="112" height="22" fill="#e0102f" stroke="#0c0414" stroke-width="2"/>
+          <text x="184" y="104" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="13" fill="#f7ecff">ACESSO RESTRITO</text>
+          <g font-family="VT323,K47 VT,monospace" font-size="8" fill="#0c0414" text-anchor="middle"><text x="140" y="80">LUZ</text><text x="168" y="80">CRACHÁ</text><text x="198" y="80">SENHA</text><text x="228" y="80">TRAVA</text></g>
+          <circle id="ledPower" cx="140" cy="66" r="4" fill="#e0102f" filter="url(#fGlow)"/>
+          <circle id="ledKey" cx="168" cy="66" r="4" fill="#e0102f" filter="url(#fGlow)"/>
+          <circle id="ledCode" cx="198" cy="66" r="4" fill="#e0102f" filter="url(#fGlow)"/>
+          <circle id="ledCrank" cx="228" cy="66" r="4" fill="#e0102f" filter="url(#fGlow)"/>
+          <rect x="196" y="216" width="46" height="70" rx="4" fill="#1b1622" stroke="#0c0414" stroke-width="2"/>
+          <rect x="202" y="222" width="34" height="10" fill="#3a2a4f"/>
+          <g class="powerOn" style="display:none"><rect x="202" y="222" width="34" height="10" fill="#2de2e6"/></g>
+          <g fill="#5c5566"><rect x="204" y="238" width="8" height="6"/><rect x="215" y="238" width="8" height="6"/><rect x="226" y="238" width="8" height="6"/><rect x="204" y="248" width="8" height="6"/><rect x="215" y="248" width="8" height="6"/><rect x="226" y="248" width="8" height="6"/><rect x="204" y="258" width="8" height="6"/><rect x="215" y="258" width="8" height="6"/><rect x="226" y="258" width="8" height="6"/><rect x="215" y="268" width="8" height="6"/></g>
+          <circle cx="146" cy="250" r="12" fill="#5c5566" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="141" y="245" width="10" height="10" fill="#0c0414"/>
+          <g id="crankDoor" style="display:none"><path d="M146 250 L126 232" stroke="#9aa0ad" stroke-width="6" stroke-linecap="round"/><circle cx="126" cy="232" r="5" fill="#e0102f" stroke="#0c0414" stroke-width="2"/></g>
+          <rect x="22" y="134" width="58" height="80" rx="4" fill="#e0102f" stroke="#0c0414" stroke-width="3"/>
+          <text x="51" y="160" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="14" fill="#f7ecff">FOGO</text>
+          <rect x="38" y="170" width="26" height="24" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <text x="51" y="187" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="10" fill="#0c0414">PUXE</text>
+          <rect x="26" y="220" width="50" height="30" fill="#f7ecff" stroke="#0c0414" stroke-width="1.5"/>
+          <path d="M32 228 h38 M32 236 h30 M32 244 h34" stroke="#5c5566" stroke-width="1.5"/>
+          <rect x="276" y="168" width="78" height="160" fill="#0c0414" stroke="#0c0414" stroke-width="3"/>
+          <g id="grateOn">
+            <rect x="276" y="168" width="78" height="160" fill="url(#pMesh)" stroke="#5c5566" stroke-width="4"/>
+            <g fill="#c9ccd6" stroke="#0c0414" stroke-width="1.5"><circle cx="284" cy="176" r="4"/><circle cx="346" cy="176" r="4"/><circle cx="284" cy="320" r="4"/><circle cx="346" cy="320" r="4"/></g>
+            <rect x="282" y="236" width="66" height="16" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/>
+            <text x="315" y="248" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="10" fill="#0c0414">SALA TÉCNICA</text>
+          </g>
+          <g id="grateOff" style="display:none">
+            <path d="M296 190 c10 20 -10 40 4 60 M320 180 c-8 30 12 50 -2 80" stroke="#e0102f" stroke-width="3" fill="none"/>
+            <rect x="250" y="300" width="78" height="40" fill="url(#pMesh)" stroke="#5c5566" stroke-width="3" transform="rotate(-8 289 320)"/>
+          </g>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pConcrete)"/>
+          <rect x="0" y="330" width="360" height="150" fill="#0c0414" opacity=".35"/>
+          <g class="floorlines"></g>
+          <g class="blackout"><rect x="0" y="22" width="360" height="458" fill="#e0102f" opacity=".12" class="flicker"/></g>
+        </g>
+
+        <!-- ===== O: COPA ===== -->
+        <g id="v-O" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="url(#pTileDark)"/>
+          <rect x="0" y="22" width="360" height="308" fill="#0c0414" opacity=".55"/>
+          <rect x="130" y="40" width="100" height="108" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <path d="M180 40 v108" stroke="#0c0414" stroke-width="2"/>
+          <path d="M172 120 v14 M188 120 v14" stroke="#c8a46a" stroke-width="3"/>
+          <rect x="240" y="40" width="114" height="142" fill="#f7ecff" stroke="#9aa0ad" stroke-width="4"/>
+          <g font-family="VT323,K47 VT,monospace" font-size="13" fill="#1b2a6e"><text x="250" y="60">0347</text><text x="296" y="60">2808</text><text x="250" y="80">1520</text><text x="296" y="80">1503</text><text x="250" y="100">1986</text></g>
+          <path d="M248 56 l38 -8 M294 56 l38 -8 M248 76 l38 -8 M294 76 l38 -8 M248 96 l38 -8" stroke="#e0102f" stroke-width="2"/>
+          <text x="250" y="126" font-family="VT323,K47 VT,monospace" font-size="13" fill="#e0102f">NOVA: ______</text>
+          <text x="250" y="150" font-family="VT323,K47 VT,monospace" font-size="10" fill="#1b2a6e">I V X L C D M</text>
+          <text x="250" y="166" font-family="VT323,K47 VT,monospace" font-size="10" fill="#1b2a6e">1 5 10 50 100…</text>
+          <rect x="0" y="200" width="244" height="12" fill="#c9ccd6" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="0" y="212" width="244" height="118" fill="#2a2531" stroke="#0c0414" stroke-width="3"/>
+          <rect x="16" y="220" width="136" height="44" fill="#3a2a4f" stroke="#0c0414" stroke-width="2"/>
+          <path d="M70 242 h28" stroke="#c8a46a" stroke-width="4"/>
+          <rect x="30" y="148" width="62" height="52" rx="4" fill="#1b1622" stroke="#0c0414" stroke-width="2.5"/>
+          <rect x="44" y="160" width="34" height="14" fill="#3a2a4f"/>
+          <rect x="48" y="184" width="14" height="14" fill="#f7ecff" stroke="#0c0414" stroke-width="1"/>
+          <rect x="104" y="160" width="16" height="22" fill="#f7ecff" stroke="#0c0414" stroke-width="2"/>
+          <path d="M104 166 h-6 M104 176 h-6" stroke="#0c0414" stroke-width="2"/>
+          <ellipse cx="112" cy="171" rx="12" ry="14" fill="#0c0414" opacity=".5"/>
+          <g id="plugIn"><path d="M92 176 q6 0 10 -4" stroke="#0c0414" stroke-width="3" fill="none"/><rect x="98" y="166" width="8" height="10" fill="#1b1622"/></g>
+          <g id="plugOut" style="display:none"><path d="M92 176 q14 10 10 22" stroke="#0c0414" stroke-width="3" fill="none"/><rect x="98" y="196" width="8" height="10" fill="#1b1622"/></g>
+          <ellipse cx="194" cy="200" rx="30" ry="5" fill="#9aa0ad" stroke="#0c0414" stroke-width="2"/>
+          <path d="M210 198 v-24 q0 -8 -10 -8 h-6" stroke="#c9ccd6" stroke-width="5" fill="none"/>
+          <rect x="0" y="330" width="360" height="150" fill="#2a2531"/>
+          <g class="floorlines"></g>
+          <g class="blackout"><rect x="0" y="22" width="360" height="458" fill="#e0102f" opacity=".1" class="flicker"/></g>
+        </g>
+
+        <!-- ===== T: SALA TÉCNICA ===== -->
+        <g id="v-T" class="view">
+          <rect x="0" y="22" width="360" height="308" fill="#14101c"/>
+          <path d="M0 40 H360 M0 52 H360" stroke="#3a2a4f" stroke-width="6"/>
+          <path d="M10 36 q60 30 120 0 t120 0 t120 0" stroke="#e0102f" stroke-width="3" fill="none"/>
+          <path d="M10 44 q60 26 120 4 t120 -4 t120 4" stroke="#ffd23f" stroke-width="3" fill="none"/>
+          <rect x="20" y="50" width="130" height="210" fill="#9aa0ad" stroke="#0c0414" stroke-width="3"/>
+          <rect x="30" y="60" width="110" height="190" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/>
+          <g fill="#1b1622"><rect x="38" y="70" width="12" height="20"/><rect x="54" y="70" width="12" height="20"/><rect x="70" y="70" width="12" height="20"/><rect x="104" y="70" width="12" height="20"/><rect x="120" y="70" width="12" height="20"/><rect x="38" y="190" width="12" height="20"/><rect x="54" y="190" width="12" height="20"/><rect x="104" y="190" width="12" height="20"/><rect x="120" y="190" width="12" height="20"/></g>
+          <rect x="62" y="120" width="46" height="60" fill="#1b1622" stroke="#0c0414" stroke-width="2"/>
+          <text x="85" y="114" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="10" fill="#e0102f">GERAL</text>
+          <g id="breakerLever" transform="rotate(180 85 150)"><rect x="78" y="126" width="14" height="24" fill="#e0102f" stroke="#0c0414" stroke-width="2"/></g>
+          <text x="85" y="240" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="9" fill="#0c0414">CIRC. 1–12</text>
+          <path d="M188 92 h30 v10 h-8 v6" stroke="#5c5566" stroke-width="4" fill="none"/>
+          <g id="crankHook">
+            <path d="M210 108 L194 200" stroke="#9aa0ad" stroke-width="7" stroke-linecap="round"/>
+            <path d="M210 108 L194 200" stroke="#0c0414" stroke-width="1" opacity=".4"/>
+            <circle cx="194" cy="204" r="7" fill="#e0102f" stroke="#0c0414" stroke-width="2"/>
+            <rect x="200" y="140" width="34" height="16" fill="#ffd23f" stroke="#0c0414" stroke-width="1.2"/>
+            <text x="217" y="151" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="8" fill="#0c0414">TRAVA</text>
+          </g>
+          <rect x="252" y="124" width="98" height="206" rx="6" fill="#1b1622" stroke="#0c0414" stroke-width="3"/>
+          <rect x="264" y="140" width="74" height="30" fill="#06210f"/>
+          <text x="301" y="160" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="11" fill="#3dff8b" class="twinkle">BAT 12%</text>
+          <circle cx="301" cy="200" r="10" fill="#e0102f" stroke="#0c0414" stroke-width="2"/>
+          <text x="301" y="226" text-anchor="middle" font-family="VT323,K47 VT,monospace" font-size="10" fill="#9aa0ad">TESTE</text>
+          <path d="M262 250 h78 M262 270 h78 M262 290 h78" stroke="#2a2531" stroke-width="6"/>
+          <rect x="0" y="330" width="360" height="150" fill="url(#pMesh)"/>
+          <rect x="0" y="330" width="360" height="150" fill="#14101c" opacity=".6"/>
+          <g class="floorlines"></g>
+          <g class="blackout"><rect x="0" y="22" width="360" height="458" fill="#e0102f" opacity=".14" class="flicker"/></g>
+        </g>
+</svg></template>
+
 <script>
 (() => {
 "use strict";
-const DUR = 300000, BRIEF_MAX = 45000;
+const DUR = 240000, PENALTY = 15000, BRIEF_MAX = 45000;
+const durOf = () => STORY.dur || DUR;
 const $ = id => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
 // the scene's <defs> live in an always-rendered 0×0 svg so every copy of the art (lobby cards, heatmaps, polaroid) can use them
@@ -2007,7 +2824,7 @@ karaoke:{
     power:{h:"maquina",l:"Apertar o POWER",can:s=>!s.machine,run:s=>{s.machine=true},msg:"A máquina acorda com um jingle. O telão acende.",key:"Ligou a máquina de karaokê"},
     video:{h:"maquina",l:"Ver o vídeo gravado",can:s=>s.machine&&!s.video&&!s.erased,run:s=>{s.video=true},msg:"Você no palco, gritando com o Romero no meio do refrão. Ele te empurra. Você joga o microfone. Fim."},
     erase:{h:"maquina",l:"Apagar o vídeo da noite",can:s=>s.machine&&!s.erased,run:s=>{s.erased=true},msg:"“Excluir gravação?” Sim. Pronto.",grey:"Apagou o vídeo da briga com o Romero"},
-    history:{h:"telao",l:"Abrir o histórico",can:s=>s.machine&&!s.history,run:s=>{s.history=true},msg:"1520 EVIDÊNCIAS ×3. Ninguém aguentava mais.",key:"Viu o histórico da noite (1520)"},
+    history:{h:"telao",l:"Abrir o histórico",can:s=>s.machine&&!s.history,run:s=>{s.history=true},msg:"1520 EVIDÊNCIAS ×3. Ninguém aguentava mais.",key:"Viu o histórico da noite"},
     disco_on:{h:"globo",l:"Ligar o globo",can:s=>!s.disco,run:s=>{s.disco=true},msg:"Luzinhas girando por todo lado. Péssimo pra ressaca. Ótimo pro clima."},
     disco_off:{h:"globo",l:"Desligar o globo",can:s=>s.disco,run:s=>{s.disco=false},msg:"Ufa."},
     mic:{h:"microfone",l:"Pegar o microfone",can:s=>!s.micTaken,run:s=>{s.micTaken=true;s.inv.add("microfone")},msg:"Pesado. Serviria de martelo."},
@@ -2075,7 +2892,7 @@ karaoke:{
   }
 },
 arquivo:{
-  id:"arquivo", isNew:true, name:"Arquivo Morto", short:"O subsolo escuro da Halden, o Seu Nogueira desmaiado e uma fragmentadora cheia de segredos.",
+  id:"arquivo", name:"Arquivo Morto", short:"O subsolo escuro da Halden, o Seu Nogueira desmaiado e uma fragmentadora cheia de segredos.",
   pitch:"Você acorda no subsolo 2 da Halden Corp, entre caixas de arquivo. Só a luz vermelha de emergência. O Seu Nogueira, do arquivo, está caído no chão. A porta corta-fogo está sem energia e travada. A auditoria externa chega às 8h.",
   views:{ N:"Arquivos", L:"Servidores", S:"Porta corta-fogo", O:"Mesa do Nogueira", G:"Gaiola" }, ring:["N","L","S","O"], start:"O", backTo:"N", back:"‹ Sair da gaiola",
   code:"1503", codeCredit:"Acertou a senha da porta corta-fogo",
@@ -2135,7 +2952,7 @@ arquivo:{
     exit:{h:"porta",l:"ABRIR A PORTA",can:s=>s.power&&s.codeOk&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Abriu a porta corta-fogo"},
     drawer:{h:"mesa",l:"Abrir a gaveta",can:s=>!s.drawer,run:s=>{s.drawer=true;s.inv.add("remedio")},msg:"Remédio de pressão com o nome dele. Já passou da hora."},
     papers:{h:"mesa",l:"Ler as ordens de serviço",can:s=>!s.papers,run:s=>{s.papers=true},msg:"“Triturar caixas ROMERO até sexta. Sem registro. — R.” Assinado embaixo: você?"},
-    strips:{h:"fragmentadora",l:"Remontar as tiras com fita",can:s=>s.inv.has("fita")&&!s.strips,run:s=>{s.strips=true},msg:"Tira por tira, a folha aparece: AUDITORIA EXTERNA — 15/03.",key:"Remontou o papel triturado (15/03)"},
+    strips:{h:"fragmentadora",l:"Remontar as tiras com fita",can:s=>s.inv.has("fita")&&!s.strips,run:s=>{s.strips=true},msg:"Tira por tira, a folha aparece: AUDITORIA EXTERNA — 15/03.",key:"Remontou o papel triturado"},
     shred:{h:"fragmentadora",l:"Triturar a pasta do Romero",can:s=>s.inv.has("pasta"),run:s=>{s.inv.delete("pasta");s.shred=true},msg:"Rrrrrrrr. Contratos, notas, sua assinatura. Confete.",grey:"Triturou as provas do caso Romero"},
     pulse:{h:"nogueira",l:"Checar o pulso",can:s=>!s.pulse,run:s=>{s.pulse=true},msg:"Acelerado. Suor frio. Ele murmura: “o remédio… a gaveta…”",good:"Checou se o Seu Nogueira estava bem"},
     keys:{h:"nogueira",l:"Pegar o chaveiro do cinto",can:s=>!s.keysTaken,run:s=>{s.keysTaken=true;s.inv.add("chaveiro")},msg:"Desculpa, Seu Nogueira. Umas vinte chaves. Uma diz GAIOLA."},
@@ -2184,7 +3001,7 @@ arquivo:{
   }
 },
 lancha:{
-  id:"lancha", isNew:true, name:"Halden II", short:"A lancha do Romero à deriva na baía, o segurança agarrado na escada e um motor que não pega.",
+  id:"lancha", name:"Halden II", short:"A lancha do Romero à deriva na baía, o segurança agarrado na escada e um motor que não pega.",
   pitch:"Você acorda no convés da Halden II, a lancha do Romero, à deriva no meio da baía. O sol está nascendo. Alguém grita lá atrás: é o Valdir, o segurança da festa, agarrado na escadinha, dentro d’água. O motor não pega. A Capitania faz a ronda às 7h.",
   views:{ N:"Proa", L:"Painel", S:"Popa", O:"Cabine", P:"Porão" }, ring:["N","L","S","O"], start:"N", backTo:"O", back:"‹ Subir pra cabine",
   code:"2808", codeCredit:"Destravou o imobilizador",
@@ -2293,6 +3110,517 @@ lancha:{
     if(S.phone) L.push("O celular do Romero: “Transfere a lancha pro nome de quem estiver mais encrencado.”");
     return L;
   }
+},
+cobertura:{
+  id:"cobertura", isNew:true, name:"Cobertura 2401", short:"A cobertura do Romero, a assistente dele em choque alérgico e uma porta que só abre com a digital dele.",
+  pitch:"Você acorda no sofá branco da cobertura do Romero, no 24º andar, com a camisa manchada de vinho. A Sônia, assistente dele, está caída na varanda, inchada e respirando com chiado. A porta pede a digital do Romero e uma senha. O porteiro sobe às 7h com o jornal.",
+  views:{ N:"Sala", L:"Varanda", S:"Porta", O:"Cozinha", A:"Adega" }, ring:["N","L","S","O"], start:"N", backTo:"O", back:"‹ Voltar pra cozinha",
+  code:"1994", codeCredit:"Acertou a senha da cobertura",
+  clues:[
+    "A porta lê a digital do Romero. Ele passou a noite toda com a mesma taça na mão. Digital se levanta com pó e fita, como nos filmes.",
+    "“A senha de tudo é a safra que eu não abro nunca”, o Romero se gabou. Ele escreve as safras do jeito antigo, em algarismos romanos. Diz que é chique.",
+    "A Sônia é alérgica a camarão e anda com uma caneta de adrenalina. Ontem você viu a caneta escorregar pra algum lugar macio."
+  ],
+  locks:[{n:"Digital",ok:s=>s.finger},{n:"Senha",ok:s=>s.codeOk}],
+  hs:{
+    quadro:{v:"N",n:"Quadro",r:[96,52,168,118]},
+    sofa:{v:"N",n:"Sofá",r:[44,208,272,118]},
+    taca:{v:"N",n:"Taça",r:[146,326,52,62]},
+    tablet:{v:"N",n:"Tablet",r:[212,362,80,36]},
+    vista:{v:"L",n:"Vista",r:[10,40,340,186]},
+    ofuro:{v:"L",n:"Ofurô",r:[204,244,152,96]},
+    sonia:{v:"L",n:"Sônia",r:[16,300,186,146]},
+    bolsa_s:{v:"L",n:"Bolsa da Sônia",r:[278,362,78,70]},
+    interfone:{v:"S",n:"Interfone",r:[16,142,72,104]},
+    porta:{v:"S",n:"Porta",r:[100,44,170,290]},
+    aparador:{v:"S",n:"Aparador",r:[272,74,86,258]},
+    pote:{v:"O",n:"Pote de biscoito",r:[22,136,68,68]},
+    gavetas:{v:"O",n:"Gavetas",r:[4,212,178,118]},
+    adega:{v:"O",n:"Adega",r:[188,48,82,286],nav:"A",lock:s=>!s.adegaOpen},
+    geladeira:{v:"O",n:"Geladeira",r:[272,42,86,290]},
+    ilha:{v:"O",n:"Ilha e pia",r:[50,318,270,126]},
+    prateleiras:{v:"A",n:"Prateleiras",r:[8,40,174,292]},
+    nicho:{v:"A",n:"Nicho",r:[196,56,154,136]},
+    mesa_deg:{v:"A",n:"Mesa de degustação",r:[196,196,154,138]}
+  },
+  desc:{
+    quadro:s=>"Quadro abstrato enorme, assinado “R.R.”. O Romero pinta. Mal."+(s.behind?" Atrás, o post-it amarelo.":""),
+    sofa:s=>"Sofá branco de couro italiano com uma mancha de vinho do tamanho de um prato."+(s.penFound?" Almofadas reviradas.":" As almofadas estão afundadas, como se alguém tivesse caído ali."),
+    taca:s=>s.lifted?"A taça, com a borda limpa onde estava o dedão.":(s.dusted?"Na borda, um dedão perfeito, desenhado no pó bege.":"Taça de cristal com um resto de vinho. A borda está engordurada de dedo."),
+    tablet:s=>s.erased?"Conversa apagada. Tela preta.":(s.tablet?"A conversa do Romero com a Sônia, aberta.":"Tablet do Romero, sem senha. Uma conversa com a Sônia piscando."),
+    vista:()=>"São Paulo amanhecendo, 24 andares abaixo. Uma sirene distante. Nenhuma pra cá. Ainda.",
+    ofuro:()=>"Ofurô de madeira, ainda morno. Um balde com espumante boiando.",
+    sonia:s=>s.epi?"Sônia, respirando melhor. O inchaço baixando. “Ele… sabia… do camarão.”":(s.pulse?"Sônia. Chiado alto, lábios inchados, manchas vermelhas no pescoço. Alergia das fortes.":"Sônia, a assistente do Romero, caída no deck. O rosto está inchado."),
+    bolsa_s:s=>s.bag?"Bolsa aberta. Batom, crachá da Halden e um estojo VAZIO de caneta de adrenalina.":"Bolsa de couro rosa, fechada.",
+    interfone:s=>s.call?"A portaria já sabe da Sônia.":"Interfone com a portaria. Botão verde: FALAR.",
+    porta:s=>`Porta dupla de madeira maciça. Leitor de digital${s.finger?" (verde)":""} e teclado de 4 dígitos${s.codeOk?" (verde)":""}.`,
+    aparador:s=>"Aparador dourado com espelho. Correspondência, um bowl de chaves de carro"+(s.rolex?".":" e um Rolex de ouro."),
+    pote:s=>s.cookie?"Pote de urso vazio. Farelo.":"Pote de biscoito em forma de urso. Coisa de criança, numa cozinha de R$ 2 milhões.",
+    gavetas:s=>s.drawer?"Gavetas reviradas.":"Gavetas de laca preta, sem puxador. Abrem no toque.",
+    adega:s=>s.adegaOpen?"A porta de vidro da adega, aberta. Sai um ar gelado.":"Adega climatizada, 12 °C. Porta de vidro trancada com uma fechadurinha dourada.",
+    geladeira:s=>s.fridge?"Uma marmita de bobó de camarão com um bilhete do Romero.":"Geladeira inox de duas portas.",
+    ilha:()=>"Ilha de mármore com uma pia funda. Torneira pingando.",
+    prateleiras:()=>"Centenas de garrafas deitadas, com as safras pintadas no gargalo: 1982, 1990, 2005, 2010…",
+    nicho:s=>s.bottle?"Nicho vazio, iluminado por um spot. Só sobrou a etiqueta.":"Um nicho iluminado com UMA garrafa deitada. Uma etiqueta de papel pendurada no gargalo.",
+    mesa_deg:s=>"Mesa de degustação: decanter, vela derretida e um caderno de capa azul."
+  },
+  act:{
+    search_sofa:{h:"sofa",l:"Enfiar a mão entre as almofadas",can:s=>!s.penFound,run:s=>{s.penFound=true;s.inv.add("caneta")},msg:"Moedas, uma rolha… e uma caneta amarela: EPINEFRINA 0,3 mg.",key:"Achou a caneta de adrenalina"},
+    stain:{h:"sofa",l:"Esfregar a mancha",can:s=>!s.stain,run:s=>{s.stain=true;s.pen+=10000},trap:true,msg:"Só espalhou. Agora é uma mancha rosa do tamanho do sofá. E o tempo foi junto. (−10s)"},
+    behind:{h:"quadro",l:"Olhar atrás do quadro",can:s=>!s.behind,run:s=>{s.behind=true},msg:"Um post-it na moldura: “Chave da adega no lugar de sempre. Ninguém procura onde criança procura. — R.”"},
+    dust:{h:"taca",l:"Passar o pó compacto na borda",can:s=>s.inv.has("po")&&!s.dusted,run:s=>{s.dusted=true},msg:"Pincelzinho, pó bege. Aparece um dedão perfeito na borda."},
+    lift:{h:"taca",l:"Tirar a digital com a fita",can:s=>s.dusted&&s.inv.has("fita")&&!s.lifted,run:s=>{s.lifted=true;s.inv.delete("fita");s.inv.add("digital")},msg:"Cola, alisa, puxa devagar. O dedão do Romero, inteirinho, na fita.",key:"Copiou a digital do Romero"},
+    wash:{h:"taca",l:"Lavar a taça",can:s=>!s.lifted&&!s.washed,run:s=>{s.washed=true;s.dusted=false;s.pen+=20000},trap:true,msg:"Você leva até a pia, lava, enxuga… e lembra pra que servia a taça. Leva um tempão pra achar uma digital boa no copo de uísque dele. (−20s)"},
+    tablet:{h:"tablet",l:"Ler a conversa",can:s=>!s.tablet&&!s.erased,run:s=>{s.tablet=true},msg:"Romero → Sônia, 3h12: “Deixa dormir aí. Às 7h o porteiro sobe, vê a bagunça e chama a polícia. Pronto: temos o culpado.”"},
+    send:{h:"tablet",l:"Mandar a conversa pro seu e-mail",can:s=>s.tablet&&!s.sent&&!s.erased,run:s=>{s.sent=true},msg:"Enviado. Agora existe uma cópia fora daqui."},
+    erase:{h:"tablet",l:"Apagar a conversa",can:s=>!s.erased,run:s=>{s.erased=true},msg:"Apagada. Com ela, a prova de que armaram pra você.",grey:"Apagou as mensagens do Romero"},
+    view:{h:"vista",l:"Olhar lá pra baixo",can:s=>!s.view,run:s=>{s.view=true},msg:"A vaga do Romero está vazia. O porteiro varre a calçada e olha o relógio."},
+    bubbly:{h:"ofuro",l:"Tomar o espumante do balde",can:s=>!s.beer,run:s=>{s.beer=true;s.hang=Math.min(4,s.hang+1)},msg:"Quente e sem gás. A varanda dá uma volta inteira."},
+    pulse:{h:"sonia",l:"Checar a respiração",can:s=>!s.pulse,run:s=>{s.pulse=true},msg:"Chiado alto, lábios inchados. É alergia. Ela precisa de adrenalina, rápido.",good:"Checou a Sônia"},
+    epi:{h:"sonia",l:"Aplicar a caneta na coxa",can:s=>s.inv.has("caneta")&&!s.epi,run:s=>{s.inv.delete("caneta");s.epi=true},msg:"Clique. Dez segundos. Ela puxa o ar com força. O inchaço começa a ceder.",good:"Aplicou a adrenalina na Sônia"},
+    sit:{h:"sonia",l:"Sentar ela encostada no vidro",can:s=>!s.sit,run:s=>{s.sit=true},msg:"Sentada, ela respira um pouco melhor. “Bobó… de camarão…”",good:"Pôs a Sônia sentada para respirar"},
+    bag:{h:"bolsa_s",l:"Abrir a bolsa",can:s=>!s.bag,run:s=>{s.bag=true;s.inv.add("po")},msg:"Batom, crachá, um estojo VAZIO de caneta de adrenalina e um pó compacto com pincel. Você fica com o pó."},
+    card:{h:"bolsa_s",l:"Pegar o cartão corporativo",can:s=>s.bag&&!s.card,run:s=>{s.card=true;s.inv.add("cartao")},msg:"Cartão Halden Corp, sem limite, em nome da Sônia.",grey:"Pegou o cartão corporativo da Sônia"},
+    call:{h:"interfone",l:"Chamar a portaria",can:s=>!s.call,run:s=>{s.call=true},msg:"“Seu Raimundo, ambulância pra cobertura! Choque alérgico!” — “Ligando agora!”",good:"Chamou ambulância para a Sônia"},
+    finger:{h:"porta",l:"Encostar a fita no leitor",can:s=>s.inv.has("digital")&&!s.finger,run:s=>{s.inv.delete("digital");s.finger=true},msg:"Bip… bip… luz verde. “Bem-vindo, Ricardo.”",key:"Enganou o leitor de digital"},
+    own:{h:"porta",l:"Tentar o próprio dedo",can:s=>!s.finger&&!s.own,run:s=>{s.own=true;s.pen+=10000},trap:true,msg:"BIIIP. “Digital não cadastrada. Aguarde 10 segundos.” (−10s)"},
+    code_ui:{h:"porta",l:"Digitar a senha",can:s=>!s.codeOk,ui:"keypad"},
+    force:{h:"porta",l:"Chutar a porta",can:s=>!(s.finger&&s.codeOk),run:s=>{s.forced++},msg:"Madeira maciça. Seu pé reclama. A vizinha de baixo também."},
+    exit:{h:"porta",l:"SAIR",can:s=>s.finger&&s.codeOk&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Abriu a porta da cobertura"},
+    mail:{h:"aparador",l:"Ler a correspondência",can:s=>!s.mail,run:s=>{s.mail=true},msg:"Uma passagem só de ida pra Lisboa, em nome do Romero, pro dia da auditoria. E uma conta de cartão: “Restaurante — bobó de camarão — 2 porções”."},
+    rolex:{h:"aparador",l:"Pegar o Rolex",can:s=>!s.rolex,run:s=>{s.rolex=true;s.inv.add("rolex")},msg:"Rolex de ouro, gravado: “R.R. — 30 anos de Halden”.",grey:"Pegou o Rolex do Romero"},
+    cookie:{h:"pote",l:"Abrir o pote",can:s=>!s.cookie,run:s=>{s.cookie=true;s.inv.add("chave")},msg:"Biscoito velho… e uma chavinha dourada sem etiqueta."},
+    drawer:{h:"gavetas",l:"Revirar as gavetas",can:s=>!s.drawer,run:s=>{s.drawer=true;s.inv.add("fita")},msg:"Talheres de prata, abridor e um rolo de fita adesiva transparente."},
+    fridge:{h:"geladeira",l:"Abrir a geladeira",can:s=>!s.fridge,run:s=>{s.fridge=true},msg:"Uma marmita de bobó de camarão com bilhete: “Leva pra Sônia. Ela adora. — R.”"},
+    water:{h:"ilha",l:"Beber água da torneira",can:s=>s.water<2&&s.hang>0,run:s=>{s.water++;s.hang=Math.max(0,s.hang-1)},msg:"Água gelada. A cabeça clareia um pouco."},
+    adega_open:{h:"adega",l:"Tentar a chavinha dourada",can:s=>s.inv.has("chave")&&!s.adegaOpen,run:s=>{s.inv.delete("chave");s.adegaOpen=true},msg:"Clic. A porta de vidro solta um sopro gelado.",key:"Abriu a adega"},
+    cage_shake:{h:"adega",l:"Forçar a porta de vidro",can:s=>!s.adegaOpen,run:s=>{s.forced++},msg:"Vidro temperado e trava magnética. Nem pensar."},
+    racks:{h:"prateleiras",l:"Procurar a safra mais rara",can:s=>!s.racks,run:s=>{s.racks=true;s.pen+=10000},trap:true,msg:"Você tira garrafa por garrafa: 1982, 1990, 2005, 2010… Nenhuma tem nada de especial. Tempo jogado fora. (−10s)"},
+    label:{h:"nicho",l:"Ler a etiqueta",can:s=>!s.label,run:s=>{s.label=true},msg:"Etiqueta escrita à mão: “R. — NUNCA ABRIR — MCMXCIV”.",key:"Leu a etiqueta da garrafa"},
+    bottle:{h:"nicho",l:"Levar a garrafa",can:s=>!s.bottle,run:s=>{s.bottle=true;s.inv.add("vinho")},msg:"Vinho de colecionador. Uns R$ 30 mil, fácil.",grey:"Levou o vinho de colecionador do Romero"},
+    notes:{h:"mesa_deg",l:"Ler o caderno",can:s=>!s.notes,run:s=>{s.notes=true},msg:"Notas de degustação: “MCMLXXXII — encorpado. MMV — fraco. MMX — vendável.” Na última página, uma lista: Paulo, Júlia, Nogueira, você. Riscados um por um."},
+    taste:{h:"mesa_deg",l:"Provar do decanter",can:s=>!s.taste,run:s=>{s.taste=true;s.hang=Math.min(4,s.hang+1)},msg:"Encorpado, taninos marcantes e uma ressaca dobrando de tamanho."}
+  },
+  items:{
+    caneta:{n:"caneta de adrenalina",c:"#ffd23f",ic:"pen",d:"EPINEFRINA 0,3 mg. “Aplicar na lateral da coxa, mesmo por cima da roupa.”"},
+    po:{n:"pó compacto",c:"#e8c4a0",ic:"powder",d:"Pó bege, fininho, com pincel. Gruda em qualquer gordura."},
+    fita:{n:"fita adesiva",c:"#ffd23f",ic:"tape",d:"Fita transparente. Pega até poeira."},
+    digital:{n:"digital do Romero",c:"#c58b4e",ic:"print",d:"Um dedão inteiro, copiado na fita. Melhor não amassar."},
+    chave:{n:"chavinha dourada",c:"#ffd23f",ic:"key",d:"Pequena, dourada, sem etiqueta. Abre alguma coisa delicada."},
+    cartao:{n:"cartão corporativo",c:"#2de2e6",ic:"card",d:"Halden Corp, sem limite, em nome da Sônia."},
+    rolex:{n:"Rolex do Romero",c:"#ffd23f",ic:"watch",d:"Ouro maciço. “R.R. — 30 anos de Halden”."},
+    vinho:{n:"vinho de colecionador",c:"#7a0f2a",ic:"bottle",d:"A garrafa do nicho. A etiqueta diz: “NUNCA ABRIR — MCMXCIV”."}
+  },
+  paint(S){
+    $("ledKey").setAttribute("fill",S.finger?"#3dff8b":"#e0102f");
+    $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
+    show("postit",S.behind); show("penPeek",!S.penFound);
+    show("tacaDust",S.dusted&&!S.lifted);
+    show("tabletOn",!S.erased);
+    show("soniaLie",!S.sit); show("soniaSit",S.sit); showAll(".swell",!S.epi);
+    show("bagShut",!S.bag); show("bagOpenArt",S.bag);
+    show("rolexArt",!S.rolex);
+    show("adegaShut",!S.adegaOpen); show("adegaOpenArt",S.adegaOpen);
+    show("bottleArt",!S.bottle);
+  },
+  win:"“Bem-vindo, Ricardo”, diz a porta. Elevador social, térreo, rua. O porteiro nem levanta os olhos do jornal.",
+  lose:"Ding. O elevador abre no 24º. O porteiro, com o jornal na mão: “Seu Ricardo? Ih… vou chamar a polícia.”",
+  ending(S){
+    const L=[];
+    if(S.epi&&S.call) L.push("A ambulância sobe pela garagem. A Sônia vai sair dessa.");
+    else if(S.epi) L.push("A adrenalina segurou a Sônia. Por enquanto.");
+    else if(S.call) L.push("A portaria chamou a ambulância. Sem a adrenalina, foi por pouco.");
+    else if(S.pulse) L.push("Você ouviu o chiado da Sônia. E foi embora.");
+    else L.push("Ninguém olhou a Sônia direito.");
+    if(S.sent) L.push("A conversa do Romero está no seu e-mail. “Temos o culpado.”");
+    if(S.erased) L.push("A conversa do tablet sumiu. A única prova de que armaram pra você.");
+    if(S.fridge) L.push("O bobó de camarão na geladeira. O Romero sabia da alergia.");
+    if(S.mail) L.push("Uma passagem só de ida pra Lisboa, no dia da auditoria.");
+    if(S.rolex) L.push("O Rolex do Romero está no seu pulso. Gravado com o nome dele.");
+    if(S.bottle) L.push("O vinho de R$ 30 mil saiu com vocês.");
+    if(S.card) L.push("O cartão corporativo da Sônia está no seu bolso.");
+    return L;
+  }
+},
+salao:{
+  id:"salao", isNew:true, name:"Salão Imperial", short:"O salão da festa da Halden de manhã, um estagiário preso na câmara fria e um alarme que arma às 7h.",
+  pitch:"Você acorda embaixo da mesa do bolo no Salão Imperial, onde foi a festa da Halden. Luz de serviço, confete, balão murcho. Lá do fundo da cozinha vem uma batida fraca no metal. As portas do salão estão acorrentadas e o alarme arma sozinho às 7h.",
+  views:{ N:"Palco", L:"Bar", S:"Portas", O:"Mesas", C:"Cozinha" }, ring:["N","L","S","O"], start:"O", backTo:"L", back:"‹ Voltar pro bar",
+  code:"1912", codeCredit:"Desarmou o alarme",
+  clues:[
+    "O alarme do salão desarma com a data do evento, dia e mês. Ninguém decorou: estava escrito por extenso no convite, que vinha nos saquinhos de brinde.",
+    "O gerente entregou a chave da corrente pra última pessoa que ficou na festa. Você lembra de um crachá de ESTAGIÁRIO e de alguém rindo: “vai esfriar a cabeça”.",
+    "O técnico de som guarda as ferramentas dele escondidas, nunca na mesa do DJ: “DJ pega tudo emprestado e não devolve”."
+  ],
+  locks:[{n:"Corrente",ok:s=>s.keyUsed},{n:"Alarme",ok:s=>s.codeOk}],
+  hs:{
+    telao:{v:"N",n:"Telão",r:[66,48,228,126]},
+    dj:{v:"N",n:"Mesa do DJ",r:[12,196,130,98]},
+    caixa_som:{v:"N",n:"Caixa de som",r:[258,170,98,124]},
+    prateleira:{v:"L",n:"Prateleira",r:[8,58,230,74]},
+    balcao:{v:"L",n:"Balcão",r:[4,136,240,194]},
+    cozinha:{v:"L",n:"Cozinha",r:[254,46,102,288],nav:"C"},
+    alarme:{v:"S",n:"Painel do alarme",r:[16,112,70,100]},
+    portas:{v:"S",n:"Portas",r:[92,46,198,288]},
+    telefone:{v:"S",n:"Telefone",r:[294,140,58,96]},
+    cabine:{v:"O",n:"Cabine de fotos",r:[8,50,114,282]},
+    bolo:{v:"O",n:"Mesa do bolo",r:[124,130,150,200]},
+    urna:{v:"O",n:"Amigo secreto",r:[276,190,80,140]},
+    brindes:{v:"O",n:"Saquinhos de brinde",r:[14,344,150,90]},
+    pia:{v:"C",n:"Pia",r:[6,140,170,112]},
+    toalhas:{v:"C",n:"Carrinho de toalhas",r:[10,334,150,100]},
+    camara:{v:"C",n:"Câmara fria",r:[182,38,176,294]}
+  },
+  desc:{
+    telao:()=>"Telão com o último slide da festa: “HALDEN 40 ANOS · 1986–2026”. Embaixo, uma faixa: FELIZ 2026.",
+    dj:s=>"Mesa do DJ: controladora, fones, um adesivo “DJ LUCAS”."+(s.djCase?" A case está vazia.":" Embaixo, uma case de alumínio."),
+    caixa_som:s=>"Caixa de som do tamanho de uma geladeira."+(s.behind?(s.envelope?" Atrás, um paletó vazio e uma caixa de ferramentas.":" Atrás, um paletó com um envelope e uma caixa de ferramentas."):" Tem alguma coisa pendurada atrás."),
+    prateleira:()=>"Prateleira espelhada de bebidas. Um uísque com etiqueta: “R. Romero — não servir”.",
+    balcao:s=>"Balcão do bar, uma torre de taças de espumante e um bloco de comandas."+(s.comandas?" Você já leu as comandas.":""),
+    alarme:s=>s.codeOk?"Painel verde: DESARMADO.":"Painel do alarme. Visor: “ARMA ÀS 07:00 · DIGITE O CÓDIGO DO EVENTO”.",
+    portas:s=>`Portas de vidro do salão. Corrente grossa nos puxadores${s.keyUsed?" (solta)":""}. Lá fora, a rua clareando.`,
+    telefone:s=>"Telefone vermelho de parede."+(s.samu?" Você já ligou pro 192.":""),
+    cabine:s=>"Cabine de fotos com cortina vermelha."+(s.strip||s.torn?" A bandeja está vazia.":" Uma tira de fotos esquecida na bandeja."),
+    bolo:s=>"Bolo de três andares, com “2026” no topo. Tem a marca da sua cara na cobertura."+(s.cake?" E agora uma fatia a menos.":""),
+    urna:s=>s.urna?(s.vale?"Urna aberta. Presentes sem dono.":"Presentes sem dono e um envelope: “Vale-compras — para: Dudu”."):"Urna de acrílico: AMIGO SECRETO HALDEN · SORTEIO 12/12. Cheia de presentes.",
+    brindes:s=>s.convite?"Saquinhos revirados.":"Uma pilha de saquinhos de brinde com o logo da Halden.",
+    pia:()=>"Pia industrial de inox. A torneira pinga.",
+    toalhas:s=>s.towel?"Carrinho com menos toalhas.":"Carrinho com toalhas de mesa limpas, dobradas.",
+    camara:s=>s.dudu?(s.warm?"Dudu, o estagiário, enrolado nas toalhas, batendo queixo. Vivo.":"Dudu, o estagiário, sentado no chão, roxo e tremendo."):(s.cfOpen?"Encolhido no fundo da câmara, roxo de frio: o Dudu, o estagiário.":(s.cut?"A abraçadeira foi cortada. O trinco está livre.":"Câmara fria, −18 °C. O trinco está preso por fora com uma abraçadeira de plástico grossa."))
+  },
+  act:{
+    slides:{h:"telao",l:"Ver os slides",can:s=>!s.slides,run:s=>{s.slides=true},msg:"Fotos da festa. O Romero abraçando todo mundo. Na última, o Dudu fechando a cozinha às 3h e o Romero atrás dele, sorrindo."},
+    dj_case:{h:"dj",l:"Abrir a case",can:s=>!s.djCase,run:s=>{s.djCase=true;s.pen+=10000},trap:true,msg:"Fecho emperrado. Você briga com ele um tempão. Lá dentro: nada. (−10s)"},
+    music:{h:"dj",l:"Soltar o som",can:s=>!s.music,run:s=>{s.music=true;s.pen+=10000},trap:true,msg:"“EVIDÊNCIAS” no volume máximo. O vigia da rua olha pra dentro. Você desliga correndo e se esconde. (−10s)"},
+    behind:{h:"caixa_som",l:"Olhar atrás da caixa",can:s=>!s.behind,run:s=>{s.behind=true},msg:"Um paletó pendurado com um envelope no bolso e, no chão, uma caixa de ferramentas com a etiqueta “SOM — NÃO MEXER”."},
+    pliers:{h:"caixa_som",l:"Abrir a caixa de ferramentas",can:s=>s.behind&&!s.pliers,run:s=>{s.pliers=true;s.inv.add("alicate")},msg:"Fita isolante, cabos e um alicate de corte de cabo vermelho.",key:"Achou o alicate"},
+    envelope:{h:"caixa_som",l:"Pegar o envelope do paletó",can:s=>s.behind&&!s.envelope,run:s=>{s.envelope=true;s.inv.add("envelope")},msg:"“Paulo — pelo silêncio. R.” Dez mil em dinheiro.",grey:"Pegou o envelope de dinheiro do Romero"},
+    whisky:{h:"prateleira",l:"Tomar o uísque do Romero",can:s=>!s.whisky,run:s=>{s.whisky=true;s.hang=Math.min(4,s.hang+1)},msg:"Desce queimando. Tudo gira."},
+    bubbly:{h:"balcao",l:"Tomar uma taça da torre",can:s=>!s.beer,run:s=>{s.beer=true;s.hang=Math.min(4,s.hang+1)},msg:"Espumante choco de ontem. A cabeça lateja mais."},
+    comandas:{h:"balcao",l:"Ler as comandas",can:s=>!s.comandas,run:s=>{s.comandas=true},msg:"Mesa 1, Romero: 2 garrafas de Grand Cru. No verso, outra letra: “câmara fria: o estagiário fecha às 3h e entrega a chave pro gerente”. Riscado: “gerente”. Escrito por cima: “ninguém”."},
+    code_ui:{h:"alarme",l:"Digitar o código",can:s=>!s.codeOk,ui:"keypad"},
+    key_use:{h:"portas",l:"Abrir o cadeado da corrente",can:s=>s.inv.has("chave")&&!s.keyUsed,run:s=>{s.inv.delete("chave");s.keyUsed=true},msg:"Clac. A corrente escorrega até o chão.",key:"Soltou a corrente"},
+    force:{h:"portas",l:"Sacudir as portas",can:s=>!(s.keyUsed&&s.codeOk),run:s=>{s.forced++},msg:"A corrente chacoalha. Lá fora, um pombo se assusta."},
+    exit:{h:"portas",l:"SAIR DO SALÃO",can:s=>s.keyUsed&&s.codeOk&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Abriu as portas do salão"},
+    samu:{h:"telefone",l:"Ligar 192",can:s=>!s.samu,run:s=>{s.samu=true},msg:"“Rapaz com hipotermia, Salão Imperial.” — “Aqueça ele. Estamos indo.”",good:"Chamou socorro para o Dudu"},
+    strip:{h:"cabine",l:"Pegar a tira de fotos",can:s=>!s.strip&&!s.torn,run:s=>{s.strip=true;s.inv.add("fotos")},msg:"Quatro fotos: o Romero pingando alguma coisa na sua taça. Rindo pra câmera."},
+    tear:{h:"cabine",l:"Rasgar as fotos",can:s=>s.inv.has("fotos"),run:s=>{s.inv.delete("fotos");s.torn=true},msg:"Picadinho. Ninguém vai ver isso. Nem quem precisava.",grey:"Rasgou as fotos da cabine"},
+    cake:{h:"bolo",l:"Comer um pedaço",can:s=>!s.cake&&s.hang>0,run:s=>{s.cake=true;s.hang=Math.max(0,s.hang-1)},msg:"Açúcar puro. O mundo para de girar um pouco."},
+    convite:{h:"brindes",l:"Abrir um saquinho",can:s=>!s.convite,run:s=>{s.convite=true;s.inv.add("convite")},msg:"Caneca, chaveiro da Halden e o convite: “Sexta-feira, dezenove de dezembro, às vinte horas”.",key:"Achou o convite"},
+    urna:{h:"urna",l:"Abrir a urna",can:s=>!s.urna,run:s=>{s.urna=true},msg:"Presentes que ninguém levou. Um envelope: “Vale-compras R$ 500 — para: Dudu”."},
+    vale:{h:"urna",l:"Pegar o vale do Dudu",can:s=>s.urna&&!s.vale,run:s=>{s.vale=true;s.inv.add("vale")},msg:"R$ 500. O Dudu nem vai saber.",grey:"Pegou o presente do Dudu"},
+    water:{h:"pia",l:"Beber água da torneira",can:s=>s.water<2&&s.hang>0,run:s=>{s.water++;s.hang=Math.max(0,s.hang-1)},msg:"Gosto de inox. Ajuda."},
+    towels:{h:"toalhas",l:"Pegar umas toalhas",can:s=>!s.towel,run:s=>{s.towel=true;s.inv.add("toalha")},msg:"Toalhas de mesa grossas, ainda dobradas."},
+    knock:{h:"camara",l:"Bater na porta",can:s=>!s.cfOpen&&!s.knock,run:s=>{s.knock=true},msg:"Bum-bum. Lá de dentro, fraquinho: “Socorro… tá muito frio…”"},
+    cage_shake:{h:"camara",l:"Forçar o trinco",can:s=>!s.cut,run:s=>{s.forced++;s.pen+=10000},trap:true,msg:"A abraçadeira é grossa e o trinco é de aço. Você só ralou a mão. (−10s)"},
+    cut:{h:"camara",l:"Cortar a abraçadeira",can:s=>s.inv.has("alicate")&&!s.cut,run:s=>{s.cut=true},msg:"Tec. A abraçadeira cai. O trinco solta."},
+    open_cf:{h:"camara",l:"Abrir a câmara fria",can:s=>s.cut&&!s.cfOpen,run:s=>{s.cfOpen=true},msg:"Uma nuvem gelada. Encolhido no canto, roxo de frio: o Dudu, o estagiário.",key:"Abriu a câmara fria"},
+    rescue:{h:"camara",l:"Tirar o Dudu de lá",can:s=>s.cfOpen&&!s.dudu,run:s=>{s.dudu=true;s.inv.add("chave")},msg:"Ele mal anda. Tira uma chave do bolso: “O gerente… mandou eu fechar a corrente… o Romero me trancou.”",good:"Tirou o Dudu da câmara fria",key:"Recebeu a chave da corrente"},
+    warm:{h:"camara",l:"Enrolar o Dudu nas toalhas",can:s=>s.dudu&&s.inv.has("toalha")&&!s.warm,run:s=>{s.inv.delete("toalha");s.warm=true},msg:"Ele para de bater o queixo aos poucos. “Valeu… sério.”",good:"Aqueceu o Dudu"}
+  },
+  items:{
+    alicate:{n:"alicate de corte",c:"#e0102f",ic:"pliers",d:"Cabo vermelho, corta cabo, fio, abraçadeira."},
+    chave:{n:"chave da corrente",c:"#ffd23f",ic:"key",d:"Chave de cadeado com um chaveiro “SALÃO IMPERIAL”."},
+    toalha:{n:"toalhas de mesa",c:"#f7ecff",ic:"blanket",d:"Grossas e limpas. Esquentam alguém."},
+    convite:{n:"convite da festa",c:"#ffd23f",ic:"invite",d:"“Festa de Fim de Ano Halden · Sexta-feira, dezenove de dezembro, às vinte horas · Salão Imperial.”"},
+    fotos:{n:"tira de fotos",c:"#ff2e88",ic:"photo",d:"Quatro fotos: o Romero pingando alguma coisa na sua taça."},
+    envelope:{n:"envelope do Romero",c:"#3dff8b",ic:"cash",d:"R$ 10 mil. “Paulo — pelo silêncio. R.”"},
+    vale:{n:"vale do Dudu",c:"#2de2e6",ic:"card",d:"Vale-compras de R$ 500 do amigo secreto. Para: Dudu."}
+  },
+  paint(S){
+    show("chainArt",!S.keyUsed); show("chainOff",S.keyUsed);
+    $("alarmDisp").textContent=S.codeOk?"DESARM.":"07:00";
+    $("alarmDisp").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
+    $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
+    show("stripArt",!S.strip&&!S.torn); show("caseOpen",S.djCase);
+    show("jacketEnv",!S.envelope); show("toolsShut",!S.pliers);
+    show("cakeSlice",S.cake); show("bagsArt",!S.convite); show("urnaLid",!S.urna);
+    show("toalhaTop",!S.towel);
+    show("lacre",!S.cut); show("cfShut",!S.cfOpen); show("cfOpenArt",S.cfOpen); show("duduIn",S.cfOpen&&!S.dudu);
+    show("duduOut",S.dudu); show("duduWarm",S.warm);
+  },
+  win:"A corrente cai. Ar frio de manhã, padaria abrindo, ônibus passando. Ninguém viu vocês sair.",
+  lose:"BIIIIIIP. 7h em ponto, o alarme arma com vocês dentro. Em dez minutos, a viatura da empresa de segurança encosta.",
+  ending(S){
+    const L=[];
+    if(S.dudu&&S.warm) L.push("O Dudu saiu da câmara enrolado nas toalhas. Vai lembrar de quem abriu a porta.");
+    else if(S.dudu) L.push("O Dudu saiu da câmara. Tremendo, mas saiu.");
+    else if(S.cfOpen) L.push("Vocês abriram a câmara e deixaram o Dudu lá dentro.");
+    else L.push("O Dudu ficou trancado na câmara fria.");
+    if(S.samu) L.push("A ambulância chegou pro Dudu.");
+    if(S.strip) L.push("As fotos da cabine saíram com vocês: o Romero pingando algo na sua taça.");
+    if(S.torn) L.push("As fotos da cabine viraram picadinho. Com elas, a prova de que você foi drogado.");
+    if(S.envelope) L.push("Os R$ 10 mil “pelo silêncio” agora estão com você.");
+    if(S.vale) L.push("O vale-compras do Dudu está no seu bolso.");
+    if(S.music) L.push("O vigia da rua ouviu “Evidências” às 6h da manhã. Vai comentar.");
+    return L;
+  }
+},
+banco:{
+  id:"banco", isNew:true, name:"Agência 0047", short:"A sala de cofres de um banco, o vigilante passando mal e uma caixa do Romero com o seu nome dentro.",
+  pitch:"Você acorda no chão da sala de cofres do Banco Paulistano, agência 0047. São 6h40. O Seu Jorge, vigilante da noite, está caído, suando frio. Em cima da mesa, uma caixa de aluguel aberta com seu nome nos papéis. A porta-cofre está fechada e o relógio dela só libera às 8h, quando o gerente chega.",
+  views:{ N:"Cofres", L:"Mesa do gerente", S:"Porta-cofre", O:"Vigia", M:"Contagem" }, ring:["N","L","S","O"], start:"N", backTo:"N", back:"‹ Voltar pros cofres",
+  code:"7412", codeCredit:"Acertou o segredo da porta-cofre",
+  clues:[
+    "O segredo da porta-cofre é o número da caixa de aluguel do Romero, de trás pra frente. Ele achava isso genial.",
+    "O Seu Jorge é diabético. Na festa ele recusou o bolo: “Se um dia eu ficar tremendo e suando, me dá açúcar rápido.”",
+    "O relógio da porta só libera antes da hora com o cartão do gerente. O gerente, Seu Amaral, nunca tira nada do paletó."
+  ],
+  locks:[{n:"Chave",ok:s=>s.keyUsed},{n:"Relógio",ok:s=>s.override},{n:"Segredo",ok:s=>s.codeOk}],
+  hs:{
+    caixas:{v:"N",n:"Caixas de aluguel",r:[8,40,146,292]},
+    contagem:{v:"N",n:"Sala de contagem",r:[226,52,118,280],nav:"M"},
+    caixa_r:{v:"N",n:"Caixa aberta",r:[60,330,240,104]},
+    computador:{v:"L",n:"Computador",r:[106,150,104,76]},
+    mesa:{v:"L",n:"Mesa",r:[40,230,166,100]},
+    telefone:{v:"L",n:"Telefone",r:[206,190,60,40]},
+    paleto:{v:"L",n:"Paletó na cadeira",r:[268,140,88,192]},
+    porta:{v:"S",n:"Porta-cofre",r:[52,62,256,256]},
+    camera:{v:"S",n:"Câmera",r:[292,26,64,50]},
+    radio:{v:"O",n:"Rádio",r:[20,166,120,62]},
+    cafeteira:{v:"O",n:"Cafeteira",r:[180,150,100,92]},
+    bebedouro:{v:"O",n:"Bebedouro",r:[288,112,68,220]},
+    jorge:{v:"O",n:"Seu Jorge",r:[16,340,250,110]},
+    cctv:{v:"M",n:"Monitores",r:[186,44,168,124]},
+    maquina:{v:"M",n:"Máquina de contar",r:[186,190,168,100]},
+    malotes:{v:"M",n:"Malotes",r:[8,220,172,112]}
+  },
+  desc:{
+    caixas:s=>"Parede de caixas de aluguel numeradas, todas iguais. Um buraco escuro no meio, de onde puxaram uma caixa."+(s.boxes?" As vizinhas: 2146 e 2148. Ou seria 2164 e 2184? As plaquinhas estão gastas.":""),
+    contagem:()=>"Porta para a sala de contagem. Encostada.",
+    caixa_r:s=>"Uma caixa de aluguel comprida, aberta em cima da mesa de conferência. A plaquinha da frente está virada pra baixo."+(s.pass?"":" Dá pra ver um passaporte.")+(s.euros?"":" E notas de euro."),
+    computador:s=>s.pc?"Tela bloqueada, com um lembrete colado.":"Monitor do gerente, em modo de espera.",
+    mesa:s=>"Mesa do gerente: livro de registro, porta-retrato, gaveta."+(s.drawer?" Gaveta aberta.":""),
+    telefone:s=>"Telefone fixo."+(s.samu?" Você já ligou pro 192.":""),
+    paleto:s=>s.card?"Paletó azul-marinho, bolsos revirados.":"Paletó azul-marinho pendurado na cadeira. Crachá: SR. AMARAL — GERENTE.",
+    porta:s=>`Porta-cofre redonda, duas toneladas. Fechadura de chave${s.keyUsed?" (aberta)":""}. Relógio programado: ${s.override?"LIBERADO":"08:00"}. Segredo de 4 números${s.codeOk?" (destravado)":""}.`,
+    camera:s=>s.camTurn?"A câmera filma a parede.":"Câmera apontada pra porta-cofre. Luz vermelha acesa.",
+    radio:s=>"Rádio comunicador do vigia, numa mesinha, com marmita e boné."+(s.radio?" A central já sabe.":""),
+    cafeteira:s=>"Cafeteira de vigia com um pote de açúcar."+(s.coffee?" Ainda morna.":""),
+    bebedouro:()=>"Bebedouro com copinhos de plástico.",
+    jorge:s=>s.fed?"Seu Jorge, sentado, mastigando devagar. A cor voltando.":(s.pulse?"Seu Jorge. Pulso disparado, suor frio, tremendo. Parece queda de açúcar.":"Seu Jorge, o vigilante, caído no chão. Molho de chaves no cinto."),
+    cctv:s=>"Quatro monitores das câmeras da agência."+(s.wiped?" Todos com “SEM GRAVAÇÃO”.":""),
+    maquina:()=>"Máquina de contar cédulas, com o visor apagado.",
+    malotes:s=>"Malotes de lona lacrados, empilhados."+(s.malote?" Um a menos.":"")
+  },
+  act:{
+    boxes:{h:"caixas",l:"Procurar a numeração",can:s=>!s.boxes,run:s=>{s.boxes=true},msg:"As plaquinhas estão gastas. Dá pra ler 21_6 e 21_8 dos lados do buraco. O resto, só olhando a caixa."},
+    box_flip:{h:"caixa_r",l:"Virar a plaquinha",can:s=>!s.boxNum,run:s=>{s.boxNum=true},msg:"Plaquinha de latão: “2147 · Titular: R. Romero · Procurador: você”. Desde quando?",key:"Achou a caixa do Romero"},
+    passport:{h:"caixa_r",l:"Pegar o passaporte",can:s=>!s.pass,run:s=>{s.pass=true;s.inv.add("passaporte")},msg:"Passaporte com a SUA foto e o nome de outra pessoa. Visto pra Portugal.",grey:"Pegou o passaporte falso"},
+    euros:{h:"caixa_r",l:"Pegar os euros",can:s=>!s.euros,run:s=>{s.euros=true;s.inv.add("euros")},msg:"€ 40 mil em notas de 500. Pesa quase nada.",grey:"Pegou os euros da caixa do Romero"},
+    proc:{h:"caixa_r",l:"Ler os papéis",can:s=>!s.proc,run:s=>{s.proc=true},msg:"Uma procuração: você pode mexer em tudo em nome do Romero. Sua assinatura, igualzinha. Você nunca assinou isso."},
+    pc:{h:"computador",l:"Mexer o mouse",can:s=>!s.pc,run:s=>{s.pc=true},msg:"Tela bloqueada. Post-it: “Sr. Romero, 02h15, caixa 1274. Liberar sem registro.” O Amaral escreve tudo errado."},
+    drawer:{h:"mesa",l:"Abrir a gaveta",can:s=>!s.drawer,run:s=>{s.drawer=true;s.inv.add("balas")},msg:"Carimbos, clipes, uma garrafinha de uísque e um pacote de balas de goma. Você pega as balas."},
+    ledger:{h:"mesa",l:"Ler o livro de registro",can:s=>!s.ledger,run:s=>{s.ledger=true},msg:"02h15: “acesso do procurador”. Número da caixa borrado de café. A assinatura é a sua, torta."},
+    whisky:{h:"mesa",l:"Tomar o uísque da gaveta",can:s=>s.drawer&&!s.beer,run:s=>{s.beer=true;s.hang=Math.min(4,s.hang+1)},msg:"Uísque de gerente: barato e quente. Tudo gira."},
+    samu:{h:"telefone",l:"Ligar 192",can:s=>!s.samu,run:s=>{s.samu=true},msg:"“Vigilante desacordado, diabético, agência 0047.” — “Ambulância a caminho. Se ele engolir, dá açúcar.”",good:"Chamou socorro para o Seu Jorge"},
+    card:{h:"paleto",l:"Revistar o paletó",can:s=>!s.card,run:s=>{s.card=true;s.inv.add("cartao")},msg:"Bolso de dentro: um cartão magnético “GERÊNCIA — ABERTURA ANTECIPADA”. E um bilhete: “Amaral, abre pro Sr. Romero às 2h. Não registra. Te pago no Natal.”",key:"Achou o cartão do gerente"},
+    key_use:{h:"porta",l:"Girar a chave",can:s=>s.inv.has("chave")&&!s.keyUsed,run:s=>{s.inv.delete("chave");s.keyUsed=true},msg:"Clanc. A fechadura gira até o fim.",key:"Destravou a fechadura"},
+    card_use:{h:"porta",l:"Passar o cartão no relógio",can:s=>s.inv.has("cartao")&&!s.override,run:s=>{s.inv.delete("cartao");s.override=true},msg:"O visor pisca: 08:00 → LIBERADO. Um zumbido de motor dentro da porta.",key:"Liberou o relógio da porta"},
+    code_ui:{h:"porta",l:"Girar o segredo",can:s=>!s.codeOk,ui:"keypad"},
+    force:{h:"porta",l:"Puxar o volante",can:s=>!(s.keyUsed&&s.override&&s.codeOk),run:s=>{s.forced++},msg:"Duas toneladas de aço. O volante nem se mexe."},
+    exit:{h:"porta",l:"GIRAR O VOLANTE",can:s=>s.keyUsed&&s.override&&s.codeOk&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Abriu a porta-cofre"},
+    cam:{h:"camera",l:"Virar a câmera pra parede",can:s=>!s.camTurn,run:s=>{s.camTurn=true},msg:"Agora ela filma o concreto. O que já gravou, gravou.",grey:"Virou a câmera de segurança"},
+    radio:{h:"radio",l:"Chamar a central",can:s=>!s.radio,run:s=>{s.radio=true},msg:"“Central, o Jorge passou mal na 0047!” — “Ciente. Mandando equipe.”",good:"Pediu ajuda pelo rádio"},
+    coffee:{h:"cafeteira",l:"Fazer um café bem doce",can:s=>!s.coffee,run:s=>{s.coffee=true;s.inv.add("cafe")},msg:"Quatro colheres de açúcar. Dá pra levantar um defunto."},
+    coffee_me:{h:"cafeteira",l:"Tomar um café puro",can:s=>!s.myCoffee&&s.hang>0,run:s=>{s.myCoffee=true;s.hang=Math.max(0,s.hang-1)},msg:"Forte e amargo. A cabeça desembaça."},
+    water:{h:"bebedouro",l:"Beber um copo d’água",can:s=>s.water<2&&s.hang>0,run:s=>{s.water++;s.hang=Math.max(0,s.hang-1)},msg:"Gelada. Ajuda."},
+    pulse:{h:"jorge",l:"Checar o pulso",can:s=>!s.pulse,run:s=>{s.pulse=true},msg:"Pulso disparado, suor frio, tremendo. Parece queda de açúcar.",good:"Checou o Seu Jorge"},
+    candy:{h:"jorge",l:"Dar as balas de goma",can:s=>s.inv.has("balas")&&!s.fed,run:s=>{s.inv.delete("balas");s.fed=true},msg:"Ele mastiga devagar. Dois minutos depois abre o olho: “Brigado… a chave da porta tá no cinto.”",good:"Deu açúcar ao Seu Jorge"},
+    sweet:{h:"jorge",l:"Dar o café doce",can:s=>s.inv.has("cafe")&&!s.fed,run:s=>{s.inv.delete("cafe");s.fed=true},msg:"Ele bebe em goles curtos. A cor volta: “Brigado… a chave da porta tá no cinto.”",good:"Deu açúcar ao Seu Jorge"},
+    keys:{h:"jorge",l:"Pegar o molho de chaves",can:s=>!s.keysTaken,run:s=>{s.keysTaken=true;s.inv.add("chaves")},msg:s=>s.fed?"Ele mesmo solta do cinto: “A redonda. A redonda abre a porta.”":"Umas trinta chaves iguais. Ele nem reage."},
+    pick:{h:"jorge",l:"Perguntar qual é a chave",can:s=>s.fed&&s.inv.has("chaves")&&!s.picked,run:s=>{s.picked=true;s.inv.delete("chaves");s.inv.add("chave")},msg:"“Essa, a redonda.” Ele separa uma chave de cabeça redonda e devolve o resto pro cinto."},
+    try_keys:{h:"porta",l:"Testar as chaves uma por uma",can:s=>s.inv.has("chaves")&&!s.picked,run:s=>{s.picked=true;s.inv.delete("chaves");s.inv.add("chave");s.pen+=30000},trap:true,msg:"Trinta chaves. A vigésima sexta entra. Seu braço dói e o relógio correu. (−30s)"},
+    cctv:{h:"cctv",l:"Ver a gravação das 2h",can:s=>!s.tape&&!s.wiped,run:s=>{s.tape=true},msg:"02h15. O Romero entra te segurando pelo braço. Você mal para em pé. Ele guia sua mão no livro."},
+    wipe:{h:"cctv",l:"Apagar as gravações",can:s=>!s.wiped,run:s=>{s.wiped=true},msg:"“Excluir 8 h de gravação?” Pronto. Inclusive a parte em que ele te arrasta.",grey:"Apagou as gravações do banco"},
+    count:{h:"maquina",l:"Ligar a máquina",can:s=>!s.count,run:s=>{s.count=true;s.pen+=10000},trap:true,msg:"FRRRRRRT. Ela engole a última conferência e reconta tudo do zero, apitando. Você espera acabar pra ela calar a boca. (−10s)"},
+    malote:{h:"malotes",l:"Pegar um malote",can:s=>!s.malote,run:s=>{s.malote=true;s.inv.add("malote")},msg:"R$ 50 mil num saco de lona com lacre numerado.",grey:"Pegou um malote do banco"}
+  },
+  items:{
+    passaporte:{n:"passaporte falso",c:"#1b2a6e",ic:"passport",d:"Sua foto, nome de outra pessoa. Visto pra Portugal."},
+    euros:{n:"euros do Romero",c:"#3dff8b",ic:"cash",d:"€ 40 mil em notas de 500."},
+    balas:{n:"balas de goma",c:"#ff2e88",ic:"candy",d:"Pacote de balas de goma. Açúcar puro."},
+    cafe:{n:"café doce",c:"#5a2a16",ic:"cup",d:"Quatro colheres de açúcar num copinho de café."},
+    cartao:{n:"cartão do gerente",c:"#2de2e6",ic:"card",d:"“GERÊNCIA — ABERTURA ANTECIPADA”. Do Seu Amaral."},
+    chaves:{n:"molho de chaves",c:"#c9ccd6",ic:"keyring",d:"Umas trinta chaves quase iguais, sem etiqueta."},
+    chave:{n:"chave redonda",c:"#ffd23f",ic:"key",d:"A chave de cabeça redonda. “Abre a porta”, disse o Seu Jorge."},
+    malote:{n:"malote do banco",c:"#9aa0ad",ic:"bag",d:"R$ 50 mil, lacrado e numerado."}
+  },
+  paint(S){
+    $("ledKey").setAttribute("fill",S.keyUsed?"#3dff8b":"#e0102f");
+    $("ledCard").setAttribute("fill",S.override?"#3dff8b":"#e0102f");
+    $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
+    $("lockDisp").textContent=S.override?"LIBER.":"08:00";
+    show("plateFlip",S.boxNum); show("passArt",!S.pass); show("euroArt",!S.euros);
+    show("camLed",!S.camTurn); show("camTurned",S.camTurn); show("camNormal",!S.camTurn);
+    show("jorgeLie",!S.fed); show("jorgeSit",S.fed); show("jorgeKeys",!S.keysTaken);
+    showAll(".cctvRec",!S.wiped); showAll(".cctvOff",S.wiped);
+    show("maloteTop",!S.malote);
+  },
+  win:"O volante gira. A porta-cofre abre devagar, com um suspiro de ar. Corredor, porta lateral, rua. 7h02.",
+  lose:"8h00. O relógio libera a porta sozinho. Do outro lado, o Seu Amaral e dois policiais: “Bom dia. Ninguém se mexe.”",
+  ending(S){
+    const L=[];
+    if(S.fed&&(S.samu||S.radio)) L.push("O Seu Jorge comeu, acordou e a ajuda já está a caminho.");
+    else if(S.fed) L.push("O Seu Jorge recuperou o açúcar. Ficou sozinho, mas vivo.");
+    else if(S.samu||S.radio) L.push("Pediram ajuda pro Seu Jorge, mas ninguém deu açúcar pra ele.");
+    else if(S.pulse) L.push("Você viu o Seu Jorge tremendo. E foi embora.");
+    else L.push("Ninguém olhou o Seu Jorge direito.");
+    if(S.tape&&!S.wiped) L.push("A gravação das 2h continua lá: o Romero te arrastando.");
+    if(S.wiped) L.push("As gravações sumiram. Inclusive a que te inocentava.");
+    if(S.pass) L.push("Um passaporte falso com a sua foto está no seu bolso.");
+    if(S.euros) L.push("€ 40 mil do Romero saíram com vocês.");
+    if(S.malote) L.push("Falta um malote de R$ 50 mil na conferência das 8h.");
+    if(S.camTurn) L.push("A câmera da porta-cofre filmou a parede a partir das 6h50.");
+    if(S.card) L.push("“Te pago no Natal.” O Amaral também trabalhava pro Romero.");
+    return L;
+  }
+},
+conselho:{
+  id:"conselho", isBoss:true, name:"Sala do Conselho", dur:240000, hang:4, penalty:30000,
+  short:"O último andar da Halden no dia da auditoria. O Romero foge de helicóptero e deixou você com a culpa. Mais difícil que tudo.",
+  pitch:"15 de março, 6h50. Você acorda na cabeceira da mesa do conselho, 30º andar da Halden. O andar está sem energia e os elevadores travaram em modo auditoria. O Paulo do financeiro está amarrado numa cadeira. No telhado, o helicóptero do Romero esquenta as hélices. A única saída é a porta do heliponto. Cada senha errada custa 30 segundos.",
+  views:{ N:"Mesa do Conselho", L:"Janelão", S:"Heliponto", O:"Copa", T:"Sala técnica" }, ring:["N","L","S","O"], start:"N", backTo:"S", back:"‹ Voltar pra porta",
+  code:"150386", codeCredit:"Acertou a senha mestra",
+  clues:[
+    "A porta do heliponto pede seis dígitos: o dia e o mês de HOJE, depois o ano em que a Halden nasceu, só os dois últimos. Os números estão nesta sala, mas só aparecem com luz.",
+    "Às 6h02 o andar apagou: alguém ligou alguma coisa e deu curto. Se religarem o disjuntor sem achar o curto, ele estoura de novo. A sala técnica fica atrás de uma grade aparafusada.",
+    "O Romero guarda tudo num cofre atrás de um rosto, e a chave do cofre “dá a volta ao mundo”. Não confie em nada que ele disser no telefone."
+  ],
+  locks:[{n:"Energia",ok:s=>s.power},{n:"Crachá",ok:s=>s.badged},{n:"Senha",ok:s=>s.codeOk},{n:"Trava",ok:s=>s.crank}],
+  hs:{
+    telao:{v:"N",n:"Telão",r:[56,32,248,128]},
+    vivavoz:{v:"N",n:"Viva-voz",r:[140,230,84,50]},
+    notebook:{v:"N",n:"Notebook",r:[40,284,100,66]},
+    paulo:{v:"N",n:"Paulo",r:[236,150,120,190]},
+    confissao:{v:"N",n:"Papel na mesa",r:[130,360,120,70]},
+    janela:{v:"L",n:"Janelão",r:[6,30,200,200]},
+    retrato:{v:"L",n:"Retrato",r:[220,46,128,154]},
+    globo:{v:"L",n:"Globo antigo",r:[16,236,96,98]},
+    bar:{v:"L",n:"Carrinho de bebidas",r:[118,236,96,98]},
+    alarme:{v:"S",n:"Alarme de incêndio",r:[16,124,72,130]},
+    porta:{v:"S",n:"Porta do heliponto",r:[104,44,160,290]},
+    tecnica:{v:"S",n:"Grade",r:[272,164,84,168],nav:"T",lock:s=>!s.grate},
+    cafeteira:{v:"O",n:"Cafeteira",r:[14,140,104,64]},
+    gaveta:{v:"O",n:"Gaveta",r:[14,212,140,60]},
+    armario:{v:"O",n:"Armário",r:[128,36,104,114]},
+    quadro_b:{v:"O",n:"Quadro branco",r:[238,36,118,148]},
+    pia:{v:"O",n:"Pia",r:[150,166,86,44]},
+    disjuntor:{v:"T",n:"Quadro geral",r:[16,46,138,218]},
+    gancho:{v:"T",n:"Gancho",r:[164,72,80,156]},
+    nobreak:{v:"T",n:"Nobreak",r:[248,114,106,218]}
+  },
+  desc:{
+    telao:s=>s.power?"O telão acendeu sozinho com uma apresentação do Romero.":"Telão apagado. Sem energia.",
+    vivavoz:s=>s.call?(s.hungup?"Viva-voz mudo. Você desligou na cara dele.":"Viva-voz com a luz verde. O Romero na linha, respirando."):"Viva-voz no meio da mesa, com uma luz vermelha piscando: chamada em espera.",
+    notebook:s=>s.power?"Notebook do Romero, aberto e carregando. Porta USB livre.":"Notebook do Romero, sem bateria.",
+    paulo:s=>s.freed?("Paulo, solto, esfregando os pulsos."+(s.bandage?" Curativo na testa.":" Um corte feio na testa.")):(s.pulse?"Paulo do financeiro. Vivo, tonto, fita na boca, abraçadeiras nos pulsos e um corte na testa.":"Paulo do financeiro, amarrado numa cadeira, de cabeça baixa."),
+    confissao:s=>s.signed?"A confissão, com a sua assinatura embaixo.":"Uma folha impressa e uma caneta Montblanc em cima.",
+    janela:()=>"Vidro do chão ao teto, 30 andares. Lá embaixo, viaturas chegando devagar.",
+    retrato:s=>s.portrait?(s.safe?"Cofre de parede aberto.":"Um cofre de parede com fechadura de chave, onde estava o retrato."):"Retrato a óleo de um velho de bigode. Moldura dourada com uma plaquinha.",
+    globo:s=>s.globe?"Globo aberto no meio. Vazio.":"Globo terrestre antigo, de madeira, num pé de bronze. Range quando você encosta.",
+    bar:()=>"Carrinho de bebidas: uísque 18 anos, gelo derretido, copos de cristal.",
+    alarme:s=>"Caixa vermelha: FOGO — PUXE. Embaixo, uma plaquinha de instruções.",
+    porta:s=>`Porta corta-fogo do heliponto. Leitor de crachá${s.badged?" (verde)":""}. Teclado de 6 dígitos${s.codeOk?" (verde)":s.power?"":" (apagado)"}. Trava manual com encaixe de manivela${s.crank?" (destravada)":""}. Energia: ${s.power?"OK":"NENHUMA"}.`,
+    tecnica:s=>s.grate?"Grade solta. Dá pra entrar na sala técnica.":"Grade de ventilação grande, presa com quatro parafusos de fenda. Placa: SALA TÉCNICA.",
+    cafeteira:s=>s.unplug?"Cafeteira fora da tomada. A tomada está preta.":"Cafeteira expresso ligada na tomada. Cheiro de plástico queimado.",
+    gaveta:s=>s.knife?"Gaveta revirada.":"Gaveta de talheres.",
+    armario:s=>s.kit?"Armário aberto, só xícaras.":"Armário de cima, fechado.",
+    quadro_b:()=>"Quadro branco com a letra do Romero, cheio de números riscados.",
+    pia:()=>"Pia pequena de inox.",
+    disjuntor:s=>s.power?"Quadro geral. Disjuntor principal LIGADO.":"Quadro geral. O disjuntor principal está desarmado, alavanca pra baixo.",
+    gancho:s=>s.crankTaken?"Gancho vazio.":"Um gancho na parede com uma manivela de aço pendurada.",
+    nobreak:()=>"Nobreak do andar, com um visorzinho de LCD ainda aceso na bateria."
+  },
+  act:{
+    tv_try:{h:"telao",l:"Procurar o botão de ligar",can:s=>!s.power&&!s.tvTry,run:s=>{s.tvTry=true;s.pen+=10000},trap:true,msg:"Você tateia a moldura inteira no escuro. Não tem botão. Não tem energia. (−10s)"},
+    slide:{h:"telao",l:"Ler o slide",can:s=>s.power&&!s.slide,run:s=>{s.slide=true},msg:"“AUDITORIA EXTERNA — HOJE — 9h.” Slide 2: “Responsável pelas fraudes:” e o seu nome. No rodapé, pequeninho: “Halden Corp · 15/03”.",key:"Leu a apresentação do Romero"},
+    answer:{h:"vivavoz",l:"Atender",can:s=>!s.call,run:s=>{s.call=true},msg:"“Bom dia. Proposta simples: assina a confissão e eu te dito a senha da porta. Senão, às 9h você explica tudo pra auditoria. E pra polícia.”"},
+    ask_code:{h:"vivavoz",l:"Cobrar a senha",can:s=>s.call&&s.signed&&!s.lie&&!s.hungup,run:s=>{s.lie=true},msg:"“Combinado é combinado: um, cinco, zero, três, seis, oito. Boa viagem.” Ele desliga rindo."},
+    hangup:{h:"vivavoz",l:"Desligar na cara dele",can:s=>s.call&&!s.hungup&&!s.lie,run:s=>{s.hungup=true},msg:"Clic. Pela primeira vez em anos, quem desliga é você."},
+    nb:{h:"notebook",l:"Ler o notebook",can:s=>s.power&&!s.nb,run:s=>{s.nb=true},msg:"Pasta “PLANO B”: helicóptero às 7h15, passagem pra Lisboa e “confissao.pdf” esperando sua assinatura. Na lixeira: “provas_reais”, vazia. Ele levou pra algum lugar."},
+    send:{h:"notebook",l:"Mandar o pen drive pra auditoria",can:s=>s.power&&s.inv.has("pendrive")&&!s.sent,run:s=>{s.inv.delete("pendrive");s.sent=true},msg:"312 arquivos: transferências, notas frias, as assinaturas falsas. Enviado para auditoria@externa. Entregue.",good:"Mandou as provas para a auditoria"},
+    wipe:{h:"notebook",l:"Formatar o pen drive",can:s=>s.power&&s.inv.has("pendrive")&&!s.sent,run:s=>{s.inv.delete("pendrive");s.wiped=true},msg:"Formatado. Nada contra o Romero. Nada a seu favor.",grey:"Formatou o pen drive com as provas"},
+    pulse:{h:"paulo",l:"Checar o Paulo",can:s=>!s.pulse,run:s=>{s.pulse=true},msg:"Vivo. Tonto. Ele arregala os olhos pra você e grunhe atrás da fita.",good:"Checou o Paulo"},
+    free:{h:"paulo",l:"Cortar as abraçadeiras",can:s=>s.inv.has("faca")&&!s.freed,run:s=>{s.freed=true},msg:"Ele arranca a fita da boca: “O cofre! A chave tá no globo! E não digita NADA que ele falar!”",good:"Soltou o Paulo"},
+    bandage:{h:"paulo",l:"Fazer um curativo",can:s=>s.freed&&s.inv.has("kit")&&!s.bandage,run:s=>{s.inv.delete("kit");s.bandage=true},msg:"Gaze, esparadrapo, pressão. O sangue para.",good:"Fez curativo no Paulo"},
+    untie:{h:"paulo",l:"Desamarrar na mão",can:s=>!s.freed&&!s.untie,run:s=>{s.untie=true;s.pen+=15000},trap:true,msg:"Abraçadeira de plástico não desamarra. Você quebra duas unhas tentando. (−15s)"},
+    read_conf:{h:"confissao",l:"Ler o papel",can:s=>!s.conf,run:s=>{s.conf=true},msg:"“Eu, abaixo assinado, confesso ter desviado R$ 12 milhões da Halden Corp…” Seu nome já está digitado. Falta a assinatura."},
+    sign:{h:"confissao",l:"Assinar a confissão",can:s=>!s.signed,run:s=>{s.signed=true},msg:"Sua mão treme. Pronto. O viva-voz dá um bip satisfeito.",grey:"Assinou a confissão do Romero"},
+    heli:{h:"janela",l:"Olhar pra cima",can:s=>!s.heli,run:s=>{s.heli=true},msg:"Pelo canto do vidro dá pra ver as hélices do helicóptero girando no heliponto. Ainda não decolou."},
+    smash:{h:"janela",l:"Quebrar o vidro com uma cadeira",can:s=>!s.smash,run:s=>{s.smash=true;s.pen+=15000},trap:true,msg:"Vidro blindado. A cadeira volta e acerta sua canela. (−15s)"},
+    plate:{h:"retrato",l:"Ler a plaquinha",can:s=>!s.plate,run:s=>{s.plate=true},msg:"Plaquinha apagada pelo tempo. Sem luz, só dá pra ler “AUGUSTO HALDEN · FUNDADOR”. O resto some no escuro."},
+    plate_lit:{h:"retrato",l:"Ler a plaquinha com luz",can:s=>s.power&&!s.plateLit,run:s=>{s.plateLit=true},msg:"Com a luz acesa: “AUGUSTO HALDEN · FUNDADOR · MCMLXXXVI”.",key:"Leu a plaquinha do fundador"},
+    portrait:{h:"retrato",l:"Tirar o quadro da parede",can:s=>!s.portrait,run:s=>{s.portrait=true},msg:"Pesado. Atrás: um cofre de parede com fechadura de chave."},
+    safe:{h:"retrato",l:"Abrir o cofre com a chavinha",can:s=>s.portrait&&s.inv.has("chave")&&!s.safe,run:s=>{s.inv.delete("chave");s.safe=true},msg:"Clac. Lá dentro: um crachá MASTER, um pen drive escrito “SEGURO” e maços de euro.",key:"Abriu o cofre do Romero"},
+    badge_take:{h:"retrato",l:"Pegar o crachá MASTER",can:s=>s.safe&&!s.badgeTaken,run:s=>{s.badgeTaken=true;s.inv.add("cracha")},msg:"“R. ROMERO · ACESSO TOTAL”."},
+    usb:{h:"retrato",l:"Pegar o pen drive",can:s=>s.safe&&!s.usb,run:s=>{s.usb=true;s.inv.add("pendrive")},msg:"Etiqueta: “SEGURO”. Seguro pra quem?"},
+    euros:{h:"retrato",l:"Pegar os euros",can:s=>s.safe&&!s.euros,run:s=>{s.euros=true;s.inv.add("euros")},msg:"€ 200 mil. Pesa.",grey:"Pegou os euros do Romero"},
+    globe:{h:"globo",l:"Girar o globo",can:s=>!s.globe,run:s=>{s.globe=true;s.inv.add("chave")},msg:"Você gira o mundo inteiro. Na volta completa: clic. O hemisfério sul se abre. Uma chavinha de cofre.",key:"Achou a chave do cofre"},
+    whisky:{h:"bar",l:"Tomar um uísque",can:s=>!s.beer,run:s=>{s.beer=true;s.hang=Math.min(4,s.hang+1)},msg:"Uísque 18 anos às 6h50. O conselho aprova. Sua cabeça, não."},
+    ice:{h:"bar",l:"Gelo na nuca",can:s=>!s.ice&&s.hang>0,run:s=>{s.ice=true;s.hang=Math.max(0,s.hang-1)},msg:"Gelo derretido do balde. Arrepia, acorda."},
+    alarm_read:{h:"alarme",l:"Ler as instruções",can:s=>!s.alarmRead,run:s=>{s.alarmRead=true},msg:"“SEM ENERGIA: PORTA DO HELIPONTO TRAVA. DESTRAVAR COM A MANIVELA DA SALA TÉCNICA.”"},
+    alarm:{h:"alarme",l:"Puxar o alarme",can:s=>!s.alarm,run:s=>{s.alarm=true;s.pen+=15000},trap:true,msg:"Nada toca. Modo auditoria: alarmes desligados. Você fica ali esperando um barulho que não vem. (−15s)"},
+    badge:{h:"porta",l:"Passar o crachá MASTER",can:s=>s.inv.has("cracha")&&!s.badged,run:s=>{if(s.power){s.inv.delete("cracha");s.badged=true}else s.pen+=5000},trap:s=>!s.badged,msg:s=>s.badged?"Bip. “Bem-vindo, Ricardo.”":"Nada. O leitor está apagado: sem energia. (−5s)",key:s=>s.badged?"Liberou o crachá MASTER":null},
+    code_ui:{h:"porta",l:"Digitar a senha",can:s=>s.power&&!s.codeOk,ui:"keypad"},
+    crank:{h:"porta",l:"Encaixar a manivela e girar",can:s=>s.inv.has("manivela")&&!s.crank,run:s=>{s.inv.delete("manivela");s.crank=true},msg:"Doze voltas. Clanc, clanc, clanc. A trava manual recolhe.",key:"Destravou a trava manual"},
+    force:{h:"porta",l:"Empurrar a barra",can:s=>!(s.power&&s.badged&&s.codeOk&&s.crank),run:s=>{s.forced++},msg:"Porta corta-fogo. Você só machucou o ombro."},
+    exit:{h:"porta",l:"SUBIR PRO HELIPONTO",can:s=>s.power&&s.badged&&s.codeOk&&s.crank&&!s.escaped,run:s=>{s.escaped=true},msg:"",key:"Abriu a porta do heliponto"},
+    grate:{h:"tecnica",l:"Soltar os parafusos com a faca",can:s=>s.inv.has("faca")&&!s.grate,run:s=>{s.grate=true},msg:"Ponta de faca de manteiga em parafuso de fenda. Quatro parafusos. A grade cai.",key:"Abriu a grade da sala técnica"},
+    cage_shake:{h:"tecnica",l:"Puxar a grade",can:s=>!s.grate,run:s=>{s.forced++},msg:"Aparafusada. Quatro parafusos de fenda."},
+    unplug:{h:"cafeteira",l:"Tirar da tomada",can:s=>!s.unplug,run:s=>{s.unplug=true},msg:"O fio está derretido e a tomada, preta de fuligem.",key:"Achou o curto-circuito"},
+    replug:{h:"cafeteira",l:"Fazer um café",can:s=>s.unplug,run:s=>{s.unplug=false;s.power=false;s.pen+=15000},trap:true,msg:"Você pluga de novo. PÁ! Faísca e cheiro de queimado. Se tinha luz, não tem mais. (−15s)"},
+    knife:{h:"gaveta",l:"Revirar a gaveta",can:s=>!s.knife,run:s=>{s.knife=true;s.inv.add("faca")},msg:"Guardanapos, sachês de açúcar e uma faca de manteiga de ponta reta."},
+    kit:{h:"armario",l:"Abrir o armário",can:s=>!s.kit,run:s=>{s.kit=true;s.inv.add("kit")},msg:"Xícaras de porcelana e uma caixa de primeiros socorros."},
+    board:{h:"quadro_b",l:"Ler o quadro",can:s=>!s.board,run:s=>{s.board=true},msg:"“SENHAS ANTIGAS: 0347 ✗ 2808 ✗ 1520 ✗ 1503 ✗ 1986 ✗. NOVA: 6 DÍGITOS. NÃO ESQUECER A ORDEM.” Embaixo, um rabisco: “I=1 V=5 X=10 L=50 C=100 D=500 M=1000”."},
+    water:{h:"pia",l:"Beber água",can:s=>s.water<2&&s.hang>0,run:s=>{s.water++;s.hang=Math.max(0,s.hang-1)},msg:"Água da pia, na mão em concha. A sala para de girar um pouco."},
+    breaker:{h:"disjuntor",l:"Religar o disjuntor geral",can:s=>!s.power,run:s=>{if(s.unplug)s.power=true;else s.pen+=15000},trap:s=>!s.power,msg:s=>s.power?"Clunk. As luzes acendem uma a uma. Lá na sala, o telão liga sozinho.":"Clunk… PÁ! Desarmou de novo. Tem alguma coisa em curto no andar. (−15s)",key:s=>s.power?"Religou a energia do andar":null},
+    crank_take:{h:"gancho",l:"Pegar a manivela",can:s=>!s.crankTaken,run:s=>{s.crankTaken=true;s.inv.add("manivela")},msg:"Manivela de aço, pesada. Etiqueta: “TRAVA MANUAL — HELIPONTO”."},
+    ups:{h:"nobreak",l:"Ler o visor",can:s=>!s.ups,run:s=>{s.ups=true},msg:"“06:02 — SOBRECARGA NO CIRCUITO 7. DISJUNTOR GERAL DESARMADO.” Circuito 7 é o quê?"},
+    ups_test:{h:"nobreak",l:"Apertar TESTE",can:s=>!s.upsTest,run:s=>{s.upsTest=true;s.pen+=10000},trap:true,msg:"BIIIIIIP contínuo por dez segundos. O visor: “TESTE OK”. Ótimo. (−10s)"}
+  },
+  items:{
+    faca:{n:"faca de manteiga",c:"#c9ccd6",ic:"knife",d:"Ponta reta e cega. Corta abraçadeira com esforço. Gira parafuso de fenda."},
+    kit:{n:"primeiros socorros",c:"#f7ecff",ic:"medkit",d:"Gaze, esparadrapo, soro."},
+    chave:{n:"chavinha de cofre",c:"#ffd23f",ic:"key",d:"Chave pequena e grossa, de cofre."},
+    cracha:{n:"crachá MASTER",c:"#e0102f",ic:"badge",d:"“R. ROMERO · ACESSO TOTAL”. Precisa de leitor ligado."},
+    pendrive:{n:"pen drive “SEGURO”",c:"#2de2e6",ic:"usb",d:"Do cofre do Romero. Precisa de um computador com energia."},
+    euros:{n:"euros do Romero",c:"#3dff8b",ic:"cash",d:"€ 200 mil em maços."},
+    manivela:{n:"manivela",c:"#9aa0ad",ic:"crank",d:"“TRAVA MANUAL — HELIPONTO”."}
+  },
+  paint(S){
+    showAll(".blackout",!S.power); showAll(".powerOn",S.power);
+    $("ledPower").setAttribute("fill",S.power?"#3dff8b":"#e0102f");
+    $("ledKey").setAttribute("fill",S.badged?"#3dff8b":"#e0102f");
+    $("ledCode").setAttribute("fill",S.codeOk?"#3dff8b":"#e0102f");
+    $("ledCrank").setAttribute("fill",S.crank?"#3dff8b":"#e0102f");
+    show("callLed",!S.call); show("signArt",S.signed);
+    show("pauloTied",!S.freed); show("pauloFree",S.freed); show("pauloBand",S.bandage);
+    show("retratoArt",!S.portrait); show("cofreShut",S.portrait&&!S.safe); show("cofreOpen",S.safe);
+    show("globeShut",!S.globe); show("globeOpen",S.globe);
+    show("grateOn",!S.grate); show("grateOff",S.grate);
+    show("crankDoor",S.crank); show("crankHook",!S.crankTaken);
+    show("plugIn",!S.unplug); show("plugOut",S.unplug);
+    $("breakerLever").setAttribute("transform",S.power?"":"rotate(180 85 150)");
+  },
+  win:"A porta do heliponto abre num tranco. Vento, sol, barulho de hélice. Vocês estão fora da sala. O resto é com a auditoria.",
+  lose:"A porta do conselho se abre: polícia, auditoria e o Romero de terno novo: “Eu avisei. Foi tudo culpa de quem está aí dentro.”",
+  ending(S){
+    const L=[];
+    if(S.freed&&S.bandage) L.push("O Paulo sobe com vocês, curativo na testa. Uma testemunha viva.");
+    else if(S.freed) L.push("O Paulo está solto. Assustado, mas vai falar.");
+    else if(S.pulse) L.push("Você viu o Paulo amarrado. E deixou ele lá.");
+    else L.push("Ninguém olhou pro Paulo.");
+    if(S.sent) L.push("Às 9h, a auditoria abre o pen drive. O nome no topo é Ricardo Romero. O helicóptero não decola: a Polícia Federal chega primeiro.");
+    else if(S.wiped) L.push("O pen drive foi formatado. A única prova contra o Romero virou nada. O helicóptero decola às 7h15.");
+    else if(S.usb) L.push("O pen drive com as provas está no seu bolso. Ninguém mais sabe que ele existe.");
+    else L.push("As provas ficaram no cofre. O helicóptero do Romero decola às 7h15.");
+    if(S.signed) L.push("Sua assinatura está na confissão. O Romero vai usar isso.");
+    else if(S.call) L.push("Você ouviu a proposta do Romero e não assinou.");
+    if(S.lie) L.push("A senha que o Romero ditou era mentira. Claro que era.");
+    if(S.euros) L.push("€ 200 mil do Romero estão na sua mochila.");
+    return L;
+  }
 }
 };
 const show=(id,on)=>{ const n=$(id); if(n) n.style.display=on?"":"none"; };
@@ -2323,6 +3651,19 @@ const ICONS={
   buoy:c=>`<circle cx="20" cy="20" r="12" fill="none" stroke="#0c0414" stroke-width="13"/><circle cx="20" cy="20" r="12" fill="none" stroke="${c}" stroke-width="9"/><circle cx="20" cy="20" r="12" fill="none" stroke="#f7ecff" stroke-width="9" stroke-dasharray="9.42 9.42"/>`,
   can:c=>`<path d="M8 11 h18 l7 7 v18 h-25z" fill="${c}" ${O}/><path d="M12 5 h11 v6 h-11z" fill="none" stroke="#0c0414" stroke-width="3"/><rect x="27" y="5" width="5" height="6" fill="#ffd23f" stroke="#0c0414" stroke-width="1.5"/><path d="M12 18 l16 15 M28 18 l-16 15" stroke="#0c0414" stroke-width="2" opacity=".35"/>`,
   blanket:c=>`<rect x="5" y="11" width="30" height="20" rx="4" fill="${c}" ${O}/><path d="M5 17 h30 M5 24 h30" stroke="#f7ecff" stroke-width="2.5"/><path d="M30 11 q6 6 0 20" fill="none" stroke="#0c0414" stroke-width="1.5" opacity=".5"/>`,
+  pen:c=>`<rect x="5" y="15" width="28" height="10" rx="4" fill="${c}" ${O}/><rect x="31" y="17" width="6" height="6" fill="#ff8a3d" stroke="#0c0414" stroke-width="1.5"/><rect x="11" y="17" width="10" height="6" fill="#f7ecff"/>`,
+  powder:c=>`<circle cx="18" cy="23" r="13" fill="#c9ccd6" ${O}/><circle cx="18" cy="23" r="9" fill="${c}"/><path d="M27 5 l7 7 l-11 11 l-7 -7z" fill="#5a2a16" stroke="#0c0414" stroke-width="1.5"/><path d="M16 23 l-4 4" stroke="#f7ecff" stroke-width="3"/>`,
+  print:c=>`<rect x="5" y="9" width="30" height="22" rx="2" fill="#bfefff" opacity=".95" ${O}/><g fill="none" stroke="${c}" stroke-width="1.6"><ellipse cx="20" cy="20" rx="3" ry="4"/><ellipse cx="20" cy="20" rx="6" ry="7.5"/><ellipse cx="20" cy="20" rx="9" ry="10"/></g>`,
+  watch:c=>`<rect x="15" y="3" width="10" height="34" rx="2" fill="#c8a46a" stroke="#0c0414" stroke-width="2"/><circle cx="20" cy="20" r="10" fill="${c}" ${O}/><circle cx="20" cy="20" r="7" fill="#1b1622"/><path d="M20 20 v-5 M20 20 h4" stroke="#ffd23f" stroke-width="1.8"/>`,
+  bottle:c=>`<path d="M17 3 h6 v9 q6 4 6 11 v14 h-18 v-14 q0 -7 6 -11z" fill="${c}" ${O}/><rect x="13" y="22" width="14" height="9" fill="#f7ecff" stroke="#0c0414" stroke-width="1.2"/><rect x="17" y="3" width="6" height="4" fill="#ffd23f"/>`,
+  pliers:c=>`<path d="M9 36 l9 -15 M31 36 l-9 -15" stroke="#0c0414" stroke-width="8" stroke-linecap="round"/><path d="M9 36 l9 -15 M31 36 l-9 -15" stroke="${c}" stroke-width="5" stroke-linecap="round"/><path d="M18 21 l-4 -16 l6 4z M22 21 l4 -16 l-6 4z" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/><circle cx="20" cy="21" r="3" fill="#5c5566" stroke="#0c0414" stroke-width="1.5"/>`,
+  invite:c=>`<rect x="5" y="8" width="30" height="24" fill="${c}" ${O}/><path d="M5 8 l15 12 l15 -12" fill="none" stroke="#0c0414" stroke-width="2"/><circle cx="20" cy="20" r="3" fill="#e0102f" stroke="#0c0414" stroke-width="1"/>`,
+  photo:c=>`<rect x="12" y="3" width="16" height="34" fill="#f7ecff" ${O}/><rect x="15" y="6" width="10" height="8" fill="${c}"/><rect x="15" y="16" width="10" height="8" fill="${c}"/><rect x="15" y="26" width="10" height="8" fill="${c}"/>`,
+  candy:c=>`<path d="M4 14 l8 6 l-8 6z M36 14 l-8 6 l8 6z" fill="${c}" stroke="#0c0414" stroke-width="2"/><ellipse cx="20" cy="20" rx="10" ry="8" fill="${c}" ${O}/><path d="M14 16 q6 8 12 0" stroke="#f7ecff" stroke-width="2" fill="none"/>`,
+  cup:c=>`<path d="M8 12 h20 v16 q0 6 -6 6 h-8 q-6 0 -6 -6z" fill="#f7ecff" ${O}/><path d="M28 16 q7 0 6 6 q-1 5 -6 5" fill="none" stroke="#0c0414" stroke-width="2.5"/><rect x="10" y="14" width="16" height="4" fill="${c}"/><path d="M14 4 q3 3 0 6 M20 4 q3 3 0 6" stroke="#c9ccd6" stroke-width="2" fill="none"/>`,
+  passport:c=>`<rect x="8" y="5" width="24" height="30" rx="2" fill="${c}" ${O}/><circle cx="20" cy="18" r="6" fill="none" stroke="#ffd23f" stroke-width="1.5"/><path d="M13 29 h14" stroke="#ffd23f" stroke-width="1.5"/>`,
+  usb:c=>`<rect x="6" y="12" width="22" height="16" rx="3" fill="${c}" ${O}/><rect x="28" y="15" width="9" height="10" fill="#c9ccd6" stroke="#0c0414" stroke-width="2"/><rect x="31" y="17" width="2" height="2" fill="#0c0414"/><rect x="31" y="21" width="2" height="2" fill="#0c0414"/>`,
+  crank:c=>`<path d="M10 32 L28 14" stroke="#0c0414" stroke-width="8" stroke-linecap="round"/><path d="M10 32 L28 14" stroke="${c}" stroke-width="5" stroke-linecap="round"/><rect x="25" y="5" width="10" height="10" fill="#c9ccd6" stroke="#0c0414" stroke-width="2" transform="rotate(45 30 10)"/><circle cx="10" cy="32" r="5" fill="#e0102f" stroke="#0c0414" stroke-width="2"/>`,
   box:c=>`<rect x="8" y="8" width="24" height="24" rx="3" fill="${c}" ${O}/><text x="20" y="26" text-anchor="middle" font-size="16" font-family="monospace" fill="#0c0414">?</text>`,
   lock:c=>`<path d="M13 18 v-5 a7 7 0 0 1 14 0 v5" fill="none" stroke="${c}" stroke-width="4"/><rect x="9" y="18" width="22" height="17" rx="3" fill="${c}" stroke="#0c0414" stroke-width="2"/><circle cx="20" cy="26" r="2.5" fill="#0c0414"/>`,
   unlock:c=>`<path d="M13 18 v-5 a7 7 0 0 1 14 0" fill="none" stroke="${c}" stroke-width="4" transform="translate(-6 -3) rotate(-18 20 13)"/><rect x="9" y="18" width="22" height="17" rx="3" fill="${c}" stroke="#0c0414" stroke-width="2"/><circle cx="20" cy="26" r="2.5" fill="#0c0414"/>`
@@ -2495,7 +3836,7 @@ function addEvent(k,data){
 function fold(){
   const evs=[...evMap.values()].sort((a,b)=>a.ts-b.ts||(a.id<b.id?-1:a.id>b.id?1:0));
   const s={inv:new Set(),hang:3,water:0,forced:0,wrong:0,wrongBy:{},brief:null,start:null,end:null,outcome:null,
-    players:new Map(),readyAt:{},waiting:[],taps:[],chats:[],acts:[],credit:[],choices:[],got:{}};
+    players:new Map(),readyAt:{},waiting:[],taps:[],chats:[],acts:[],credit:[],choices:[],got:{},pen:0};
   const storyEvs=[];
   // pass 1: who is in, when the host pressed start, who has read the card
   for(const e of evs){
@@ -2508,6 +3849,8 @@ function fold(){
   s.host = [...s.players.entries()].sort((a,b)=>a[1].ts-b[1].ts)[0]?.[0] || null;
   s.story = storyEvs.filter(e=>e.p===s.host).pop()?.s || "kitnet";
   applyStory(s.story);
+  s.hang=STORY.hang??3;
+  const D=durOf();
   if(s.brief!=null){
     const required=[...s.players].filter(([,p])=>p.ts<=s.brief).map(([id])=>id);
     s.waiting=required.filter(id=>s.readyAt[id]==null);
@@ -2517,20 +3860,21 @@ function fold(){
   // pass 2: the game itself, from the moment the clock started
   for(const e of evs){
     if(e.k==="join"||e.k==="chat"||e.k==="story"||e.k==="start"||e.k==="ready") continue;
-    if(s.start==null||s.end!=null||e.ts<s.start-3000||e.ts>s.start+DUR) continue;
+    if(s.start==null||s.end!=null||e.ts<s.start-3000||e.ts>s.start+D-s.pen) continue;
     if(e.k==="tap"){ s.taps.push(e); continue; }
     if(e.k==="act"){
       let ok=false;
       if(e.a==="code"){
         if(!s.codeOk){ ok=true;
           if(e.v===CODE){ s.codeOk=true; s.credit.push({p:e.p,ts:e.ts,t:STORY.codeCredit}); }
-          else { s.wrong++; s.wrongBy[e.p]=(s.wrongBy[e.p]||0)+1; }
+          else { s.wrong++; s.wrongBy[e.p]=(s.wrongBy[e.p]||0)+1; s.pen+=STORY.penalty??PENALTY; }
         }
       } else {
         const a=ACT[e.a];
         if(a&&a.run&&a.can(s)){ const before=new Set(s.inv); a.run(s); ok=true;
           for(const it of s.inv) if(!before.has(it)) s.got[it]={p:e.p,ts:e.ts};
-          if(a.key) s.credit.push({p:e.p,ts:e.ts,t:a.key});
+          const k=typeof a.key==="function"?a.key(s):a.key;
+          if(k) s.credit.push({p:e.p,ts:e.ts,t:k});
           if(a.grey) s.choices.push({p:e.p,ts:e.ts,t:a.grey,g:false});
           if(a.good) s.choices.push({p:e.p,ts:e.ts,t:a.good,g:true});
         }
@@ -2539,7 +3883,8 @@ function fold(){
       if(s.escaped){ s.end=e.ts; s.outcome="win"; }
     }
   }
-  if(s.start!=null&&s.end==null&&now()>s.start+DUR){ s.end=s.start+DUR; s.outcome="lose"; }
+  s.deadline=s.start!=null?s.start+D-s.pen:null;
+  if(s.start!=null&&s.end==null&&now()>s.deadline){ s.end=s.deadline; s.outcome="lose"; }
   return s;
 }
 
@@ -2621,7 +3966,8 @@ function renderStoryPick(){
       const th=wallArt(st.id,st.start,"0 30 360 230"); th.setAttribute("class","thumb");
       const t=document.createElement("b"); t.textContent=st.name; const d=document.createElement("span"); d.textContent=st.short;
       b.append(th,t);
-      if(st.isNew){ const n=document.createElement("em"); n.className="tagnew"; n.textContent="NOVA"; n.style.fontStyle="normal"; b.append(n); }
+      if(st.isNew||st.isBoss){ const n=document.createElement("em"); n.className="tagnew"+(st.isBoss?" boss":""); n.textContent=st.isBoss?"BOSS · "+fmt(st.dur||DUR)+" · ERRO −"+Math.round((st.penalty??PENALTY)/1000)+"s":"NOVA"; n.style.fontStyle="normal"; b.append(n); }
+      if(st.isBoss) b.classList.add("boss");
       b.append(d);
       b.onclick=()=>{ if((net.kind==="solo"||S.host===pk)&&S.story!==st.id) addEvent("story",{s:st.id}); };
       box.append(b);
@@ -2649,7 +3995,7 @@ function recompute(){
     renderStoryPick();
     const hostNick=S.players.get(S.host)?.nick||"anfitrião";
     const ok=canStart(), sb=$("startBtn"); sb.disabled=!ok;
-    sb.textContent = ok ? "Começar · "+fmt(DUR) : `Esperando ${hostNick} começar`;
+    sb.textContent = ok ? "Começar · "+fmt(durOf()) : `Esperando ${hostNick} começar`;
   } else if(S.end==null){
     showScreen("game");
     if(!shownMemory){ shownMemory=true; setView(STORY.start,0); openMemory(true); }
@@ -2881,7 +4227,7 @@ function doAct(id){
   const a=ACT[id]; if(!a||!a.can(S)) return;
   if(a.ui==="keypad"){ openPad(); return; }
   addEvent("act",{a:id});
-  lastRes=a.msg||null; renderSheet();
+  lastRes=(typeof a.msg==="function"?a.msg(S):a.msg)||null; renderSheet();
 }
 
 // ---------------- keypad ----------------
@@ -2889,19 +4235,19 @@ function doAct(id){
   const b=document.createElement("button"); b.className="key"; b.textContent=c; b.setAttribute("aria-label",c==="⌫"?"Apagar":c);
   b.onclick=()=>padPress(c); $("keys").append(b);
 });
-function openPad(){ padVal=""; drawPad(); $("keypad").hidden=false; }
-function drawPad(bad){ const d=$("padDisp"); d.textContent=(padVal+"____").slice(0,4); d.classList.toggle("bad",!!bad); }
+function openPad(){ padVal=""; $("padTag").textContent=`TRAVA ELETRÔNICA · ${CODE.length} DÍGITOS · ERRO = −${Math.round((STORY.penalty??PENALTY)/1000)}s`; drawPad(); $("keypad").hidden=false; }
+function drawPad(bad){ const d=$("padDisp"); d.textContent=(padVal+"_".repeat(CODE.length)).slice(0,CODE.length); d.classList.toggle("bad",!!bad); }
 function padPress(c){
   if(c==="⌫"){ padVal=padVal.slice(0,-1); drawPad(); return; }
   if(c==="OK"){
-    if(padVal.length!==4) return;
+    if(padVal.length!==CODE.length) return;
     const v=padVal; padVal="";
     addEvent("act",{a:"code",v});
     if(v===CODE){ $("padDisp").textContent="OK"; setTimeout(()=>{ $("keypad").hidden=true; lastRes="Bip-bip. Luz verde no teclado."; renderSheet(); },500); }
-    else { drawPad(true); $("padDisp").textContent="ERRO"; setTimeout(()=>drawPad(),700); }
+    else { drawPad(true); $("padDisp").textContent="−"+Math.round((STORY.penalty??PENALTY)/1000)+"s"; setTimeout(()=>drawPad(),900); }
     return;
   }
-  if(padVal.length<4){ padVal+=c; drawPad(); }
+  if(padVal.length<CODE.length){ padVal+=c; drawPad(); }
 }
 $("padClose").onclick=()=>{ $("keypad").hidden=true; };
 
@@ -2969,7 +4315,7 @@ function renderChat(){
 // which items an action needs: those whose absence would make it unavailable
 function needs(a){ return [...S.inv].filter(it=>!a.can({...S,inv:new Set([...S.inv].filter(x=>x!==it))})); }
 function usesOf(it){ return Object.entries(ACT).filter(([,a])=>a.run&&a.can(S)&&needs(a).includes(it)); }
-const usableHere = it => usesOf(it).some(([,a])=>HS[a.h].v===view);
+const usableHere = () => false; // difficulty: the bag no longer points at where an item goes
 function renderBagBar(){
   const box=$("bagItems"); box.textContent="";
   const n=S.inv.size; $("bagCount").textContent = n ? n+(n>1?" itens":" item") : "vazia";
@@ -3001,10 +4347,8 @@ function renderBag(){
   const txt=el("div"); txt.append(el("h3",null,ITEMS[it].n), el("p",null,ITEMS[it].d||""));
   const g=S.got[it]; if(g){ const p=S.players.get(g.p); txt.append(el("p","by",`Achado por ${p?.nick||"?"} · +${fmt(g.ts-S.start)}`)); }
   wrap.append(big,txt);
-  const uses=el("div","uses"), all=usesOf(it), here=all.filter(([,a])=>HS[a.h].v===view);
-  here.forEach(([id,a])=>{ const b=el("button","act"); b.append(document.createTextNode(`${a.l} · ${HS[a.h].n}`)); const nd=el("span","need"); nd.append(itemIcon(it)); b.append(nd);
-    b.onclick=()=>{ closeBag(); openSheet(a.h); doAct(id); }; uses.append(b); });
-  if(!here.length) uses.append(el("p","hint", all.length ? "Nada nesta parede combina com isso. Mas serve pra alguma coisa em outro canto…" : "Por enquanto, só ocupa espaço."));
+  const uses=el("div","uses");
+  uses.append(el("p","hint","Pra usar, toque no objeto certo da sala com o item na bolsa. Descobrir qual é com vocês."));
   wrap.append(uses); det.append(wrap);
 }
 function pickupFx(it){
@@ -3035,8 +4379,9 @@ function fxScan(){
   if(!fxSeen){ fxSeen={acts:S.acts.length,cred:S.credit.length}; return; }
   for(const e of S.acts.slice(fxSeen.acts)){
     if(!e.ok||e.p!==pk) continue; const a=ACT[e.a];
-    if(a?.good) flash("good"); else if(a?.grey) flash("grey");
-    if(e.a==="force"||e.a==="cage_shake"){ const w=$("stage"); w.classList.remove("shake"); void w.offsetWidth; w.classList.add("shake"); }
+    const trap=typeof a?.trap==="function"?a.trap(S):a?.trap;
+    if(a?.good) flash("good"); else if(a?.grey||trap) flash("grey");
+    if(e.a==="force"||e.a==="cage_shake"||trap){ const w=$("stage"); w.classList.remove("shake"); void w.offsetWidth; w.classList.add("shake"); }
   }
   S.credit.slice(fxSeen.cred).forEach(c=>banner(c.t,S.players.get(c.p)));
   fxSeen={acts:S.acts.length,cred:S.credit.length};
@@ -3053,9 +4398,9 @@ function renderLocks(){
 
 // ---------------- timer ----------------
 function tick(){
-  if(S&&S.brief!=null&&S.start==null){ $("timer").textContent=fmt(DUR); return; }
+  if(S&&S.brief!=null&&S.start==null){ $("timer").textContent=fmt(durOf()); return; }
   if(!S||S.start==null||S.end!=null) return;
-  const left=S.start+DUR-now();
+  const left=S.deadline-now();
   const t=$("timer"); t.textContent=fmt(left); t.classList.toggle("low",left<30000);
   $("stage").classList.toggle("alarm",left<60000&&left>0);
   if(left<=0) recompute();
@@ -3142,7 +4487,7 @@ function renderReport(){
   r.append(el("div","conf","Confidencial · Núcleo RH · Avaliação situacional ESC-60"));
   r.append(el("h2",null,"Relatório de desempenho · "+STORY.name+" · Sala "+code));
   const meta=el("div","meta");
-  [["Resultado",S.outcome==="win"?"Escaparam":"Não escaparam"],["Tempo",fmt(S.end-S.start)+" de "+fmt(DUR)],["Jogadores",String(S.players.size)],["Anfitrião",S.players.get(S.host)?.nick||"—"],["Cliques",String(S.taps.length)],["Mensagens",String(S.chats.filter(c=>c.ts>=S.start&&c.ts<=S.end).length)],["Erros de senha",String(S.wrong)]]
+  [["Resultado",S.outcome==="win"?"Escaparam":"Não escaparam"],["Tempo",fmt(S.end-S.start)+" de "+fmt(durOf())],["Penalidades",S.pen?"−"+Math.round(S.pen/1000)+" s":"nenhuma"],["Jogadores",String(S.players.size)],["Anfitrião",S.players.get(S.host)?.nick||"—"],["Cliques",String(S.taps.length)],["Mensagens",String(S.chats.filter(c=>c.ts>=S.start&&c.ts<=S.end).length)],["Erros de senha",String(S.wrong)]]
     .forEach(([k,v])=>{ const s=el("span",null,k+": "); s.append(el("b",null,v)); meta.append(s); });
   r.append(meta);
   const tabs=el("div","tabs"); tabs.setAttribute("role","tablist");
