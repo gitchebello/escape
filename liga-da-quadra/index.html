@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Liga da Quadra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;1,700;1,800&family=Figtree:wght@400;500;700&display=swap">
+<style>
+/* Quadra dura vista de cima: linhas de giz sobre o azul, a bola marca o que importa. */
+:root {
+  color-scheme: dark;
+  --quadra: #123f6d; --quadra-funda: #0d2f53; --quadra-clara: #1a5088;
+  --giz: #f3f7fb; --giz-suave: #b4c8dc; --linha: rgba(243, 247, 251, .22);
+  --bola: #e3f04b;
+  --p0: #6fdc7e; --p1: #cdbdff; --p2: #5fdcf5; --p3: #ff9d5c;
+  --display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+  --texto: "Figtree", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--quadra-funda); color: var(--giz); font: 400 16px/1.5 var(--texto); }
+h1, h2, h3, p, ol, ul { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+a { color: inherit; }
+a:focus-visible { outline: 2px solid var(--bola); outline-offset: 3px; }
+
+.moldura { max-width: 1180px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Abertura */
+.abertura { background: var(--quadra); border-bottom: 3px solid var(--giz); position: relative; overflow: hidden; }
+.linhas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.linhas * { fill: none; stroke: rgba(243, 247, 251, .12); stroke-width: 3; vector-effect: non-scaling-stroke; }
+.abertura-grade { position: relative; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 40px; align-items: end; padding-block: 28px 44px; }
+.marca { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 20px; font: 700 italic 1.5rem/1 var(--display); letter-spacing: .02em; text-transform: uppercase; }
+.marca small { font: 500 .85rem/1.5 var(--texto); letter-spacing: 0; text-transform: none; color: var(--giz-suave); }
+.mvp-rotulo { display: inline-block; background: var(--bola); color: var(--quadra-funda); font: 800 italic 1.1rem/1 var(--display); letter-spacing: .06em; text-transform: uppercase; padding: 6px 12px 5px; transform: skewX(-8deg); }
+#mvp-nome { font: 800 italic clamp(4.5rem, 15vw, 10.5rem)/.9 var(--display); color: var(--cor, var(--giz)); text-transform: uppercase; margin-block: 12px 14px; overflow-wrap: anywhere; }
+#mvp-frase { font-size: 1.1rem; max-width: 34em; text-wrap: balance; }
+
+.placar-caixa { background: var(--quadra-funda); border: 2px solid var(--giz); padding: 18px 20px 20px; min-width: 0; }
+.placar-caixa h2 { font: 700 italic 1.5rem/1.1 var(--display); text-transform: uppercase; letter-spacing: .03em; margin-bottom: 10px; }
+.placar-linha { display: grid; grid-template-columns: 2em minmax(0, 5em) minmax(0, 1fr) 3em; gap: 10px; align-items: center; padding-block: 8px; border-top: 1px solid var(--linha); }
+.placar-pos { color: var(--giz-suave); font-variant-numeric: tabular-nums; }
+.placar-nome { font-weight: 700; color: var(--cor); }
+.placar-trilho { height: 10px; background: rgba(243, 247, 251, .1); }
+.placar-barra { display: block; height: 100%; background: var(--cor); }
+.placar-total { font: 800 italic 1.7rem/1 var(--display); text-align: right; font-variant-numeric: tabular-nums; }
+.metodo { margin-top: 12px; font-size: .85rem; color: var(--giz-suave); }
+
+/* Navegação */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--quadra-funda); border-bottom: 1px solid var(--linha); }
+.nav ul { display: flex; gap: 22px; overflow-x: auto; padding-block: 12px; }
+.nav a { font: 700 italic 1.15rem/1 var(--display); text-transform: uppercase; letter-spacing: .04em; text-decoration: none; white-space: nowrap; color: var(--giz-suave); }
+.nav a:hover { color: var(--bola); }
+
+/* Seções */
+.secao { padding-block: 44px 8px; scroll-margin-top: 44px; }
+.secao > h2 { font: 800 italic clamp(2rem, 5vw, 3rem)/1 var(--display); text-transform: uppercase; letter-spacing: .01em; }
+.secao > .nota { margin-block: 6px 20px; font-size: .95rem; max-width: 60ch; }
+.nota { color: var(--giz-suave); font-size: .85rem; }
+.cartao { background: var(--quadra); border: 1px solid var(--linha); padding: 18px; min-width: 0; }
+.cartao h3 { font: 700 italic 1.45rem/1.1 var(--display); text-transform: uppercase; letter-spacing: .02em; }
+
+.grade-ranks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.cartao-largo { grid-column: span 2; }
+.rank { margin-top: 12px; display: grid; gap: 8px; }
+.rank-linha { display: grid; grid-template-columns: 1.8em minmax(0, 1fr) auto; gap: 2px 8px; align-items: baseline; }
+.rank-pos { color: var(--giz-suave); font-size: .85rem; font-variant-numeric: tabular-nums; }
+.rank-nome { font-weight: 500; }
+.rank-lider .rank-nome { font-weight: 700; color: var(--cor); }
+.rank-valor { font-weight: 700; font-variant-numeric: tabular-nums; }
+.rank-trilho { grid-column: 2 / -1; grid-row: 2; height: 6px; background: rgba(243, 247, 251, .1); }
+.rank-barra { display: block; height: 100%; background: var(--cor); }
+
+.grade-fichas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.ficha { border-top: 5px solid var(--cor); display: flex; flex-direction: column; gap: 12px; }
+.ficha-topo { display: flex; gap: 12px; align-items: center; }
+.ficha-id { flex: 1; min-width: 0; }
+.ficha-vd { font: 800 italic 2.4rem/1 var(--display); font-variant-numeric: tabular-nums; }
+.ficha-pers { font-size: .92rem; }
+.ficha-cats { display: grid; gap: 2px; }
+.ficha-cat { display: grid; grid-template-columns: 2em minmax(0, 1fr) auto; gap: 8px; padding-block: 4px; border-top: 1px solid var(--linha); font-size: .92rem; }
+.ficha-pos { color: var(--giz-suave); font-variant-numeric: tabular-nums; }
+.ficha-val { font-variant-numeric: tabular-nums; }
+.ficha-ouro .ficha-pos, .ficha-ouro .ficha-rot, .ficha-ouro .ficha-val { color: var(--bola); font-weight: 700; }
+.selos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.selo { font-size: .78rem; font-weight: 700; padding: 2px 8px; color: var(--quadra-funda); background: var(--cor); }
+.selo-zoeira { background: none; color: var(--giz-suave); outline: 1px dashed var(--giz-suave); outline-offset: -1px; }
+
+.bola { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--cor); color: var(--quadra-funda); font: 800 italic 1.4rem/1 var(--display); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .55), inset 5px -3px 0 rgba(13, 47, 83, .16); }
+.bola-zoeira { background: none; color: var(--giz-suave); box-shadow: inset 0 0 0 2px var(--giz-suave); }
+
+.grade-conquistas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.conquista { display: flex; gap: 12px; }
+.conquista-corpo { min-width: 0; }
+.conquista-dono { margin-top: 10px; font-weight: 700; }
+.conquista-valor { font: 800 italic 1.7rem/1.1 var(--display); color: var(--bola); }
+.conquista-zoeira .conquista-valor { color: var(--giz-suave); }
+.conquista-det { font-size: .8rem; }
+
+.tabela-rolagem { overflow-x: auto; border: 1px solid var(--linha); background: var(--quadra); }
+table { border-collapse: collapse; width: 100%; min-width: 680px; font-size: .95rem; }
+th, td { text-align: left; padding: 10px 14px; border-top: 1px solid var(--linha); }
+th { border-top: 0; font: 700 italic 1.05rem/1.2 var(--display); text-transform: uppercase; letter-spacing: .03em; color: var(--giz-suave); }
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.forte { font-weight: 700; }
+.dest { color: var(--cor); font-weight: 700; }
+
+.rodape { padding-block: 40px 48px; color: var(--giz-suave); font-size: .85rem; display: grid; gap: 6px; max-width: 75ch; }
+code { font-size: .95em; color: var(--giz); }
+
+@media (max-width: 900px) {
+  .abertura-grade { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .grade-ranks, .grade-conquistas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grade-fichas { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .grade-ranks, .grade-conquistas { grid-template-columns: minmax(0, 1fr); }
+  .cartao-largo { grid-column: auto; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<header class="abertura">
+  <svg class="linhas" viewBox="0 0 1200 500" preserveAspectRatio="none" aria-hidden="true">
+    <rect x="40" y="30" width="1120" height="440"/>
+    <path d="M40 90H1160M40 410H1160M300 90V410M900 90V410M300 250H900M600 30V470"/>
+  </svg>
+  <div class="moldura abertura-grade">
+    <p class="marca">Liga da Quadra <small>Mario Tennis Aces em duplas: Rebello, Pougy, Dana e Cohen</small></p>
+    <div>
+      <span class="mvp-rotulo">MVP da liga</span>
+      <h1 id="mvp-nome">…</h1>
+      <p id="mvp-frase">Carregando as partidas…</p>
+    </div>
+    <section class="placar-caixa" aria-label="Placar geral">
+      <h2>Placar do MVP</h2>
+      <ol id="placar"></ol>
+      <p class="metodo">Em cada categoria, o último colocado recebe um ponto e cada posição acima recebe um a mais. Empate divide os pontos, e todas as categorias pesam igual.</p>
+    </section>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Seções">
+  <ul class="moldura">
+    <li><a href="#s-rankings">Rankings</a></li>
+    <li><a href="#s-jogadores">Jogadores</a></li>
+    <li><a href="#s-conquistas">Conquistas</a></li>
+    <li><a href="#s-partidas">Partidas</a></li>
+  </ul>
+</nav>
+
+<main class="moldura">
+  <section class="secao" id="s-rankings">
+    <h2>Rankings</h2>
+    <p class="nota">Todas as estatísticas da tela de resultados, somadas em todas as partidas.</p>
+    <div class="grade-ranks" id="rankings"></div>
+  </section>
+
+  <section class="secao" id="s-jogadores">
+    <h2>Jogadores</h2>
+    <p class="nota">A posição de cada um em cada categoria, o retrospecto por personagem e as conquistas. Amarelo marca liderança.</p>
+    <div class="grade-fichas" id="fichas"></div>
+  </section>
+
+  <section class="secao" id="s-conquistas">
+    <h2>Conquistas</h2>
+    <p class="nota">Os títulos mudam de dono sozinhos quando alguém bate a marca em uma partida nova.</p>
+    <div class="grade-conquistas" id="conquistas"></div>
+  </section>
+
+  <section class="secao" id="s-partidas">
+    <h2>Partidas</h2>
+    <p class="nota">O número é o da foto da tela de resultados. Placar é a soma dos pontos de cada dupla, e destaque é quem mais pontuou.</p>
+    <div class="tabela-rolagem">
+      <table>
+        <thead><tr><th>Foto</th><th>Vencedores</th><th>Placar</th><th>Perdedores</th><th>Destaque</th></tr></thead>
+        <tbody id="partidas"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="rodape">
+    <p>Dados lidos das fotos das telas de resultado. Jogadores com 0 ponto não aparecem na barra de pontos do jogo, então esses zeros são deduzidos. Tratar o X como dano na raquete é uma interpretação.</p>
+    <p>Para registrar uma partida, acrescente quatro linhas em <code>partidas.csv</code> e recarregue a página.</p>
+  </footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
